@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pagebreak</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf9f7;
+    --surface: #ffffff;
+    --ink: #1c1b18;
+    --ink-mid: #6b6860;
+    --ink-dim: #b0ada6;
+    --ink-faint: #e8e5df;
+    --accent: #c2692a;
+    --accent-dim: rgba(194,105,42,0.1);
+    --accent-border: rgba(194,105,42,0.25);
+    --nudge-bg: #fdfcfa;
+    --nudge-border: #ede9e2;
+    --c-p: #b84a4a;
+    --c-a: #c2692a;
+    --c-s: #a06b1a;
+    --c-t: #2a7a4a;
+    --c-o: #2a5a8a;
+    --c-r: #6a3a9a;
+  }
+  .dark {
+    --bg: #141412;
+    --surface: #1c1b18;
+    --ink: #e8e4db;
+    --ink-mid: #968f84;
+    --ink-dim: #4a4740;
+    --ink-faint: #2a2825;
+    --nudge-bg: #181714;
+    --nudge-border: #2a2825;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: var(--bg); transition: background 0.4s; }
+  body { font-family: 'DM Sans', sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; overflow: hidden; }
+
+  /* ── Chrome ── */
+  .chrome {
+    position: fixed; top: 0; left: 0; right: 0; height: 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px;
+    background: var(--bg); border-bottom: 1px solid var(--ink-faint);
+    z-index: 100; transition: background 0.4s, border-color 0.4s, opacity 0.3s;
+    gap: 12px;
+  }
+
+  .chrome-left {
+    display: flex; align-items: center; gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .brand {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 14px; font-weight: 600; letter-spacing: -0.02em;
+    color: var(--ink); flex-shrink: 0;
+  }
+
+  .brand-mark {
+    width: 18px; height: 18px; background: var(--accent);
+    border-radius: 4px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .brand-mark svg { width: 10px; height: 10px; }
+
+  /* Inline post title — subtle, sits next to brand */
+  .post-title-inline {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 400;
+    color: var(--ink-dim); background: none; border: none; outline: none;
+    width: 220px; max-width: 30vw;
+    transition: color 0.2s;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .post-title-inline::placeholder { color: var(--ink-dim); }
+  .post-title-inline:focus { color: var(--ink-mid); }
+
+  /* Separator */
+  .chrome-sep {
+    width: 1px; height: 16px; background: var(--ink-faint); flex-shrink: 0;
+  }
+
+  .chrome-right {
+    display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+  }
+
+  .word-count {
+    font-size: 12px; font-weight: 500; color: var(--ink-dim);
+    font-variant-numeric: tabular-nums; min-width: 54px; text-align: right;
+    transition: color 0.3s;
+  }
+  .word-count.milestone { color: var(--accent); }
+
+  .icon-btn {
+    width: 30px; height: 30px;
+    border: 1px solid var(--ink-faint); border-radius: 6px;
+    background: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--ink-mid);
+    transition: all 0.15s;
+  }
+  .icon-btn:hover { background: var(--ink-faint); color: var(--ink); }
+  .icon-btn.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* ── Layout ── */
+  .writing-area {
+    position: fixed; top: 48px; left: 0; right: 0; bottom: 0;
+    display: flex; overflow: hidden;
+  }
+
+  /* ── Editor ── */
+  .editor-wrap {
+    flex: 1; overflow-y: auto; padding: 56px 0 120px;
+  }
+  .editor-wrap::-webkit-scrollbar { width: 3px; }
+  .editor-wrap::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
+
+  .editor-inner { max-width: 640px; margin: 0 auto; padding: 0 36px; }
+
+  .title-divider { height: 1px; background: var(--ink-faint); margin-bottom: 28px; transition: background 0.3s; }
+
+  .editor {
+    font-family: 'Lora', serif;
+    font-size: 18px; font-weight: 400; line-height: 1.9;
+    color: var(--ink); background: none; border: none; outline: none;
+    width: 100%; min-height: calc(100vh - 220px);
+    resize: none; caret-color: var(--accent);
+    transition: color 0.3s; letter-spacing: 0.005em;
+  }
+  .editor::placeholder { color: var(--ink-dim); font-style: italic; font-family: 'Lora', serif; }
+
+  /* ── Nudge panel ── */
+  .nudge-panel {
+    width: 272px; flex-shrink: 0;
+    border-left: 1px solid var(--ink-faint);
+    background: var(--nudge-bg);
+    display: flex; flex-direction: column; overflow: hidden;
+    transition: width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s, border-color 0.4s;
+  }
+  .nudge-panel.hidden { width: 0; opacity: 0; border-left-width: 0; }
+
+  .nudge-header {
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid var(--nudge-border); flex-shrink: 0;
+  }
+  .nudge-header-label {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.14em; color: var(--ink-dim); margin-bottom: 3px;
+  }
+  .nudge-header-sub {
+    font-size: 11px; color: var(--ink-mid); line-height: 1.4;
+  }
+
+  /* 3 nudge cards */
+  .nudge-cards {
+    flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 8px;
+    overflow: hidden; /* exactly 3, no scroll needed */
+  }
+
+  .nudge-card {
+    flex: 1; /* each card fills 1/3 of space */
+    background: var(--surface);
+    border: 1px solid var(--nudge-border);
+    border-radius: 10px; padding: 12px 14px;
+    cursor: pointer; transition: all 0.18s ease;
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+
+  /* Left accent bar */
+  .nudge-card::before {
+    content: ""; position: absolute;
+    left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: 10px 0 0 10px;
+    opacity: 0; transition: opacity 0.18s;
+  }
+  .nudge-card:hover { transform: translateX(2px); }
+  .nudge-card:hover::before { opacity: 1; }
+
+  .nudge-card[data-step="P"]::before { background: var(--c-p); }
+  .nudge-card[data-step="A"]::before { background: var(--c-a); }
+  .nudge-card[data-step="S"]::before { background: var(--c-s); }
+  .nudge-card[data-step="T"]::before { background: var(--c-t); }
+  .nudge-card[data-step="O"]::before { background: var(--c-o); }
+  .nudge-card[data-step="R"]::before { background: var(--c-r); }
+
+  .nudge-card[data-step="P"]:hover { border-color: rgba(184,74,74,0.3); }
+  .nudge-card[data-step="A"]:hover { border-color: rgba(194,105,42,0.3); }
+  .nudge-card[data-step="S"]:hover { border-color: rgba(160,107,26,0.3); }
+  .nudge-card[data-step="T"]:hover { border-color: rgba(42,122,74,0.3); }
+  .nudge-card[data-step="O"]:hover { border-color: rgba(42,90,138,0.3); }
+  .nudge-card[data-step="R"]:hover { border-color: rgba(106,58,154,0.3); }
+
+  .nudge-step {
+    font-size: 9px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    flex-shrink: 0;
+  }
+  .nudge-step[data-step="P"] { color: var(--c-p); }
+  .nudge-step[data-step="A"] { color: var(--c-a); }
+  .nudge-step[data-step="S"] { color: var(--c-s); }
+  .nudge-step[data-step="T"] { color: var(--c-t); }
+  .nudge-step[data-step="O"] { color: var(--c-o); }
+  .nudge-step[data-step="R"] { color: var(--c-r); }
+
+  .nudge-text {
+    font-size: 11.5px; line-height: 1.55;
+    color: var(--ink-mid); font-family: 'DM Sans', sans-serif;
+    flex: 1;
+  }
+
+  .nudge-insert {
+    display: none; font-size: 10px; font-weight: 600;
+    border: none; border-radius: 5px; padding: 3px 8px;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s; align-self: flex-start; flex-shrink: 0;
+  }
+  .nudge-card:hover .nudge-insert { display: block; }
+
+  .nudge-card[data-step="P"] .nudge-insert { background: rgba(184,74,74,0.1); color: var(--c-p); }
+  .nudge-card[data-step="A"] .nudge-insert { background: rgba(194,105,42,0.1); color: var(--c-a); }
+  .nudge-card[data-step="S"] .nudge-insert { background: rgba(160,107,26,0.1); color: var(--c-s); }
+  .nudge-card[data-step="T"] .nudge-insert { background: rgba(42,122,74,0.1); color: var(--c-t); }
+  .nudge-card[data-step="O"] .nudge-insert { background: rgba(42,90,138,0.1); color: var(--c-o); }
+  .nudge-card[data-step="R"] .nudge-insert { background: rgba(106,58,154,0.1); color: var(--c-r); }
+
+  /* Footer */
+  .nudge-footer {
+    padding: 10px 12px;
+    border-top: 1px solid var(--nudge-border); flex-shrink: 0;
+  }
+  .btn-refresh {
+    width: 100%; padding: 8px;
+    background: none; border: 1px dashed var(--nudge-border);
+    border-radius: 7px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 11px;
+    font-weight: 500; color: var(--ink-dim);
+    transition: all 0.15s; letter-spacing: 0.02em;
+  }
+  .btn-refresh:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-dim); }
+
+  /* ── Celebration ── */
+  .celebration {
+    position: fixed; top: 62px; left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    background: var(--ink); color: var(--bg);
+    font-size: 13px; font-weight: 500;
+    padding: 8px 18px; border-radius: 20px;
+    opacity: 0; pointer-events: none; z-index: 300;
+    transition: opacity 0.3s, transform 0.3s;
+    white-space: nowrap; letter-spacing: -0.01em;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  }
+  .celebration.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Stuck bar ── */
+  .stuck-bar {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    background: var(--surface); border: 1px solid var(--nudge-border);
+    border-radius: 12px; padding: 9px 16px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    font-size: 12px; color: var(--ink-mid);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s, transform 0.4s;
+    z-index: 200; white-space: nowrap;
+  }
+  .stuck-bar.show { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
+
+  .stuck-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+
+  .stuck-btn {
+    font-size: 11px; font-weight: 600; border: none;
+    border-radius: 6px; padding: 4px 10px;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; transition: filter 0.15s;
+  }
+  .stuck-btn.primary { background: var(--accent); color: #fff; }
+  .stuck-btn.primary:hover { filter: brightness(1.1); }
+  .stuck-btn.ghost { background: var(--ink-faint); color: var(--ink-mid); }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; bottom: 20px; right: 20px;
+    font-size: 12px; font-weight: 500; color: var(--ink-mid);
+    background: var(--surface); border: 1px solid var(--ink-faint);
+    border-radius: 7px; padding: 6px 12px;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 300;
+  }
+  .toast.show { opacity: 1; }
+
+  /* ── Focus overlay ── */
+  .focus-overlay {
+    position: fixed; inset: 0; z-index: 50;
+    background: var(--bg); opacity: 0;
+    pointer-events: none; transition: opacity 0.5s;
+  }
+  .focus-overlay.on { opacity: 0.9; pointer-events: all; }
+
+  @media (max-width: 700px) {
+    .nudge-panel { display: none; }
+    .editor-inner { padding: 0 20px; }
+    .post-title-inline { max-width: 120px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="focus-overlay" id="focusOverlay"></div>
+
+<!-- Chrome -->
+<div class="chrome" id="chrome">
+  <div class="chrome-left">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 10 10" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round">
+          <path d="M1 8 L5 1 L9 8 M2.5 6 H7.5"/>
+        </svg>
+      </div>
+      Pagebreak
+    </div>
+    <div class="chrome-sep"></div>
+    <input class="post-title-inline" id="postTitleInline" type="text"
+      placeholder="Untitled post…" maxlength="80" oninput="onType()" />
+  </div>
+  <div class="chrome-right">
+    <span class="word-count" id="wordCount">0 words</span>
+    <button class="icon-btn" id="btnDark" title="Dark mode" onclick="toggleDark()">🌙</button>
+    <button class="icon-btn" id="btnNudge" title="Toggle nudges (💡)" onclick="toggleNudge()">💡</button>
+    <button class="icon-btn" id="btnFocus" title="Focus mode (⌘↵)" onclick="toggleFocus()">⊙</button>
+    <button class="icon-btn" title="Copy all text" onclick="copyText()">⎘</button>
+  </div>
+</div>
+
+<!-- Writing area -->
+<div class="writing-area">
+
+  <div class="editor-wrap">
+    <div class="editor-inner">
+      <div class="title-divider"></div>
+      <textarea class="editor" id="editor"
+        placeholder="Start writing…"
+        oninput="onType()"
+        onkeydown="handleTab(event)"></textarea>
+    </div>
+  </div>
+
+  <!-- Nudge panel — 3 cards -->
+  <div class="nudge-panel" id="nudgePanel">
+    <div class="nudge-header">
+      <div class="nudge-header-label">PASTOR Nudges</div>
+      <div class="nudge-header-sub" id="nudgeSub">Three prompts to get you moving.</div>
+    </div>
+    <div class="nudge-cards" id="nudgeCards"></div>
+    <div class="nudge-footer">
+      <button class="btn-refresh" onclick="refreshNudges()">↻ &nbsp;Shuffle nudges</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Celebration -->
+<div class="celebration" id="celebration"></div>
+
+<!-- Stuck bar -->
+<div class="stuck-bar" id="stuckBar">
+  <div class="stuck-dot"></div>
+  Stuck? Try a nudge.
+  <button class="stuck-btn primary" onclick="openNudges()">Show nudges 💡</button>
+  <button class="stuck-btn ghost" onclick="dismissStuck()">Dismiss</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════
+// PASTOR NUDGE BANK — 30 prompts
+// ══════════════════════════════════
+const ALL_NUDGES = [
+  { step:'P', label:'Problem',    text:'What\'s the exact problem your reader woke up with today? Name it plainly — no jargon.' },
+  { step:'P', label:'Problem',    text:'What would your reader Google at 11pm when they\'re frustrated? That search is your opening line.' },
+  { step:'P', label:'Problem',    text:'Describe the moment someone realises something isn\'t working. What are they feeling right then?' },
+  { step:'P', label:'Problem',    text:'Write the cost of NOT solving this problem — time, money, stress. Make it specific.' },
+  { step:'P', label:'Problem',    text:'Start with "Most people think…" then flip it. That flip IS the problem.' },
+
+  { step:'A', label:'Amplify',    text:'Fast-forward 6 months. What does their life look like if nothing changes? Write that scene.' },
+  { step:'A', label:'Amplify',    text:'What\'s the hidden cost — the thing they haven\'t even counted yet? Name the thing under the thing.' },
+  { step:'A', label:'Amplify',    text:'Zoom in: what does this problem look like on a typical Tuesday for your reader?' },
+  { step:'A', label:'Amplify',    text:'Write the emotional weight of this problem — not the practical cost, the feeling of carrying it.' },
+  { step:'A', label:'Amplify',    text:'What has your reader already tried? Why didn\'t it work? Show you understand their history.' },
+
+  { step:'S', label:'Solution',   text:'Introduce your solution in one sentence — like you\'re telling a smart friend who\'s never heard of it.' },
+  { step:'S', label:'Solution',   text:'Break your solution into 3 clear steps. What does the reader actually do?' },
+  { step:'S', label:'Solution',   text:'What makes your approach different from everything they\'ve already tried? Don\'t be modest.' },
+  { step:'S', label:'Solution',   text:'What\'s the fastest win your reader could get from this? Lead with that.' },
+  { step:'S', label:'Solution',   text:'Use an analogy: "This is like [familiar thing] but for [their problem]." Build a paragraph around it.' },
+
+  { step:'T', label:'Testimony',  text:'Write a before-and-after story. Where was someone before this solution? Where are they now?' },
+  { step:'T', label:'Testimony',  text:'Share your own experience — the messy, honest version. When did you finally crack this?' },
+  { step:'T', label:'Testimony',  text:'What would your reader say to a friend after this worked for them? Write that word-of-mouth moment.' },
+  { step:'T', label:'Testimony',  text:'What\'s the most surprising result someone got from this? The one that still makes you smile?' },
+  { step:'T', label:'Testimony',  text:'Describe the transformation in sensory terms — what does life feel, look, or sound like after?' },
+
+  { step:'O', label:'Offer',      text:'What is the reader getting, exactly? List it plainly — no fluff, no padding.' },
+  { step:'O', label:'Offer',      text:'What\'s the one sentence that removes all hesitation? Write the no-brainer.' },
+  { step:'O', label:'Offer',      text:'Address the biggest objection head-on. What\'s the reason someone would say no — and why is that wrong?' },
+  { step:'O', label:'Offer',      text:'Why is now the right time to act? What makes this moment different from 6 months ago?' },
+  { step:'O', label:'Offer',      text:'What does the reader lose by waiting? Write the cost of inaction in concrete terms.' },
+
+  { step:'R', label:'Response',   text:'What\'s the ONE thing you want your reader to do right now? A single, clear instruction.' },
+  { step:'R', label:'Response',   text:'Write your CTA like you\'re talking to one specific person — "Here\'s what to do next…"' },
+  { step:'R', label:'Response',   text:'Make the next step feel tiny. What\'s the smallest possible action that starts the journey?' },
+  { step:'R', label:'Response',   text:'End with a question that invites a reply. Conversation is the goal, not just consumption.' },
+  { step:'R', label:'Response',   text:'Write a closing line that leaves the reader feeling capable, not overwhelmed.' },
+];
+
+const STEPS = ['P','A','S','T','O','R'];
+const CELEBRATIONS = [
+  '100 words ✦', '200 words. You\'re in the zone →',
+  '300 words. This is good ✦', '400 words. Keep going →',
+  '500 words ✦ Halfway there.', '600 words. Unstoppable →',
+  '700 words ✦', '800 words →', '900 words ✦',
+  '1000 words. 🎉 Legendary.',
+];
+
+// ── State ──
+let isDark = false, nudgeVisible = true, focusMode = false;
+let stuckTimer = null, stuckShown = false;
+let lastMilestone = 0;
+let currentNudges = [];
+let usedIndices = { P:[], A:[], S:[], T:[], O:[], R:[] };
+
+// ── Init ──
+window.addEventListener('DOMContentLoaded', () => {
+  loadDoc();
+  pickNudges();
+  setInterval(silentSave, 20000);
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey||e.ctrlKey) && e.key === 's') { e.preventDefault(); silentSave(); showToast('Saved ✓'); }
+    if ((e.metaKey||e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); toggleFocus(); }
+  });
+});
+
+// ══════════════════════════════════
+// NUDGE LOGIC — 3 balanced cards
+// ══════════════════════════════════
+function pickNudges() {
+  // Pick 3 nudges, one each from 3 different randomly-chosen steps
+  // Rotate through steps so repeats are avoided
+  const stepOrder = [...STEPS].sort(() => Math.random() - 0.5);
+  const picked = [];
+
+  for (const step of stepOrder) {
+    if (picked.length === 3) break;
+    const pool = ALL_NUDGES
+      .map((n, i) => ({ ...n, i }))
+      .filter(n => n.step === step && !usedIndices[step].includes(n.i));
+
+    if (pool.length === 0) {
+      // Reset used for this step
+      usedIndices[step] = [];
+      const full = ALL_NUDGES.map((n,i)=>({...n,i})).filter(n=>n.step===step);
+      const pick = full[Math.floor(Math.random() * full.length)];
+      usedIndices[step].push(pick.i);
+      picked.push(pick);
+    } else {
+      const pick = pool[Math.floor(Math.random() * pool.length)];
+      usedIndices[step].push(pick.i);
+      picked.push(pick);
+    }
+  }
+
+  currentNudges = picked;
+  renderNudges();
+}
+
+function refreshNudges() {
+  const cards = document.getElementById('nudgeCards');
+  cards.style.opacity = '0.3';
+  cards.style.transform = 'translateX(4px)';
+  setTimeout(() => {
+    pickNudges();
+    cards.style.transition = 'opacity 0.25s, transform 0.25s';
+    cards.style.opacity = '1';
+    cards.style.transform = 'translateX(0)';
+    setTimeout(() => { cards.style.transition = ''; }, 300);
+  }, 160);
+}
+
+function renderNudges() {
+  document.getElementById('nudgeCards').innerHTML = currentNudges.map((n, i) => `
+    <div class="nudge-card" data-step="${n.step}" onclick="focusEditor()">
+      <div class="nudge-step" data-step="${n.step}">${n.step} — ${n.label}</div>
+      <div class="nudge-text">${n.text}</div>
+      <button class="nudge-insert" onclick="event.stopPropagation(); insertNudge(${i})">↳ Use as prompt</button>
+    </div>
+  `).join('');
+
+  // Update subtitle
+  const words = getWordCount();
+  const sub = document.getElementById('nudgeSub');
+  if (words === 0)       sub.textContent = 'Pick one that speaks to you →';
+  else if (words < 150)  sub.textContent = 'Good start. What\'s the next section?';
+  else if (words < 400)  sub.textContent = 'Nice momentum — keep building.';
+  else                   sub.textContent = 'You\'re flowing. Need a push?';
+}
+
+function insertNudge(i) {
+  const n = currentNudges[i];
+  const editor = document.getElementById('editor');
+  const val = editor.value, pos = editor.selectionStart;
+  const prefix = val.length > 0 ? (val.endsWith('\n\n') ? '' : val.endsWith('\n') ? '\n' : '\n\n') : '';
+  const insert = prefix + '[ ' + n.step + ' — ' + n.label + ': ' + n.text + ' ]\n\n';
+  editor.value = val.slice(0, pos) + insert + val.slice(pos);
+  editor.selectionStart = editor.selectionEnd = pos + insert.length;
+  editor.focus();
+  onType();
+}
+
+function focusEditor() { document.getElementById('editor').focus(); }
+
+// ══════════════════════════════════
+// TYPING + WORD COUNT
+// ══════════════════════════════════
+function onType() {
+  updateWordCount();
+  resetStuckTimer();
+  clearTimeout(onType._t);
+  onType._t = setTimeout(silentSave, 5000);
+}
+
+function getWordCount() {
+  const full = (
+    document.getElementById('postTitleInline').value + ' ' +
+    document.getElementById('editor').value
+  ).trim();
+  return full ? full.split(/\s+/).filter(w => w.length > 0).length : 0;
+}
+
+function updateWordCount() {
+  const words = getWordCount();
+  const el = document.getElementById('wordCount');
+  el.textContent = words + ' word' + (words !== 1 ? 's' : '');
+
+  const milestone = Math.floor(words / 100);
+  if (milestone > lastMilestone && words > 0) {
+    lastMilestone = milestone;
+    const msg = CELEBRATIONS[Math.min(milestone - 1, CELEBRATIONS.length - 1)];
+    celebrate(msg);
+  }
+}
+
+function celebrate(msg) {
+  const el = document.getElementById('celebration');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(celebrate._t);
+  celebrate._t = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+function handleTab(e) {
+  if (e.key !== 'Tab') return;
+  e.preventDefault();
+  const el = e.target, s = el.selectionStart;
+  el.value = el.value.slice(0, s) + '    ' + el.value.slice(el.selectionEnd);
+  el.selectionStart = el.selectionEnd = s + 4;
+  onType();
+}
+
+// ══════════════════════════════════
+// STUCK DETECTOR
+// ══════════════════════════════════
+function resetStuckTimer() {
+  stuckShown = false;
+  document.getElementById('stuckBar').classList.remove('show');
+  clearTimeout(stuckTimer);
+  if (getWordCount() < 5) return;
+  stuckTimer = setTimeout(() => {
+    stuckShown = true;
+    document.getElementById('stuckBar').classList.add('show');
+  }, 75000);
+}
+
+function dismissStuck() {
+  document.getElementById('stuckBar').classList.remove('show');
+  stuckShown = true;
+}
+
+function openNudges() {
+  dismissStuck();
+  if (!nudgeVisible) { nudgeVisible = false; toggleNudge(); }
+  refreshNudges();
+}
+
+// ══════════════════════════════════
+// TOGGLES
+// ══════════════════════════════════
+function toggleDark() {
+  isDark = !isDark;
+  document.body.classList.toggle('dark', isDark);
+  document.getElementById('btnDark').textContent = isDark ? '☀️' : '🌙';
+  document.getElementById('btnDark').classList.toggle('on', isDark);
+  localStorage.setItem('pb_dark', isDark);
+}
+
+function toggleNudge() {
+  nudgeVisible = !nudgeVisible;
+  document.getElementById('nudgePanel').classList.toggle('hidden', !nudgeVisible);
+  document.getElementById('btnNudge').classList.toggle('on', nudgeVisible);
+}
+
+let focusChromeTimer = null;
+function toggleFocus() {
+  focusMode = !focusMode;
+  document.getElementById('focusOverlay').classList.toggle('on', focusMode);
+  document.getElementById('btnFocus').classList.toggle('on', focusMode);
+  const chrome = document.getElementById('chrome');
+  if (focusMode) {
+    chrome.style.opacity = '0'; chrome.style.pointerEvents = 'none';
+    document.getElementById('editor').focus();
+    document.addEventListener('mousemove', onFocusMove);
+  } else {
+    chrome.style.opacity = '1'; chrome.style.pointerEvents = '';
+    document.removeEventListener('mousemove', onFocusMove);
+  }
+}
+
+function onFocusMove(e) {
+  const chrome = document.getElementById('chrome');
+  if (e.clientY < 56) {
+    chrome.style.opacity = '1'; chrome.style.pointerEvents = 'all';
+    clearTimeout(focusChromeTimer);
+    focusChromeTimer = setTimeout(() => {
+      if (focusMode) { chrome.style.opacity = '0'; chrome.style.pointerEvents = 'none'; }
+    }, 2200);
+  }
+}
+
+// ══════════════════════════════════
+// SAVE / LOAD / EXPORT
+// ══════════════════════════════════
+function silentSave() {
+  localStorage.setItem('pb_v3', JSON.stringify({
+    title: document.getElementById('postTitleInline').value,
+    body:  document.getElementById('editor').value,
+    isDark,
+  }));
+}
+
+function loadDoc() {
+  try {
+    const raw = localStorage.getItem('pb_v3');
+    if (raw) {
+      const d = JSON.parse(raw);
+      if (d.title) document.getElementById('postTitleInline').value = d.title;
+      if (d.body)  document.getElementById('editor').value = d.body;
+      updateWordCount();
+    }
+    if (localStorage.getItem('pb_dark') === 'true') { isDark = false; toggleDark(); }
+  } catch(e) {}
+}
+
+function copyText() {
+  const title = document.getElementById('postTitleInline').value;
+  const body  = document.getElementById('editor').value;
+  navigator.clipboard.writeText((title ? '# ' + title + '\n\n' : '') + body)
+    .then(() => showToast('Copied to clipboard ✓'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove('show'), 2000);
+}
+</script>
+</body>
+</html>
