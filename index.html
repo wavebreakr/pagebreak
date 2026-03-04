@@ -144,9 +144,17 @@
     color: var(--ink-dim); font-style: italic; pointer-events: none;
   }
 
-  /* Paragraph spacing */
-  .editor p { margin-bottom: 0.75em; }
-  .editor p:last-child { margin-bottom: 0; }
+  /* Paragraph spacing — browsers use both p and div in contenteditable */
+  .editor p,
+  .editor div {
+    margin-bottom: 1.15em;
+    min-height: 1em;
+  }
+  .editor p:last-child,
+  .editor div:last-child { margin-bottom: 0; }
+
+  /* Shift+Enter line breaks stay tight — no extra gap */
+  .editor br { display: block; margin-bottom: 0; }
 
   /* Bullet points */
   .editor ul {
@@ -183,19 +191,32 @@
     padding: 16px 16px 12px;
     border-bottom: 1px solid var(--nudge-border); flex-shrink: 0;
   }
+  .nudge-header-top {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px;
+  }
   .nudge-header-label {
     font-size: 10px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.14em; color: var(--ink-dim); margin-bottom: 3px;
+    letter-spacing: 0.14em; color: var(--ink-dim);
   }
+  .nudge-info-btn {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 1px solid var(--ink-dim); background: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: var(--ink-dim);
+    font-family: 'DM Sans', sans-serif; letter-spacing: 0;
+    transition: all 0.15s; flex-shrink: 0; line-height: 1;
+  }
+  .nudge-info-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
   .nudge-header-sub { font-size: 11px; color: var(--ink-mid); line-height: 1.4; }
 
   .nudge-cards {
     flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 8px;
-    overflow: hidden;
+    overflow-y: auto; align-content: flex-start;
   }
+  .nudge-cards::-webkit-scrollbar { width: 2px; }
+  .nudge-cards::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
 
   .nudge-card {
-    flex: 1;
     background: var(--surface); border: 1px solid var(--nudge-border);
     border-radius: 10px; padding: 12px 14px;
     cursor: pointer; transition: all 0.18s ease;
@@ -238,7 +259,7 @@
 
   .nudge-text {
     font-size: 11.5px; line-height: 1.55;
-    color: var(--ink-mid); font-family: 'DM Sans', sans-serif; flex: 1;
+    color: var(--ink-mid); font-family: 'DM Sans', sans-serif;
   }
 
   .nudge-insert {
@@ -267,6 +288,77 @@
     color: var(--ink-dim); transition: all 0.15s; letter-spacing: 0.02em;
   }
   .btn-refresh:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-dim); }
+
+  /* ── PASTOR modal ── */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 400;
+    background: rgba(0,0,0,0.35);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s ease;
+    backdrop-filter: blur(2px);
+  }
+  .modal-backdrop.show { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface); border-radius: 14px;
+    width: min(480px, 90vw); max-height: 80vh;
+    overflow-y: auto; padding: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    transform: translateY(8px) scale(0.98);
+    transition: transform 0.2s ease;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .modal-backdrop.show .modal { transform: translateY(0) scale(1); }
+  .modal::-webkit-scrollbar { width: 3px; }
+  .modal::-webkit-scrollbar-thumb { background: var(--ink-faint); }
+
+  .modal-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 18px; gap: 12px;
+  }
+  .modal-title {
+    font-size: 16px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink);
+  }
+  .modal-subtitle {
+    font-size: 12px; color: var(--ink-mid); margin-top: 3px; line-height: 1.4;
+  }
+  .modal-close {
+    width: 28px; height: 28px; border-radius: 6px;
+    border: 1px solid var(--ink-faint); background: none;
+    cursor: pointer; font-size: 16px; color: var(--ink-mid);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .modal-close:hover { background: var(--ink-faint); color: var(--ink); }
+
+  .pastor-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
+  .pastor-step-row {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 11px 13px; border-radius: 9px;
+    border: 1px solid var(--nudge-border);
+    background: var(--nudge-bg);
+  }
+  .pastor-step-letter {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.02em;
+    width: 20px; flex-shrink: 0; padding-top: 1px;
+  }
+  .pastor-step-info { flex: 1; }
+  .pastor-step-name {
+    font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 2px;
+  }
+  .pastor-step-desc { font-size: 11.5px; color: var(--ink-mid); line-height: 1.5; }
+
+  .modal-why {
+    padding: 14px; border-radius: 9px;
+    background: var(--accent-dim); border: 1px solid var(--accent-border);
+  }
+  .modal-why-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--accent); margin-bottom: 6px;
+  }
+  .modal-why-text { font-size: 12px; color: var(--ink-mid); line-height: 1.6; }
 
   /* ── Celebration ── */
   .celebration {
@@ -394,7 +486,10 @@
   <!-- Nudge panel -->
   <div class="nudge-panel" id="nudgePanel">
     <div class="nudge-header">
-      <div class="nudge-header-label">PASTOR Nudges</div>
+      <div class="nudge-header-top">
+        <div class="nudge-header-label">PASTOR Nudges</div>
+        <button class="nudge-info-btn" onclick="openModal()" title="What is PASTOR?">i</button>
+      </div>
       <div class="nudge-header-sub" id="nudgeSub">Pick one that speaks to you →</div>
     </div>
     <div class="nudge-cards" id="nudgeCards"></div>
@@ -415,10 +510,88 @@
   <button class="stuck-btn ghost" onclick="dismissStuck()">Dismiss</button>
 </div>
 
+<!-- PASTOR Modal -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModalOnBackdrop(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">The PASTOR Framework</div>
+        <div class="modal-subtitle">A copywriting formula for content that actually converts</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+
+    <div class="pastor-steps">
+      <div class="pastor-step-row">
+        <div class="pastor-step-letter" style="color:var(--c-p)">P</div>
+        <div class="pastor-step-info">
+          <div class="pastor-step-name">Problem</div>
+          <div class="pastor-step-desc">Identify and name the exact pain your reader is experiencing. Be specific — the more precisely you describe their problem, the more they feel understood.</div>
+        </div>
+      </div>
+      <div class="pastor-step-row">
+        <div class="pastor-step-letter" style="color:var(--c-a)">A</div>
+        <div class="pastor-step-info">
+          <div class="pastor-step-name">Amplify</div>
+          <div class="pastor-step-desc">Deepen the stakes. What happens if they do nothing? Show the real cost — emotional, financial, or practical — of leaving the problem unsolved.</div>
+        </div>
+      </div>
+      <div class="pastor-step-row">
+        <div class="pastor-step-letter" style="color:var(--c-s)">S</div>
+        <div class="pastor-step-info">
+          <div class="pastor-step-name">Solution</div>
+          <div class="pastor-step-desc">Introduce your answer. Present it clearly and simply, explaining what makes your approach different from what they've already tried.</div>
+        </div>
+      </div>
+      <div class="pastor-step-row">
+        <div class="pastor-step-letter" style="color:var(--c-t)">T</div>
+        <div class="pastor-step-info">
+          <div class="pastor-step-name">Testimony</div>
+          <div class="pastor-step-desc">Prove it works. Share a before-and-after story — your own or someone else's. Real transformation, told honestly, builds trust faster than any claim.</div>
+        </div>
+      </div>
+      <div class="pastor-step-row">
+        <div class="pastor-step-letter" style="color:var(--c-o)">O</div>
+        <div class="pastor-step-info">
+          <div class="pastor-step-name">Offer</div>
+          <div class="pastor-step-desc">Make it irresistible. Spell out exactly what the reader gets, address their biggest objection, and remove any reason to hesitate.</div>
+        </div>
+      </div>
+      <div class="pastor-step-row">
+        <div class="pastor-step-letter" style="color:var(--c-r)">R</div>
+        <div class="pastor-step-info">
+          <div class="pastor-step-name">Response</div>
+          <div class="pastor-step-desc">Ask for one clear action. A single, specific next step — small enough to feel easy, clear enough to act on immediately.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-why">
+      <div class="modal-why-label">Why it works</div>
+      <div class="modal-why-text">PASTOR works because it mirrors how people actually make decisions — they feel a pain, they imagine it getting worse, they look for a solution, they need to trust it, then they act. Writing that follows this sequence doesn't feel like marketing. It feels like someone finally gets it.</div>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
+// ══════════════════════════════════
+// PASTOR MODAL
+// ══════════════════════════════════
+function openModal() {
+  document.getElementById('modalBackdrop').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('show');
+}
+function closeModalOnBackdrop(e) {
+  if (e.target === document.getElementById('modalBackdrop')) closeModal();
+}
+// Escape key closes modal
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
 // ══════════════════════════════════
 // PASTOR NUDGE BANK
 // ══════════════════════════════════
@@ -495,6 +668,9 @@ window.addEventListener('DOMContentLoaded', () => {
       // Undo / Redo are handled natively by contenteditable — no need to intercept
     }
   });
+
+  // Force <p> on Enter (not <div>) for consistent paragraph spacing
+  document.execCommand('defaultParagraphSeparator', false, 'p');
 
   // Bullet transform: "- " at start of line → bullet list item
   editor.addEventListener('keydown', e => {
