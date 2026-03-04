@@ -431,8 +431,80 @@
     padding: 1px 5px; font-size: 10px; color: var(--ink-mid);
   }
 
+  /* ── Posts sidebar ── */
+  .posts-panel {
+    width: 220px; flex-shrink: 0;
+    border-right: 1px solid var(--ink-faint);
+    background: var(--nudge-bg);
+    display: flex; flex-direction: column; overflow: hidden;
+    transition: width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s, border-color 0.4s;
+    order: -1;
+  }
+  .posts-panel.hidden { width: 0; opacity: 0; border-right-width: 0; }
+
+  .posts-panel-header {
+    padding: 16px 14px 12px;
+    border-bottom: 1px solid var(--nudge-border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .posts-panel-label {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.14em; color: var(--ink-dim);
+  }
+
+  .posts-list {
+    flex: 1; overflow-y: auto;
+    padding: 8px; display: flex; flex-direction: column; gap: 3px;
+  }
+  .posts-list::-webkit-scrollbar { width: 2px; }
+  .posts-list::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
+
+  .post-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 7px;
+    cursor: pointer; transition: all 0.15s;
+    position: relative;
+  }
+  .post-row:hover { background: var(--ink-faint); }
+  .post-row.active { background: var(--accent-dim); }
+
+  .post-row-info { flex: 1; min-width: 0; }
+  .post-row-title {
+    font-size: 12.5px; font-weight: 500; color: var(--ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    letter-spacing: -0.01em; line-height: 1.3;
+  }
+  .post-row.active .post-row-title { color: var(--accent); }
+  .post-row-meta { font-size: 10.5px; color: var(--ink-dim); margin-top: 2px; }
+
+  .post-row-delete {
+    width: 20px; height: 20px; border-radius: 4px;
+    border: none; background: none; cursor: pointer;
+    color: var(--ink-dim); font-size: 13px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: all 0.15s; flex-shrink: 0;
+  }
+  .post-row:hover .post-row-delete { opacity: 1; }
+  .post-row-delete:hover { background: rgba(184,74,74,0.12); color: var(--c-p); }
+
+  .posts-panel-footer {
+    padding: 10px; border-top: 1px solid var(--nudge-border); flex-shrink: 0;
+  }
+  .btn-new-post {
+    width: 100%; padding: 7px;
+    background: none; border: 1px dashed var(--nudge-border);
+    border-radius: 7px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+    color: var(--ink-dim); transition: all 0.15s; letter-spacing: 0.02em;
+  }
+  .btn-new-post:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-dim); }
+
+  /* Brand — not clickable */
+  .brand { user-select: none; }
+
   @media (max-width: 700px) {
     .nudge-panel { display: none; }
+    .posts-panel { display: none; }
     .editor-inner { padding: 0 20px; }
     .post-title-inline { max-width: 120px; }
   }
@@ -451,6 +523,14 @@
       </div>
       Pagebreak
     </div>
+    <button class="icon-btn" id="btnPosts" title="All posts" onclick="togglePostsScreen()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+        <rect x="2" y="2" width="5" height="6" rx="1"/>
+        <rect x="9" y="2" width="5" height="6" rx="1"/>
+        <rect x="2" y="10" width="5" height="4" rx="1"/>
+        <rect x="9" y="10" width="5" height="4" rx="1"/>
+      </svg>
+    </button>
     <div class="chrome-sep"></div>
     <input class="post-title-inline" id="postTitleInline" type="text"
       placeholder="Untitled post…" maxlength="80" oninput="onType()" />
@@ -471,6 +551,18 @@
 
 <!-- Writing area -->
 <div class="writing-area">
+
+  <!-- Posts sidebar -->
+  <div class="posts-panel hidden" id="postsPanel">
+    <div class="posts-panel-header">
+      <div class="posts-panel-label">Posts</div>
+    </div>
+    <div class="posts-list" id="postsList"></div>
+    <div class="posts-panel-footer">
+      <button class="btn-new-post" onclick="newPost()">+ New post</button>
+    </div>
+  </div>
+
   <div class="editor-wrap">
     <div class="editor-inner">
       <div
@@ -589,8 +681,13 @@ function closeModal() {
 function closeModalOnBackdrop(e) {
   if (e.target === document.getElementById('modalBackdrop')) closeModal();
 }
-// Escape key closes modal
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+// Escape key closes modal or posts screen
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (postsScreenOpen) { togglePostsScreen(); }
+    else { closeModal(); }
+  }
+});
 
 // ══════════════════════════════════
 // PASTOR NUDGE BANK
@@ -643,6 +740,125 @@ let stuckTimer = null, stuckShown = false;
 let lastMilestone = 0;
 let currentNudges = [];
 let usedIndices = { P:[], A:[], S:[], T:[], O:[], R:[] };
+let postsScreenOpen = false;
+
+// ── Post ID helpers ──
+function genId() { return 'pb_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+function getAllPostIds() {
+  try { return JSON.parse(localStorage.getItem('pb_posts') || '[]'); } catch(e) { return []; }
+}
+function saveAllPostIds(ids) { localStorage.setItem('pb_posts', JSON.stringify(ids)); }
+function getActiveId() { return localStorage.getItem('pb_active') || null; }
+function setActiveId(id) { localStorage.setItem('pb_active', id); }
+function getPost(id) {
+  try { return JSON.parse(localStorage.getItem(id) || 'null'); } catch(e) { return null; }
+}
+function savePost(id, data) { localStorage.setItem(id, JSON.stringify(data)); }
+function deletePost(id) {
+  localStorage.removeItem(id);
+  const ids = getAllPostIds().filter(i => i !== id);
+  saveAllPostIds(ids);
+}
+
+// ══════════════════════════════════
+// POSTS SCREEN
+// ══════════════════════════════════
+function togglePostsScreen() {
+  postsScreenOpen = !postsScreenOpen;
+  if (postsScreenOpen) {
+    silentSave();
+    renderPostsList();
+  }
+  document.getElementById('postsPanel').classList.toggle('hidden', !postsScreenOpen);
+  document.getElementById('btnPosts').classList.toggle('on', postsScreenOpen);
+}
+
+function renderPostsList() {
+  const ids = getAllPostIds();
+  const activeId = getActiveId();
+  const list = document.getElementById('postsList');
+
+  if (ids.length === 0) {
+    list.innerHTML = '<div style="font-size:13px;color:var(--ink-dim);padding:8px 0;">No posts yet — start writing!</div>';
+    return;
+  }
+
+  list.innerHTML = ids.slice().reverse().map(id => {
+    const post = getPost(id);
+    if (!post) return '';
+    const title = post.title || 'Untitled post';
+    const words = post.body ? post.body.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(w=>w).length : 0;
+    const date = post.saved ? new Date(post.saved).toLocaleDateString('en-GB', {day:'numeric',month:'short'}) : '';
+    const isActive = id === activeId;
+    return `
+      <div class="post-row${isActive?' active':''}" onclick="openPost('${id}')">
+        <div class="post-row-dot"></div>
+        <div class="post-row-info">
+          <div class="post-row-title">${escHtml(title)}</div>
+          <div class="post-row-meta">${words} word${words!==1?'s':''} · ${date}</div>
+        </div>
+        <button class="post-row-delete" title="Delete post"
+          onclick="event.stopPropagation(); confirmDeletePost('${id}')">×</button>
+      </div>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function openPost(id) {
+  silentSave();
+  setActiveId(id);
+  const post = getPost(id);
+  if (post) {
+    document.getElementById('postTitleInline').value = post.title || '';
+    document.getElementById('editor').innerHTML = post.body || '';
+    lastMilestone = 0;
+    updateWordCount();
+    renderNudges();
+  }
+  postsScreenOpen = false;
+  document.getElementById('postsPanel').classList.add('hidden');
+  document.getElementById('btnPosts').classList.remove('on');
+  setTimeout(() => focusEditor(), 50);
+}
+
+function newPost() {
+  silentSave();
+  const id = genId();
+  const ids = getAllPostIds();
+  ids.push(id);
+  saveAllPostIds(ids);
+  savePost(id, { title: '', body: '', saved: Date.now() });
+  setActiveId(id);
+  document.getElementById('postTitleInline').value = '';
+  document.getElementById('editor').innerHTML = '';
+  lastMilestone = 0;
+  updateWordCount();
+  postsScreenOpen = false;
+  document.getElementById('postsPanel').classList.add('hidden');
+  document.getElementById('btnPosts').classList.remove('on');
+  setTimeout(() => focusEditor(), 50);
+}
+
+function confirmDeletePost(id) {
+  const post = getPost(id);
+  const name = post?.title || 'Untitled post';
+  if (!confirm(`Delete "${name}"? This can't be undone.`)) return;
+  const activeId = getActiveId();
+  deletePost(id);
+  if (id === activeId) {
+    const ids = getAllPostIds();
+    if (ids.length > 0) {
+      openPost(ids[ids.length - 1]);
+    } else {
+      newPost();
+      return;
+    }
+  }
+  renderPostsList();
+}
 
 // ══════════════════════════════════
 // INIT
@@ -968,22 +1184,62 @@ function toggleNudge() {
 // SAVE / LOAD / COPY
 // ══════════════════════════════════
 function silentSave() {
-  localStorage.setItem('pb_v4', JSON.stringify({
+  let id = getActiveId();
+  // First run: migrate legacy pb_v4 or create first post
+  if (!id) {
+    id = genId();
+    const ids = getAllPostIds();
+    ids.push(id);
+    saveAllPostIds(ids);
+    setActiveId(id);
+
+    // Attempt to migrate old single-doc save
+    try {
+      const legacy = JSON.parse(localStorage.getItem('pb_v4') || 'null');
+      if (legacy) {
+        document.getElementById('postTitleInline').value = legacy.title || '';
+        document.getElementById('editor').innerHTML = legacy.body || '';
+        localStorage.removeItem('pb_v4');
+        updateWordCount();
+      }
+    } catch(e) {}
+  }
+
+  savePost(id, {
     title: document.getElementById('postTitleInline').value,
     body:  document.getElementById('editor').innerHTML,
+    saved: Date.now(),
     isDark,
-  }));
+  });
 }
 
 function loadDoc() {
   try {
-    const raw = localStorage.getItem('pb_v4');
-    if (raw) {
-      const d = JSON.parse(raw);
+    // Migrate legacy single-doc save if it exists and no posts yet
+    const ids = getAllPostIds();
+    const legacy = localStorage.getItem('pb_v4');
+    if (legacy && ids.length === 0) {
+      const d = JSON.parse(legacy);
+      const id = genId();
+      ids.push(id);
+      saveAllPostIds(ids);
+      setActiveId(id);
+      savePost(id, { title: d.title||'', body: d.body||'', saved: Date.now(), isDark: d.isDark });
+      localStorage.removeItem('pb_v4');
       if (d.title) document.getElementById('postTitleInline').value = d.title;
       if (d.body)  document.getElementById('editor').innerHTML = d.body;
-      updateWordCount();
+    } else {
+      let activeId = getActiveId();
+      if (!activeId && ids.length > 0) { activeId = ids[ids.length-1]; setActiveId(activeId); }
+      if (activeId) {
+        const post = getPost(activeId);
+        if (post) {
+          document.getElementById('postTitleInline').value = post.title || '';
+          document.getElementById('editor').innerHTML = post.body || '';
+        }
+      }
     }
+    updateWordCount();
     if (localStorage.getItem('pb_dark') === 'true') { isDark = false; toggleDark(); }
   } catch(e) {}
 }
