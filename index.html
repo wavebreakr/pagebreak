@@ -487,18 +487,6 @@
   .post-row:hover .post-row-delete { opacity: 1; }
   .post-row-delete:hover { background: rgba(184,74,74,0.12); color: var(--c-p); }
 
-  .posts-panel-footer {
-    padding: 10px; border-top: 1px solid var(--nudge-border); flex-shrink: 0;
-  }
-  .btn-new-post {
-    width: 100%; padding: 7px;
-    background: none; border: 1px dashed var(--nudge-border);
-    border-radius: 7px; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
-    color: var(--ink-dim); transition: all 0.15s; letter-spacing: 0.02em;
-  }
-  .btn-new-post:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-dim); }
-
   /* Brand — not clickable */
   .brand { user-select: none; }
 
@@ -556,11 +544,9 @@
   <div class="posts-panel hidden" id="postsPanel">
     <div class="posts-panel-header">
       <div class="posts-panel-label">Posts</div>
+      <button class="icon-btn" onclick="newPost()" title="New post" style="width:24px;height:24px;font-size:16px;border-radius:5px;">＋</button>
     </div>
     <div class="posts-list" id="postsList"></div>
-    <div class="posts-panel-footer">
-      <button class="btn-new-post" onclick="newPost()">+ New post</button>
-    </div>
   </div>
 
   <div class="editor-wrap">
