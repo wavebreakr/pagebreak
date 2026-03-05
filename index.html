@@ -139,9 +139,28 @@
   }
 
   /* Empty placeholder */
-  .editor:empty::before {
+  .editor.is-empty::before {
     content: attr(data-placeholder);
     color: var(--ink-dim); font-style: italic; pointer-events: none;
+  }
+
+  /* Blinking cursor when empty and focused */
+  @keyframes caretBlink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+  }
+  .editor.is-empty::after {
+    content: '';
+    display: inline-block;
+    width: 2px; height: 1.1em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    margin-left: 1px;
+    opacity: 0;
+    border-radius: 1px;
+  }
+  .editor.is-empty:focus::after {
+    animation: caretBlink 1.1s ease-in-out infinite;
   }
 
   /* Paragraph spacing — browsers use both p and div in contenteditable */
@@ -179,7 +198,7 @@
 
   /* ── Nudge panel ── */
   .nudge-panel {
-    width: 272px; flex-shrink: 0;
+    width: 288px; flex-shrink: 0;
     border-left: 1px solid var(--ink-faint);
     background: var(--nudge-bg);
     display: flex; flex-direction: column; overflow: hidden;
@@ -431,68 +450,8 @@
     padding: 1px 5px; font-size: 10px; color: var(--ink-mid);
   }
 
-  /* ── Posts sidebar ── */
-  .posts-panel {
-    width: 220px; flex-shrink: 0;
-    border-right: 1px solid var(--ink-faint);
-    background: var(--nudge-bg);
-    display: flex; flex-direction: column; overflow: hidden;
-    transition: width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s, border-color 0.4s;
-    order: -1;
-  }
-  .posts-panel.hidden { width: 0; opacity: 0; border-right-width: 0; }
-
-  .posts-panel-header {
-    padding: 16px 14px 12px;
-    border-bottom: 1px solid var(--nudge-border); flex-shrink: 0;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .posts-panel-label {
-    font-size: 10px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.14em; color: var(--ink-dim);
-  }
-
-  .posts-list {
-    flex: 1; overflow-y: auto;
-    padding: 8px; display: flex; flex-direction: column; gap: 3px;
-  }
-  .posts-list::-webkit-scrollbar { width: 2px; }
-  .posts-list::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
-
-  .post-row {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 10px; border-radius: 7px;
-    cursor: pointer; transition: all 0.15s;
-    position: relative;
-  }
-  .post-row:hover { background: var(--ink-faint); }
-  .post-row.active { background: var(--accent-dim); }
-
-  .post-row-info { flex: 1; min-width: 0; }
-  .post-row-title {
-    font-size: 12.5px; font-weight: 500; color: var(--ink);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    letter-spacing: -0.01em; line-height: 1.3;
-  }
-  .post-row.active .post-row-title { color: var(--accent); }
-  .post-row-meta { font-size: 10.5px; color: var(--ink-dim); margin-top: 2px; }
-
-  .post-row-delete {
-    width: 20px; height: 20px; border-radius: 4px;
-    border: none; background: none; cursor: pointer;
-    color: var(--ink-dim); font-size: 13px; line-height: 1;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; transition: all 0.15s; flex-shrink: 0;
-  }
-  .post-row:hover .post-row-delete { opacity: 1; }
-  .post-row-delete:hover { background: rgba(184,74,74,0.12); color: var(--c-p); }
-
-  /* Brand — not clickable */
-  .brand { user-select: none; }
-
   @media (max-width: 700px) {
     .nudge-panel { display: none; }
-    .posts-panel { display: none; }
     .editor-inner { padding: 0 20px; }
     .post-title-inline { max-width: 120px; }
   }
@@ -511,14 +470,6 @@
       </div>
       Pagebreak
     </div>
-    <button class="icon-btn" id="btnPosts" title="All posts" onclick="togglePostsScreen()">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-        <rect x="2" y="2" width="5" height="6" rx="1"/>
-        <rect x="9" y="2" width="5" height="6" rx="1"/>
-        <rect x="2" y="10" width="5" height="4" rx="1"/>
-        <rect x="9" y="10" width="5" height="4" rx="1"/>
-      </svg>
-    </button>
     <div class="chrome-sep"></div>
     <input class="post-title-inline" id="postTitleInline" type="text"
       placeholder="Untitled post…" maxlength="80" oninput="onType()" />
@@ -539,16 +490,6 @@
 
 <!-- Writing area -->
 <div class="writing-area">
-
-  <!-- Posts sidebar -->
-  <div class="posts-panel hidden" id="postsPanel">
-    <div class="posts-panel-header">
-      <div class="posts-panel-label">Posts</div>
-      <button class="icon-btn" onclick="newPost()" title="New post" style="width:24px;height:24px;font-size:16px;border-radius:5px;">＋</button>
-    </div>
-    <div class="posts-list" id="postsList"></div>
-  </div>
-
   <div class="editor-wrap">
     <div class="editor-inner">
       <div
@@ -667,13 +608,8 @@ function closeModal() {
 function closeModalOnBackdrop(e) {
   if (e.target === document.getElementById('modalBackdrop')) closeModal();
 }
-// Escape key closes modal or posts screen
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    if (postsScreenOpen) { togglePostsScreen(); }
-    else { closeModal(); }
-  }
-});
+// Escape key closes modal
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 // ══════════════════════════════════
 // PASTOR NUDGE BANK
@@ -726,127 +662,13 @@ let stuckTimer = null, stuckShown = false;
 let lastMilestone = 0;
 let currentNudges = [];
 let usedIndices = { P:[], A:[], S:[], T:[], O:[], R:[] };
-let postsScreenOpen = false;
-
-// ── Post ID helpers ──
-function genId() { return 'pb_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
-function getAllPostIds() {
-  try { return JSON.parse(localStorage.getItem('pb_posts') || '[]'); } catch(e) { return []; }
-}
-function saveAllPostIds(ids) { localStorage.setItem('pb_posts', JSON.stringify(ids)); }
-function getActiveId() { return localStorage.getItem('pb_active') || null; }
-function setActiveId(id) { localStorage.setItem('pb_active', id); }
-function getPost(id) {
-  try { return JSON.parse(localStorage.getItem(id) || 'null'); } catch(e) { return null; }
-}
-function savePost(id, data) { localStorage.setItem(id, JSON.stringify(data)); }
-function deletePost(id) {
-  localStorage.removeItem(id);
-  const ids = getAllPostIds().filter(i => i !== id);
-  saveAllPostIds(ids);
-}
-
-// ══════════════════════════════════
-// POSTS SCREEN
-// ══════════════════════════════════
-function togglePostsScreen() {
-  postsScreenOpen = !postsScreenOpen;
-  if (postsScreenOpen) {
-    silentSave();
-    renderPostsList();
-  }
-  document.getElementById('postsPanel').classList.toggle('hidden', !postsScreenOpen);
-  document.getElementById('btnPosts').classList.toggle('on', postsScreenOpen);
-}
-
-function renderPostsList() {
-  const ids = getAllPostIds();
-  const activeId = getActiveId();
-  const list = document.getElementById('postsList');
-
-  if (ids.length === 0) {
-    list.innerHTML = '<div style="font-size:13px;color:var(--ink-dim);padding:8px 0;">No posts yet — start writing!</div>';
-    return;
-  }
-
-  list.innerHTML = ids.slice().reverse().map(id => {
-    const post = getPost(id);
-    if (!post) return '';
-    const title = post.title || 'Untitled post';
-    const words = post.body ? post.body.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(w=>w).length : 0;
-    const date = post.saved ? new Date(post.saved).toLocaleDateString('en-GB', {day:'numeric',month:'short'}) : '';
-    const isActive = id === activeId;
-    return `
-      <div class="post-row${isActive?' active':''}" onclick="openPost('${id}')">
-        <div class="post-row-dot"></div>
-        <div class="post-row-info">
-          <div class="post-row-title">${escHtml(title)}</div>
-          <div class="post-row-meta">${words} word${words!==1?'s':''} · ${date}</div>
-        </div>
-        <button class="post-row-delete" title="Delete post"
-          onclick="event.stopPropagation(); confirmDeletePost('${id}')">×</button>
-      </div>`;
-  }).join('');
-}
-
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function openPost(id) {
-  silentSave();
-  setActiveId(id);
-  const post = getPost(id);
-  if (post) {
-    document.getElementById('postTitleInline').value = post.title || '';
-    document.getElementById('editor').innerHTML = post.body || '';
-    lastMilestone = 0;
-    updateWordCount();
-    renderNudges();
-  }
-  renderPostsList();
-  setTimeout(() => focusEditor(), 50);
-}
-
-function newPost() {
-  silentSave();
-  const id = genId();
-  const ids = getAllPostIds();
-  ids.push(id);
-  saveAllPostIds(ids);
-  savePost(id, { title: '', body: '', saved: Date.now() });
-  setActiveId(id);
-  document.getElementById('postTitleInline').value = '';
-  document.getElementById('editor').innerHTML = '';
-  lastMilestone = 0;
-  updateWordCount();
-  renderPostsList();
-  setTimeout(() => focusEditor(), 50);
-}
-
-function confirmDeletePost(id) {
-  const post = getPost(id);
-  const name = post?.title || 'Untitled post';
-  if (!confirm(`Delete "${name}"? This can't be undone.`)) return;
-  const activeId = getActiveId();
-  deletePost(id);
-  if (id === activeId) {
-    const ids = getAllPostIds();
-    if (ids.length > 0) {
-      openPost(ids[ids.length - 1]);
-    } else {
-      newPost();
-      return;
-    }
-  }
-  renderPostsList();
-}
 
 // ══════════════════════════════════
 // INIT
 // ══════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
   loadDoc();
+  updateEmptyState();
   pickNudges();
   setInterval(silentSave, 20000);
 
@@ -870,6 +692,18 @@ window.addEventListener('DOMContentLoaded', () => {
   // Force <p> on Enter (not <div>) for consistent paragraph spacing
   document.execCommand('defaultParagraphSeparator', false, 'p');
 
+  // Ensure first keystroke lands inside a <p>, not a bare text node
+  editor.addEventListener('focus', () => {
+    if (editor.innerHTML.trim() === '' || editor.innerHTML === '<br>') {
+      editor.innerHTML = '<p><br></p>';
+      const range = document.createRange();
+      const p = editor.querySelector('p');
+      range.setStart(p, 0); range.collapse(true);
+      const sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(range);
+    }
+  });
+
   // Bullet transform: "- " at start of line → bullet list item
   editor.addEventListener('keydown', e => {
     if (e.key === ' ') {
@@ -878,28 +712,24 @@ window.addEventListener('DOMContentLoaded', () => {
       const range = sel.getRangeAt(0);
       const node = range.startContainer;
       if (node.nodeType === Node.TEXT_NODE) {
-        const textBefore = node.textContent.slice(0, range.startOffset);
-        if (textBefore === '-') {
+        const text = node.textContent.slice(0, range.startOffset);
+        if (text === '-') {
           e.preventDefault();
+          // Replace the '-' node with a proper list item
           const block = node.parentElement;
+          // Remove the hyphen text
+          node.textContent = node.textContent.slice(1);
 
-          // Everything after the '-' becomes the li content
-          const remainder = node.textContent.slice(1);
-
-          // Create <ul><li></li></ul>
+          // Create <ul><li></li></ul> and insert
           const ul = document.createElement('ul');
           const li = document.createElement('li');
-          if (remainder) {
-            li.textContent = remainder;
-          } else {
-            li.innerHTML = '<br>';
-          }
+          li.innerHTML = '<br>';
           ul.appendChild(li);
           block.replaceWith(ul);
 
-          // Place cursor at start of the li text (before any remainder)
+          // Place cursor inside li
           const newRange = document.createRange();
-          newRange.setStart(li.firstChild, 0);
+          newRange.setStart(li, 0);
           newRange.collapse(true);
           sel.removeAllRanges();
           sel.addRange(newRange);
@@ -1013,24 +843,20 @@ function cleanPastedHTML(html) {
 // NUDGES
 // ══════════════════════════════════
 function pickNudges() {
-  const stepOrder = [...STEPS].sort(() => Math.random() - 0.5);
-  const picked = [];
-
-  for (const step of stepOrder) {
-    if (picked.length === 3) break;
-    const pool = ALL_NUDGES.map((n,i)=>({...n,i})).filter(n => n.step===step && !usedIndices[step].includes(n.i));
+  currentNudges = STEPS.map(step => {
+    const pool = ALL_NUDGES.map((n,i) => ({...n,i})).filter(n => n.step === step && !usedIndices[step].includes(n.i));
+    // If we've exhausted all variants for this step, reset
     if (pool.length === 0) {
       usedIndices[step] = [];
-      const full = ALL_NUDGES.map((n,i)=>({...n,i})).filter(n=>n.step===step);
-      const pick = full[Math.floor(Math.random()*full.length)];
-      usedIndices[step].push(pick.i); picked.push(pick);
-    } else {
-      const pick = pool[Math.floor(Math.random()*pool.length)];
-      usedIndices[step].push(pick.i); picked.push(pick);
+      const full = ALL_NUDGES.map((n,i) => ({...n,i})).filter(n => n.step === step);
+      const pick = full[Math.floor(Math.random() * full.length)];
+      usedIndices[step].push(pick.i);
+      return pick;
     }
-  }
-
-  currentNudges = picked;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    usedIndices[step].push(pick.i);
+    return pick;
+  });
   renderNudges();
 }
 
@@ -1092,7 +918,14 @@ function focusEditor() {
 // ══════════════════════════════════
 // WORD COUNT + MILESTONES
 // ══════════════════════════════════
+function updateEmptyState() {
+  const editor = document.getElementById('editor');
+  const text = editor.innerText.trim();
+  editor.classList.toggle('is-empty', text === '');
+}
+
 function onType() {
+  updateEmptyState();
   updateWordCount();
   resetStuckTimer();
   clearTimeout(onType._t);
@@ -1170,62 +1003,23 @@ function toggleNudge() {
 // SAVE / LOAD / COPY
 // ══════════════════════════════════
 function silentSave() {
-  let id = getActiveId();
-  // First run: migrate legacy pb_v4 or create first post
-  if (!id) {
-    id = genId();
-    const ids = getAllPostIds();
-    ids.push(id);
-    saveAllPostIds(ids);
-    setActiveId(id);
-
-    // Attempt to migrate old single-doc save
-    try {
-      const legacy = JSON.parse(localStorage.getItem('pb_v4') || 'null');
-      if (legacy) {
-        document.getElementById('postTitleInline').value = legacy.title || '';
-        document.getElementById('editor').innerHTML = legacy.body || '';
-        localStorage.removeItem('pb_v4');
-        updateWordCount();
-      }
-    } catch(e) {}
-  }
-
-  savePost(id, {
+  localStorage.setItem('pb_v4', JSON.stringify({
     title: document.getElementById('postTitleInline').value,
     body:  document.getElementById('editor').innerHTML,
-    saved: Date.now(),
     isDark,
-  });
+  }));
 }
 
 function loadDoc() {
   try {
-    // Migrate legacy single-doc save if it exists and no posts yet
-    const ids = getAllPostIds();
-    const legacy = localStorage.getItem('pb_v4');
-    if (legacy && ids.length === 0) {
-      const d = JSON.parse(legacy);
-      const id = genId();
-      ids.push(id);
-      saveAllPostIds(ids);
-      setActiveId(id);
-      savePost(id, { title: d.title||'', body: d.body||'', saved: Date.now(), isDark: d.isDark });
-      localStorage.removeItem('pb_v4');
+    const raw = localStorage.getItem('pb_v4');
+    if (raw) {
+      const d = JSON.parse(raw);
       if (d.title) document.getElementById('postTitleInline').value = d.title;
       if (d.body)  document.getElementById('editor').innerHTML = d.body;
-    } else {
-      let activeId = getActiveId();
-      if (!activeId && ids.length > 0) { activeId = ids[ids.length-1]; setActiveId(activeId); }
-      if (activeId) {
-        const post = getPost(activeId);
-        if (post) {
-          document.getElementById('postTitleInline').value = post.title || '';
-          document.getElementById('editor').innerHTML = post.body || '';
-        }
-      }
+      updateWordCount();
+      updateEmptyState();
     }
-    updateWordCount();
     if (localStorage.getItem('pb_dark') === 'true') { isDark = false; toggleDark(); }
   } catch(e) {}
 }
