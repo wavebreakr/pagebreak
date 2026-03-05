@@ -804,9 +804,7 @@ function openPost(id) {
     updateWordCount();
     renderNudges();
   }
-  postsScreenOpen = false;
-  document.getElementById('postsPanel').classList.add('hidden');
-  document.getElementById('btnPosts').classList.remove('on');
+  renderPostsList();
   setTimeout(() => focusEditor(), 50);
 }
 
@@ -822,9 +820,7 @@ function newPost() {
   document.getElementById('editor').innerHTML = '';
   lastMilestone = 0;
   updateWordCount();
-  postsScreenOpen = false;
-  document.getElementById('postsPanel').classList.add('hidden');
-  document.getElementById('btnPosts').classList.remove('on');
+  renderPostsList();
   setTimeout(() => focusEditor(), 50);
 }
 
