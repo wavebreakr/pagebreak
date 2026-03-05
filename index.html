@@ -878,24 +878,28 @@ window.addEventListener('DOMContentLoaded', () => {
       const range = sel.getRangeAt(0);
       const node = range.startContainer;
       if (node.nodeType === Node.TEXT_NODE) {
-        const text = node.textContent.slice(0, range.startOffset);
-        if (text === '-') {
+        const textBefore = node.textContent.slice(0, range.startOffset);
+        if (textBefore === '-') {
           e.preventDefault();
-          // Replace the '-' node with a proper list item
           const block = node.parentElement;
-          // Remove the hyphen text
-          node.textContent = node.textContent.slice(1);
 
-          // Create <ul><li></li></ul> and insert
+          // Everything after the '-' becomes the li content
+          const remainder = node.textContent.slice(1);
+
+          // Create <ul><li></li></ul>
           const ul = document.createElement('ul');
           const li = document.createElement('li');
-          li.innerHTML = '<br>';
+          if (remainder) {
+            li.textContent = remainder;
+          } else {
+            li.innerHTML = '<br>';
+          }
           ul.appendChild(li);
           block.replaceWith(ul);
 
-          // Place cursor inside li
+          // Place cursor at start of the li text (before any remainder)
           const newRange = document.createRange();
-          newRange.setStart(li, 0);
+          newRange.setStart(li.firstChild, 0);
           newRange.collapse(true);
           sel.removeAllRanges();
           sel.addRange(newRange);
