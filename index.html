@@ -52,22 +52,18 @@
     z-index: 100; transition: background 0.4s, border-color 0.4s;
     gap: 12px;
   }
-
   .chrome-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-
   .brand {
     display: flex; align-items: center; gap: 7px;
     font-size: 14px; font-weight: 600; letter-spacing: -0.02em;
     color: var(--ink); flex-shrink: 0;
   }
-
   .brand-mark {
     width: 18px; height: 18px; background: var(--accent);
     border-radius: 4px; display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
   .brand-mark svg { width: 10px; height: 10px; }
-
   .post-title-inline {
     font-family: 'DM Sans', sans-serif;
     font-size: 13px; font-weight: 400;
@@ -77,17 +73,13 @@
   }
   .post-title-inline::placeholder { color: var(--ink-dim); }
   .post-title-inline:focus { color: var(--ink-mid); }
-
   .chrome-sep { width: 1px; height: 16px; background: var(--ink-faint); flex-shrink: 0; }
-
   .chrome-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-
   .word-count {
     font-size: 12px; font-weight: 500; color: var(--ink-dim);
     font-variant-numeric: tabular-nums; min-width: 54px; text-align: right;
     transition: color 0.3s;
   }
-
   .icon-btn {
     width: 30px; height: 30px;
     border: 1px solid var(--ink-faint); border-radius: 6px;
@@ -98,8 +90,6 @@
   }
   .icon-btn:hover { background: var(--ink-faint); color: var(--ink); }
   .icon-btn.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-
-  /* Copy button — text label style */
   .copy-btn {
     font-family: 'DM Sans', sans-serif;
     font-size: 11px; font-weight: 500;
@@ -119,15 +109,12 @@
   }
 
   /* ── Editor wrap ── */
-  .editor-wrap {
-    flex: 1; overflow-y: auto; padding: 52px 0 120px;
-  }
+  .editor-wrap { flex: 1; overflow-y: auto; padding: 52px 0 120px; }
   .editor-wrap::-webkit-scrollbar { width: 3px; }
   .editor-wrap::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
-
   .editor-inner { max-width: 640px; margin: 0 auto; padding: 0 36px; }
 
-  /* ── contenteditable editor ── */
+  /* ── Editor ── */
   .editor {
     font-family: 'Lora', serif;
     font-size: 18px; font-weight: 400; line-height: 1.9;
@@ -137,65 +124,32 @@
     transition: color 0.3s; letter-spacing: 0.005em;
     word-break: break-word;
   }
-
-  /* Empty placeholder — only when editor has no content */
   .editor:empty::before {
     content: attr(data-placeholder);
     color: var(--ink-dim); font-style: italic; pointer-events: none;
   }
-
-
-
-  /* Paragraph spacing — browsers use both p and div in contenteditable */
-  .editor p,
-  .editor div {
-    margin-bottom: 1.15em;
-    min-height: 1em;
-  }
-  .editor p:last-child,
-  .editor div:last-child { margin-bottom: 0; }
-
-  /* Shift+Enter line breaks stay tight — no extra gap */
+  /* Browsers use both p and div in contenteditable */
+  .editor p, .editor div { margin-bottom: 1.15em; min-height: 1em; }
+  .editor p:last-child, .editor div:last-child { margin-bottom: 0; }
   .editor br { display: block; margin-bottom: 0; }
-
-  /* Bullet points */
-  .editor ul {
-    padding-left: 1.4em;
-    margin-bottom: 0.75em;
-    list-style: disc;
-  }
+  .editor ul { padding-left: 1.4em; margin-bottom: 0.75em; list-style: disc; }
   .editor ul li { margin-bottom: 0.2em; line-height: 1.9; }
-
-  /* URL links */
-  .editor a {
-    color: var(--link);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    cursor: pointer;
-  }
+  .editor a { color: var(--link); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
   .editor a:hover { opacity: 0.8; }
-
-  /* Bold / italic handled by browser execCommand */
   .editor b, .editor strong { font-weight: 700; }
   .editor i, .editor em { font-style: italic; }
 
   /* ── Nudge panel ── */
   .nudge-panel {
-    width: 288px; flex-shrink: 0;
+    width: 272px; flex-shrink: 0;
     border-left: 1px solid var(--ink-faint);
     background: var(--nudge-bg);
     display: flex; flex-direction: column; overflow: hidden;
     transition: width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s, border-color 0.4s;
   }
   .nudge-panel.hidden { width: 0; opacity: 0; border-left-width: 0; }
-
-  .nudge-header {
-    padding: 16px 16px 12px;
-    border-bottom: 1px solid var(--nudge-border); flex-shrink: 0;
-  }
-  .nudge-header-top {
-    display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px;
-  }
+  .nudge-header { padding: 16px 16px 12px; border-bottom: 1px solid var(--nudge-border); flex-shrink: 0; }
+  .nudge-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
   .nudge-header-label {
     font-size: 10px; font-weight: 600; text-transform: uppercase;
     letter-spacing: 0.14em; color: var(--ink-dim);
@@ -210,20 +164,19 @@
   }
   .nudge-info-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
   .nudge-header-sub { font-size: 11px; color: var(--ink-mid); line-height: 1.4; }
-
   .nudge-cards {
     flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 8px;
     overflow-y: auto; align-content: flex-start;
   }
   .nudge-cards::-webkit-scrollbar { width: 2px; }
   .nudge-cards::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
-
   .nudge-card {
     background: var(--surface); border: 1px solid var(--nudge-border);
     border-radius: 10px; padding: 12px 14px;
     cursor: pointer; transition: all 0.18s ease;
     position: relative; overflow: hidden;
     display: flex; flex-direction: column; gap: 5px;
+    flex-shrink: 0;
   }
   .nudge-card::before {
     content: ""; position: absolute;
@@ -233,21 +186,18 @@
   }
   .nudge-card:hover { transform: translateX(2px); }
   .nudge-card:hover::before { opacity: 1; }
-
   .nudge-card[data-step="P"]::before { background: var(--c-p); }
   .nudge-card[data-step="A"]::before { background: var(--c-a); }
   .nudge-card[data-step="S"]::before { background: var(--c-s); }
   .nudge-card[data-step="T"]::before { background: var(--c-t); }
   .nudge-card[data-step="O"]::before { background: var(--c-o); }
   .nudge-card[data-step="R"]::before { background: var(--c-r); }
-
   .nudge-card[data-step="P"]:hover { border-color: rgba(184,74,74,0.3); }
   .nudge-card[data-step="A"]:hover { border-color: rgba(194,105,42,0.3); }
   .nudge-card[data-step="S"]:hover { border-color: rgba(160,107,26,0.3); }
   .nudge-card[data-step="T"]:hover { border-color: rgba(42,122,74,0.3); }
   .nudge-card[data-step="O"]:hover { border-color: rgba(42,90,138,0.3); }
   .nudge-card[data-step="R"]:hover { border-color: rgba(106,58,154,0.3); }
-
   .nudge-step {
     font-size: 9px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.1em; flex-shrink: 0;
@@ -258,12 +208,10 @@
   .nudge-step[data-step="T"] { color: var(--c-t); }
   .nudge-step[data-step="O"] { color: var(--c-o); }
   .nudge-step[data-step="R"] { color: var(--c-r); }
-
   .nudge-text {
     font-size: 11.5px; line-height: 1.55;
     color: var(--ink-mid); font-family: 'DM Sans', sans-serif;
   }
-
   .nudge-insert {
     display: none; font-size: 10px; font-weight: 600;
     border: none; border-radius: 5px; padding: 3px 8px;
@@ -271,17 +219,13 @@
     transition: all 0.15s; align-self: flex-start; flex-shrink: 0;
   }
   .nudge-card:hover .nudge-insert { display: block; }
-
   .nudge-card[data-step="P"] .nudge-insert { background: rgba(184,74,74,0.1); color: var(--c-p); }
   .nudge-card[data-step="A"] .nudge-insert { background: rgba(194,105,42,0.1); color: var(--c-a); }
   .nudge-card[data-step="S"] .nudge-insert { background: rgba(160,107,26,0.1); color: var(--c-s); }
   .nudge-card[data-step="T"] .nudge-insert { background: rgba(42,122,74,0.1); color: var(--c-t); }
   .nudge-card[data-step="O"] .nudge-insert { background: rgba(42,90,138,0.1); color: var(--c-o); }
   .nudge-card[data-step="R"] .nudge-insert { background: rgba(106,58,154,0.1); color: var(--c-r); }
-
-  .nudge-footer {
-    padding: 10px 12px; border-top: 1px solid var(--nudge-border); flex-shrink: 0;
-  }
+  .nudge-footer { padding: 10px 12px; border-top: 1px solid var(--nudge-border); flex-shrink: 0; }
   .btn-refresh {
     width: 100%; padding: 8px;
     background: none; border: 1px dashed var(--nudge-border);
@@ -301,7 +245,6 @@
     backdrop-filter: blur(2px);
   }
   .modal-backdrop.show { opacity: 1; pointer-events: all; }
-
   .modal {
     background: var(--surface); border-radius: 14px;
     width: min(480px, 90vw); max-height: 80vh;
@@ -314,17 +257,12 @@
   .modal-backdrop.show .modal { transform: translateY(0) scale(1); }
   .modal::-webkit-scrollbar { width: 3px; }
   .modal::-webkit-scrollbar-thumb { background: var(--ink-faint); }
-
   .modal-header {
     display: flex; align-items: flex-start; justify-content: space-between;
     margin-bottom: 18px; gap: 12px;
   }
-  .modal-title {
-    font-size: 16px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink);
-  }
-  .modal-subtitle {
-    font-size: 12px; color: var(--ink-mid); margin-top: 3px; line-height: 1.4;
-  }
+  .modal-title { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
+  .modal-subtitle { font-size: 12px; color: var(--ink-mid); margin-top: 3px; line-height: 1.4; }
   .modal-close {
     width: 28px; height: 28px; border-radius: 6px;
     border: 1px solid var(--ink-faint); background: none;
@@ -333,25 +271,17 @@
     transition: all 0.15s; flex-shrink: 0;
   }
   .modal-close:hover { background: var(--ink-faint); color: var(--ink); }
-
   .pastor-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-
   .pastor-step-row {
     display: flex; gap: 12px; align-items: flex-start;
     padding: 11px 13px; border-radius: 9px;
     border: 1px solid var(--nudge-border);
     background: var(--nudge-bg);
   }
-  .pastor-step-letter {
-    font-size: 13px; font-weight: 700; letter-spacing: 0.02em;
-    width: 20px; flex-shrink: 0; padding-top: 1px;
-  }
+  .pastor-step-letter { font-size: 13px; font-weight: 700; letter-spacing: 0.02em; width: 20px; flex-shrink: 0; padding-top: 1px; }
   .pastor-step-info { flex: 1; }
-  .pastor-step-name {
-    font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 2px;
-  }
+  .pastor-step-name { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
   .pastor-step-desc { font-size: 11.5px; color: var(--ink-mid); line-height: 1.5; }
-
   .modal-why {
     padding: 14px; border-radius: 9px;
     background: var(--accent-dim); border: 1px solid var(--accent-border);
@@ -390,13 +320,11 @@
     z-index: 200; white-space: nowrap;
   }
   .stuck-bar.show { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
-
   .stuck-dot {
     width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
     animation: pulse 1.5s ease-in-out infinite;
   }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
-
   .stuck-btn {
     font-size: 11px; font-weight: 600; border: none;
     border-radius: 6px; padding: 4px 10px;
@@ -416,23 +344,6 @@
   }
   .toast.show { opacity: 1; }
 
-  /* ── Keyboard hint tooltip ── */
-  .kb-hint {
-    position: fixed; bottom: 20px; left: 50%;
-    transform: translateX(-50%);
-    font-size: 11px; color: var(--ink-dim);
-    font-family: 'DM Sans', sans-serif;
-    pointer-events: none; opacity: 0;
-    transition: opacity 0.4s;
-    letter-spacing: 0.01em;
-  }
-  .kb-hint.show { opacity: 1; }
-  .kb-hint kbd {
-    font-family: 'DM Mono', monospace;
-    background: var(--ink-faint); border-radius: 3px;
-    padding: 1px 5px; font-size: 10px; color: var(--ink-mid);
-  }
-
   /* ── Posts sidebar ── */
   .posts-panel {
     width: 220px; flex-shrink: 0;
@@ -443,7 +354,6 @@
     order: -1;
   }
   .posts-panel.hidden { width: 0; opacity: 0; border-right-width: 0; }
-
   .posts-panel-header {
     padding: 16px 14px 12px;
     border-bottom: 1px solid var(--nudge-border); flex-shrink: 0;
@@ -453,14 +363,12 @@
     font-size: 10px; font-weight: 600; text-transform: uppercase;
     letter-spacing: 0.14em; color: var(--ink-dim);
   }
-
   .posts-list {
     flex: 1; overflow-y: auto;
     padding: 8px; display: flex; flex-direction: column; gap: 3px;
   }
   .posts-list::-webkit-scrollbar { width: 2px; }
   .posts-list::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
-
   .post-row {
     display: flex; align-items: center; gap: 8px;
     padding: 8px 10px; border-radius: 7px;
@@ -468,7 +376,6 @@
   }
   .post-row:hover { background: var(--ink-faint); }
   .post-row.active { background: var(--accent-dim); }
-
   .post-row-info { flex: 1; min-width: 0; }
   .post-row-title {
     font-size: 12.5px; font-weight: 500; color: var(--ink);
@@ -477,7 +384,6 @@
   }
   .post-row.active .post-row-title { color: var(--accent); }
   .post-row-meta { font-size: 10.5px; color: var(--ink-dim); margin-top: 2px; }
-
   .post-row-delete {
     width: 20px; height: 20px; border-radius: 4px;
     border: none; background: none; cursor: pointer;
@@ -516,7 +422,7 @@
     </button>
     <div class="chrome-sep"></div>
     <input class="post-title-inline" id="postTitleInline" type="text"
-      placeholder="Untitled post…" maxlength="80" oninput="onType()" />
+      placeholder="Untitled post…" maxlength="80" oninput="onTitleType()" />
   </div>
   <div class="chrome-right">
     <span class="word-count" id="wordCount">0 words</span>
@@ -593,7 +499,6 @@
       </div>
       <button class="modal-close" onclick="closeModal()">×</button>
     </div>
-
     <div class="pastor-steps">
       <div class="pastor-step-row">
         <div class="pastor-step-letter" style="color:var(--c-p)">P</div>
@@ -638,7 +543,6 @@
         </div>
       </div>
     </div>
-
     <div class="modal-why">
       <div class="modal-why-label">Why it works</div>
       <div class="modal-why-text">PASTOR works because it mirrors how people actually make decisions — they feel a pain, they imagine it getting worse, they look for a solution, they need to trust it, then they act. Writing that follows this sequence doesn't feel like marketing. It feels like someone finally gets it.</div>
@@ -662,7 +566,6 @@ function closeModal() {
 function closeModalOnBackdrop(e) {
   if (e.target === document.getElementById('modalBackdrop')) closeModal();
 }
-// Escape key closes modal
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 // ══════════════════════════════════
@@ -712,7 +615,7 @@ const CELEBRATIONS = [
 
 // ── State ──
 let isDark = false, nudgeVisible = true;
-let stuckTimer = null, stuckShown = false;
+let stuckTimer = null, stuckDismissed = false;
 let lastMilestone = 0;
 let currentNudges = [];
 let usedIndices = { P:[], A:[], S:[], T:[], O:[], R:[] };
@@ -721,105 +624,69 @@ let usedIndices = { P:[], A:[], S:[], T:[], O:[], R:[] };
 // INIT
 // ══════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
-  const editor = document.getElementById('editor');
-
   loadDoc();
-  updateEmptyState();
   pickNudges();
   setInterval(silentSave, 20000);
 
-  // Auto-focus so the native caret is visible immediately
-  editor.focus();
+  // Nudge button reflects panel's visible-by-default state
+  document.getElementById('btnNudge').classList.add('on');
 
-  // Global keyboard shortcuts
+  const editor = document.getElementById('editor');
+
+  // Keyboard shortcuts
   document.addEventListener('keydown', e => {
     const mod = e.metaKey || e.ctrlKey;
-
-    // Save
     if (mod && e.key === 's') { e.preventDefault(); silentSave(); showToast('Saved ✓'); return; }
-
-    // Bold / Italic — only when editor is focused
-    if (document.activeElement === editor || editor.contains(document.getSelection()?.anchorNode)) {
+    // Bold / italic — only when editor has focus
+    if (editor.contains(document.getSelection()?.anchorNode) || document.activeElement === editor) {
       if (mod && e.key === 'b') { e.preventDefault(); document.execCommand('bold'); return; }
       if (mod && e.key === 'i') { e.preventDefault(); document.execCommand('italic'); return; }
-      // Undo / Redo are handled natively by contenteditable — no need to intercept
     }
   });
 
-  // Force <p> on Enter (not <div>) for consistent paragraph spacing
+  // Use <p> for Enter, not <div>
   document.execCommand('defaultParagraphSeparator', false, 'p');
 
-  // Ensure there's always a block element so execCommand (bold/italic) works.
-  // Inject a <p> wrapper on the very first keypress if the editor is still empty.
+  // Bullet shorthand: type "- " at start of a blank line → <ul><li>
   editor.addEventListener('keydown', e => {
-    if (editor.innerHTML.trim() === '' || editor.innerHTML === '<br>') {
-      // Don't intercept shortcuts or special keys
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
-      if (['Tab','Escape','Enter','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) return;
-      editor.innerHTML = '<p></p>';
-      const p = editor.querySelector('p');
-      const range = document.createRange();
-      range.setStart(p, 0); range.collapse(true);
-      const sel = window.getSelection();
-      sel.removeAllRanges(); sel.addRange(range);
-      // Don't preventDefault — let the keystroke land naturally inside the <p>
-    }
-  }, true); // capture phase so it runs before the bullet handler
-
-  // Bullet transform: "- " at start of line → bullet list item
-  editor.addEventListener('keydown', e => {
-    if (e.key === ' ') {
-      const sel = window.getSelection();
-      if (!sel.rangeCount) return;
-      const range = sel.getRangeAt(0);
-      const node = range.startContainer;
-      if (node.nodeType === Node.TEXT_NODE) {
-        const text = node.textContent.slice(0, range.startOffset);
-        if (text === '-') {
-          e.preventDefault();
-          // Replace the '-' node with a proper list item
-          const block = node.parentElement;
-          // Remove the hyphen text
-          node.textContent = node.textContent.slice(1);
-
-          // Create <ul><li></li></ul> and insert
-          const ul = document.createElement('ul');
-          const li = document.createElement('li');
-          li.innerHTML = '<br>';
-          ul.appendChild(li);
-          block.replaceWith(ul);
-
-          // Place cursor inside li
-          const newRange = document.createRange();
-          newRange.setStart(li, 0);
-          newRange.collapse(true);
-          sel.removeAllRanges();
-          sel.addRange(newRange);
-          onType();
-        }
-      }
+    if (e.key !== ' ') return;
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    const node = range.startContainer;
+    if (node.nodeType === Node.TEXT_NODE && node.textContent.slice(0, range.startOffset) === '-') {
+      e.preventDefault();
+      const block = node.parentElement;
+      node.textContent = node.textContent.slice(1);
+      const ul = document.createElement('ul');
+      const li = document.createElement('li');
+      li.innerHTML = '<br>';
+      ul.appendChild(li);
+      block.replaceWith(ul);
+      const newRange = document.createRange();
+      newRange.setStart(li, 0);
+      newRange.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+      onType();
     }
   });
 
-  // URL auto-linkify on space/enter
+  // Linkify on word boundary
   editor.addEventListener('keyup', e => {
-    if (e.key === ' ' || e.key === 'Enter') {
-      linkifyEditor();
-    }
+    if (e.key === ' ' || e.key === 'Enter') linkifyEditor();
     onType();
   });
 
   editor.addEventListener('input', onType);
 
-  // Paste: strip heavy HTML, keep bold/italic/links
+  // Paste: strip heavy HTML, keep bold/italic/links/lists
   editor.addEventListener('paste', e => {
     e.preventDefault();
     const html = e.clipboardData.getData('text/html');
     const text = e.clipboardData.getData('text/plain');
     if (html) {
-      // Clean paste: only allow b, i, em, strong, a, br, p
-      const clean = cleanPastedHTML(html);
-      document.execCommand('insertHTML', false, clean);
+      document.execCommand('insertHTML', false, cleanPastedHTML(html));
     } else {
       document.execCommand('insertText', false, text);
     }
@@ -833,7 +700,6 @@ window.addEventListener('DOMContentLoaded', () => {
 // ══════════════════════════════════
 function linkifyEditor() {
   const editor = document.getElementById('editor');
-  // Walk text nodes, replace bare URLs with <a> tags
   const urlRegex = /(?<!['"=])(https?:\/\/[^\s<>"']+)/g;
 
   function walk(node) {
@@ -841,7 +707,6 @@ function linkifyEditor() {
       const text = node.textContent;
       if (!urlRegex.test(text)) return;
       urlRegex.lastIndex = 0;
-
       const frag = document.createDocumentFragment();
       let last = 0, match;
       while ((match = urlRegex.exec(text)) !== null) {
@@ -859,36 +724,29 @@ function linkifyEditor() {
     }
   }
 
-  // Save cursor
+  // Save and restore cursor
   const sel = window.getSelection();
   let savedRange = null;
   if (sel.rangeCount) savedRange = sel.getRangeAt(0).cloneRange();
-
   walk(editor);
-
-  // Restore cursor approximately
-  if (savedRange) {
-    try { sel.removeAllRanges(); sel.addRange(savedRange); } catch(e) {}
-  }
+  if (savedRange) { try { sel.removeAllRanges(); sel.addRange(savedRange); } catch(e) {} }
 }
 
 function cleanPastedHTML(html) {
   const div = document.createElement('div');
   div.innerHTML = html;
-  // Remove everything except allowed tags
   const allowed = new Set(['B','I','EM','STRONG','A','BR','P','UL','OL','LI']);
   function clean(node) {
     for (const child of Array.from(node.childNodes)) {
       if (child.nodeType === Node.ELEMENT_NODE) {
         if (!allowed.has(child.tagName)) {
-          // Replace with its children
           const frag = document.createDocumentFragment();
           Array.from(child.childNodes).forEach(c => frag.appendChild(c));
           child.replaceWith(frag);
           clean(node);
           return;
         } else {
-          // Strip all attributes except href on <a>
+          // Keep only href on <a>, strip everything else
           Array.from(child.attributes).forEach(attr => {
             if (!(child.tagName === 'A' && attr.name === 'href')) child.removeAttribute(attr.name);
           });
@@ -905,45 +763,53 @@ function cleanPastedHTML(html) {
 // NUDGES
 // ══════════════════════════════════
 function pickNudges() {
-  currentNudges = STEPS.map(step => {
-    const pool = ALL_NUDGES.map((n,i) => ({...n,i})).filter(n => n.step === step && !usedIndices[step].includes(n.i));
-    // If we've exhausted all variants for this step, reset
+  // One nudge per PASTOR step = all 6 steps shown, in order
+  const picked = [];
+  for (const step of STEPS) {
+    let pool = ALL_NUDGES
+      .map((n, i) => ({ ...n, i }))
+      .filter(n => n.step === step && !usedIndices[step].includes(n.i));
+    // Reset step pool if exhausted
     if (pool.length === 0) {
       usedIndices[step] = [];
-      const full = ALL_NUDGES.map((n,i) => ({...n,i})).filter(n => n.step === step);
-      const pick = full[Math.floor(Math.random() * full.length)];
-      usedIndices[step].push(pick.i);
-      return pick;
+      pool = ALL_NUDGES.map((n, i) => ({ ...n, i })).filter(n => n.step === step);
     }
     const pick = pool[Math.floor(Math.random() * pool.length)];
     usedIndices[step].push(pick.i);
-    return pick;
-  });
+    picked.push(pick);
+  }
+  currentNudges = picked;
   renderNudges();
 }
 
 function refreshNudges() {
   const cards = document.getElementById('nudgeCards');
-  cards.style.opacity = '0.3'; cards.style.transform = 'translateX(4px)';
+  cards.style.opacity = '0.3';
+  cards.style.transform = 'translateX(4px)';
   setTimeout(() => {
     pickNudges();
     cards.style.transition = 'opacity 0.25s, transform 0.25s';
-    cards.style.opacity = '1'; cards.style.transform = 'translateX(0)';
+    cards.style.opacity = '1';
+    cards.style.transform = 'translateX(0)';
     setTimeout(() => { cards.style.transition = ''; }, 300);
   }, 160);
 }
 
 function renderNudges() {
-  document.getElementById('nudgeCards').innerHTML = currentNudges.map((n,i) => `
+  document.getElementById('nudgeCards').innerHTML = currentNudges.map((n, i) => `
     <div class="nudge-card" data-step="${n.step}" onclick="focusEditor()">
       <div class="nudge-step" data-step="${n.step}">${n.step} — ${n.label}</div>
       <div class="nudge-text">${n.text}</div>
       <button class="nudge-insert" onclick="event.stopPropagation(); insertNudge(${i})">↳ Use as prompt</button>
     </div>
   `).join('');
+  updateNudgeSub();
+}
 
+function updateNudgeSub() {
   const words = getWordCount();
   const sub = document.getElementById('nudgeSub');
+  if (!sub) return;
   if (words === 0)       sub.textContent = 'Pick one that speaks to you →';
   else if (words < 150)  sub.textContent = 'Good start. What\'s next?';
   else if (words < 400)  sub.textContent = 'Nice momentum — keep building.';
@@ -954,51 +820,58 @@ function insertNudge(i) {
   const n = currentNudges[i];
   const editor = document.getElementById('editor');
   editor.focus();
-  // Move cursor to end
+  // Insert as a proper new paragraph at end
+  const p = document.createElement('p');
+  p.textContent = `[ ${n.step} — ${n.label}: ${n.text} ]`;
+  editor.appendChild(p);
+  // Place cursor at end of inserted paragraph
   const range = document.createRange();
-  range.selectNodeContents(editor);
+  range.selectNodeContents(p);
   range.collapse(false);
   const sel = window.getSelection();
-  sel.removeAllRanges(); sel.addRange(range);
-
-  const text = `\n[ ${n.step} — ${n.label}: ${n.text} ]\n`;
-  document.execCommand('insertText', false, text);
+  sel.removeAllRanges();
+  sel.addRange(range);
   onType();
 }
 
 function focusEditor() {
-  const editor = document.getElementById('editor');
-  editor.focus();
-  // Move cursor to end if empty-ish
-  const range = document.createRange();
-  range.selectNodeContents(editor);
-  range.collapse(false);
-  const sel = window.getSelection();
-  sel.removeAllRanges(); sel.addRange(range);
+  document.getElementById('editor').focus();
+}
+
+function onTitleType() {
+  const chromeEl = document.getElementById('postTitleInline');
+  const title = chromeEl.value.trim();
+  document.title = title ? title + ' — Pagebreak' : 'Pagebreak';
+  // Re-render sidebar card so the title updates live
+  const panel = document.getElementById('postsPanel');
+  if (!panel.classList.contains('hidden')) renderPostsList();
+  onType();
 }
 
 // ══════════════════════════════════
 // WORD COUNT + MILESTONES
 // ══════════════════════════════════
-function updateEmptyState() {
-  const editor = document.getElementById('editor');
-  const text = editor.innerText.trim();
-  editor.classList.toggle('is-empty', text === '');
-}
-
 function onType() {
-  updateEmptyState();
   updateWordCount();
+  updateNudgeSub();
   resetStuckTimer();
   clearTimeout(onType._t);
   onType._t = setTimeout(silentSave, 5000);
-  renderNudges(); // keep subtitle fresh
 }
 
 function getWordCount() {
-  const title = document.getElementById('postTitleInline').value || '';
-  const body  = document.getElementById('editor').innerText || '';
-  const full  = (title + ' ' + body).trim();
+  // Walk text nodes directly — avoids innerText's phantom newline-words
+  const editor = document.getElementById('editor');
+  const parts = [];
+  function collect(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      parts.push(node.textContent);
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      for (const child of node.childNodes) collect(child);
+    }
+  }
+  collect(editor);
+  const full = parts.join(' ').trim();
   return full ? full.split(/\s+/).filter(w => w.length > 0).length : 0;
 }
 
@@ -1014,7 +887,8 @@ function updateWordCount() {
 
 function celebrate(msg) {
   const el = document.getElementById('celebration');
-  el.textContent = msg; el.classList.add('show');
+  el.textContent = msg;
+  el.classList.add('show');
   clearTimeout(celebrate._t);
   celebrate._t = setTimeout(() => el.classList.remove('show'), 2600);
 }
@@ -1023,19 +897,18 @@ function celebrate(msg) {
 // STUCK DETECTOR
 // ══════════════════════════════════
 function resetStuckTimer() {
-  stuckShown = false;
-  document.getElementById('stuckBar').classList.remove('show');
   clearTimeout(stuckTimer);
+  // Once dismissed in a session, don't re-show
+  if (stuckDismissed) return;
   if (getWordCount() < 5) return;
   stuckTimer = setTimeout(() => {
-    stuckShown = true;
     document.getElementById('stuckBar').classList.add('show');
   }, 75000);
 }
 
 function dismissStuck() {
   document.getElementById('stuckBar').classList.remove('show');
-  stuckShown = true;
+  stuckDismissed = true;
 }
 
 function openNudges() {
@@ -1067,7 +940,7 @@ function togglePostsPanel() {
   const isHidden = panel.classList.contains('hidden');
   if (isHidden) { silentSave(); renderPostsList(); }
   panel.classList.toggle('hidden', !isHidden);
-  document.getElementById('btnPosts').classList.toggle('on', !isHidden ? false : true);
+  document.getElementById('btnPosts').classList.toggle('on', isHidden);
 }
 
 function renderPostsList() {
@@ -1102,10 +975,10 @@ function openPost(id) {
   if (post) {
     document.getElementById('postTitleInline').value = post.title || '';
     document.getElementById('editor').innerHTML = post.body || '';
-    lastMilestone = 0;
+    document.title = (post.title||'').trim() ? post.title.trim() + ' — Pagebreak' : 'Pagebreak';
+    lastMilestone = Math.floor(getWordCount() / 100);
     updateWordCount();
-    updateEmptyState();
-    renderNudges();
+    updateNudgeSub();
   }
   renderPostsList();
   focusEditor();
@@ -1114,30 +987,26 @@ function openPost(id) {
 function newPost() {
   silentSave();
   const id = genId();
-  const ids = getAllPostIds();
-  ids.push(id);
-  saveAllPostIds(ids);
+  saveAllPostIds([...getAllPostIds(), id]);
   savePost(id, { title:'', body:'', saved: Date.now() });
   setActiveId(id);
   document.getElementById('postTitleInline').value = '';
   document.getElementById('editor').innerHTML = '';
+  document.title = 'Pagebreak';
   lastMilestone = 0;
   updateWordCount();
-  updateEmptyState();
+  updateNudgeSub();
   renderPostsList();
   focusEditor();
 }
 
 function confirmDeletePost(id) {
-  // Find the row and swap it to a confirmation state inline — no confirm() dialog
   const rows = document.querySelectorAll('.post-row');
   let targetRow = null;
   rows.forEach(r => { if (r.dataset.postId === id) targetRow = r; });
   if (!targetRow) return;
-
   const post = getPost(id);
   const name = post?.title || 'Untitled post';
-
   targetRow.innerHTML = `
     <div class="post-row-info" style="min-width:0">
       <div class="post-row-title" style="color:var(--c-p);font-size:11px">Delete "${escHtml(name)}"?</div>
@@ -1196,13 +1065,16 @@ function silentSave() {
     saved: Date.now(),
     isDark,
   });
+  // Keep sidebar title in sync without full re-render
+  const panel = document.getElementById('postsPanel');
+  if (!panel.classList.contains('hidden')) renderPostsList();
 }
 
 function loadDoc() {
   try {
     const ids = getAllPostIds();
+    // Migrate legacy single-doc save (pb_v4) into the multi-post system
     const legacy = localStorage.getItem('pb_v4');
-    // Migrate legacy single-doc save
     if (legacy && ids.length === 0) {
       const d = JSON.parse(legacy);
       const id = genId();
@@ -1212,33 +1084,50 @@ function loadDoc() {
       localStorage.removeItem('pb_v4');
       document.getElementById('postTitleInline').value = d.title || '';
       document.getElementById('editor').innerHTML = d.body || '';
+      document.title = (d.title||'').trim() ? d.title.trim() + ' — Pagebreak' : 'Pagebreak';
     } else {
       let activeId = getActiveId();
-      if (!activeId && ids.length > 0) { activeId = ids[ids.length-1]; setActiveId(activeId); }
+      if (!activeId && ids.length > 0) { activeId = ids[ids.length - 1]; setActiveId(activeId); }
       if (activeId) {
         const post = getPost(activeId);
         if (post) {
           document.getElementById('postTitleInline').value = post.title || '';
           document.getElementById('editor').innerHTML = post.body || '';
+          document.title = (post.title||'').trim() ? post.title.trim() + ' — Pagebreak' : 'Pagebreak';
         }
       }
     }
+    // Initialise lastMilestone so celebrations don't re-fire on reload
+    lastMilestone = Math.floor(getWordCount() / 100);
     updateWordCount();
-    updateEmptyState();
     if (localStorage.getItem('pb_dark') === 'true') { isDark = false; toggleDark(); }
   } catch(e) {}
 }
 
 function copyText() {
   const title = document.getElementById('postTitleInline').value;
-  const body  = document.getElementById('editor').innerText;
+  // Walk text nodes with block-level newlines for readable output
+  const editor = document.getElementById('editor');
+  const parts = [];
+  function collect(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      parts.push(node.textContent);
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const isBlock = ['P','DIV','LI','BR'].includes(node.tagName);
+      for (const child of node.childNodes) collect(child);
+      if (isBlock) parts.push('\n');
+    }
+  }
+  collect(editor);
+  const body = parts.join('').replace(/\n{3,}/g, '\n\n').trim();
   navigator.clipboard.writeText((title ? title + '\n\n' : '') + body)
     .then(() => showToast('Copied to clipboard ✓'));
 }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
+  t.textContent = msg;
+  t.classList.add('show');
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => t.classList.remove('show'), 2000);
 }
