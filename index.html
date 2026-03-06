@@ -138,8 +138,8 @@
     word-break: break-word;
   }
 
-  /* Empty placeholder */
-  .editor.is-empty::before {
+  /* Empty placeholder — only when editor has no content */
+  .editor:empty::before {
     content: attr(data-placeholder);
     color: var(--ink-dim); font-style: italic; pointer-events: none;
   }
@@ -721,15 +721,15 @@ let usedIndices = { P:[], A:[], S:[], T:[], O:[], R:[] };
 // INIT
 // ══════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
+  const editor = document.getElementById('editor');
+
   loadDoc();
   updateEmptyState();
   pickNudges();
+  setInterval(silentSave, 20000);
 
   // Auto-focus so the native caret is visible immediately
   editor.focus();
-  setInterval(silentSave, 20000);
-
-  const editor = document.getElementById('editor');
 
   // Global keyboard shortcuts
   document.addEventListener('keydown', e => {
@@ -749,17 +749,22 @@ window.addEventListener('DOMContentLoaded', () => {
   // Force <p> on Enter (not <div>) for consistent paragraph spacing
   document.execCommand('defaultParagraphSeparator', false, 'p');
 
-  // Ensure first keystroke lands inside a <p>, not a bare text node
-  editor.addEventListener('focus', () => {
+  // Ensure there's always a block element so execCommand (bold/italic) works.
+  // Inject a <p> wrapper on the very first keypress if the editor is still empty.
+  editor.addEventListener('keydown', e => {
     if (editor.innerHTML.trim() === '' || editor.innerHTML === '<br>') {
-      editor.innerHTML = '<p><br></p>';
-      const range = document.createRange();
+      // Don't intercept shortcuts or special keys
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (['Tab','Escape','Enter','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) return;
+      editor.innerHTML = '<p></p>';
       const p = editor.querySelector('p');
+      const range = document.createRange();
       range.setStart(p, 0); range.collapse(true);
       const sel = window.getSelection();
       sel.removeAllRanges(); sel.addRange(range);
+      // Don't preventDefault — let the keystroke land naturally inside the <p>
     }
-  });
+  }, true); // capture phase so it runs before the bullet handler
 
   // Bullet transform: "- " at start of line → bullet list item
   editor.addEventListener('keydown', e => {
@@ -1136,6 +1141,7 @@ function confirmDeletePost(id) {
   targetRow.innerHTML = `
     <div class="post-row-info" style="min-width:0">
       <div class="post-row-title" style="color:var(--c-p);font-size:11px">Delete "${escHtml(name)}"?</div>
+      <div class="post-row-meta">This can't be undone</div>
     </div>
     <button onclick="event.stopPropagation();doDeletePost('${id}')"
       style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;border:none;
