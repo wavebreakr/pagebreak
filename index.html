@@ -144,27 +144,7 @@
     color: var(--ink-dim); font-style: italic; pointer-events: none;
   }
 
-  /* Blinking cursor when empty and focused */
-  @keyframes caretBlink {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0; }
-  }
-  .editor.is-empty::after {
-    content: '';
-    display: inline-block;
-    width: 2px; height: 1.1em;
-    background: var(--accent);
-    vertical-align: text-bottom;
-    margin-left: 1px;
-    opacity: 0;
-    border-radius: 1px;
-  }
-  .editor.is-empty:focus {
-    caret-color: transparent;
-  }
-  .editor.is-empty:focus::after {
-    animation: caretBlink 1.1s ease-in-out infinite;
-  }
+
 
   /* Paragraph spacing — browsers use both p and div in contenteditable */
   .editor p,
@@ -673,6 +653,9 @@ window.addEventListener('DOMContentLoaded', () => {
   loadDoc();
   updateEmptyState();
   pickNudges();
+
+  // Auto-focus so the native caret is visible immediately
+  editor.focus();
   setInterval(silentSave, 20000);
 
   const editor = document.getElementById('editor');
