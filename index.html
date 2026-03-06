@@ -52,18 +52,22 @@
     z-index: 100; transition: background 0.4s, border-color 0.4s;
     gap: 12px;
   }
+
   .chrome-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
   .brand {
     display: flex; align-items: center; gap: 7px;
     font-size: 14px; font-weight: 600; letter-spacing: -0.02em;
     color: var(--ink); flex-shrink: 0;
   }
+
   .brand-mark {
     width: 18px; height: 18px; background: var(--accent);
     border-radius: 4px; display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
   .brand-mark svg { width: 10px; height: 10px; }
+
   .post-title-inline {
     font-family: 'DM Sans', sans-serif;
     font-size: 13px; font-weight: 400;
@@ -73,13 +77,17 @@
   }
   .post-title-inline::placeholder { color: var(--ink-dim); }
   .post-title-inline:focus { color: var(--ink-mid); }
+
   .chrome-sep { width: 1px; height: 16px; background: var(--ink-faint); flex-shrink: 0; }
+
   .chrome-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
   .word-count {
     font-size: 12px; font-weight: 500; color: var(--ink-dim);
     font-variant-numeric: tabular-nums; min-width: 54px; text-align: right;
     transition: color 0.3s;
   }
+
   .icon-btn {
     width: 30px; height: 30px;
     border: 1px solid var(--ink-faint); border-radius: 6px;
@@ -90,6 +98,8 @@
   }
   .icon-btn:hover { background: var(--ink-faint); color: var(--ink); }
   .icon-btn.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* Copy button — text label style */
   .copy-btn {
     font-family: 'DM Sans', sans-serif;
     font-size: 11px; font-weight: 500;
@@ -109,12 +119,15 @@
   }
 
   /* ── Editor wrap ── */
-  .editor-wrap { flex: 1; overflow-y: auto; padding: 52px 0 120px; }
+  .editor-wrap {
+    flex: 1; overflow-y: auto; padding: 52px 0 120px;
+  }
   .editor-wrap::-webkit-scrollbar { width: 3px; }
   .editor-wrap::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
+
   .editor-inner { max-width: 640px; margin: 0 auto; padding: 0 36px; }
 
-  /* ── Editor ── */
+  /* ── contenteditable editor ── */
   .editor {
     font-family: 'Lora', serif;
     font-size: 18px; font-weight: 400; line-height: 1.9;
@@ -124,18 +137,43 @@
     transition: color 0.3s; letter-spacing: 0.005em;
     word-break: break-word;
   }
+
+  /* Empty placeholder */
   .editor:empty::before {
     content: attr(data-placeholder);
     color: var(--ink-dim); font-style: italic; pointer-events: none;
   }
-  /* Browsers use both p and div in contenteditable */
-  .editor p, .editor div { margin-bottom: 1.15em; min-height: 1em; }
-  .editor p:last-child, .editor div:last-child { margin-bottom: 0; }
+
+  /* Paragraph spacing — browsers use both p and div in contenteditable */
+  .editor p,
+  .editor div {
+    margin-bottom: 1.15em;
+    min-height: 1em;
+  }
+  .editor p:last-child,
+  .editor div:last-child { margin-bottom: 0; }
+
+  /* Shift+Enter line breaks stay tight — no extra gap */
   .editor br { display: block; margin-bottom: 0; }
-  .editor ul { padding-left: 1.4em; margin-bottom: 0.75em; list-style: disc; }
+
+  /* Bullet points */
+  .editor ul {
+    padding-left: 1.4em;
+    margin-bottom: 0.75em;
+    list-style: disc;
+  }
   .editor ul li { margin-bottom: 0.2em; line-height: 1.9; }
-  .editor a { color: var(--link); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+
+  /* URL links */
+  .editor a {
+    color: var(--link);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
   .editor a:hover { opacity: 0.8; }
+
+  /* Bold / italic handled by browser execCommand */
   .editor b, .editor strong { font-weight: 700; }
   .editor i, .editor em { font-style: italic; }
 
@@ -148,8 +186,14 @@
     transition: width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s, border-color 0.4s;
   }
   .nudge-panel.hidden { width: 0; opacity: 0; border-left-width: 0; }
-  .nudge-header { padding: 16px 16px 12px; border-bottom: 1px solid var(--nudge-border); flex-shrink: 0; }
-  .nudge-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
+
+  .nudge-header {
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid var(--nudge-border); flex-shrink: 0;
+  }
+  .nudge-header-top {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px;
+  }
   .nudge-header-label {
     font-size: 10px; font-weight: 600; text-transform: uppercase;
     letter-spacing: 0.14em; color: var(--ink-dim);
@@ -164,19 +208,20 @@
   }
   .nudge-info-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
   .nudge-header-sub { font-size: 11px; color: var(--ink-mid); line-height: 1.4; }
+
   .nudge-cards {
     flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 8px;
     overflow-y: auto; align-content: flex-start;
   }
   .nudge-cards::-webkit-scrollbar { width: 2px; }
   .nudge-cards::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
+
   .nudge-card {
     background: var(--surface); border: 1px solid var(--nudge-border);
     border-radius: 10px; padding: 12px 14px;
     cursor: pointer; transition: all 0.18s ease;
     position: relative; overflow: hidden;
     display: flex; flex-direction: column; gap: 5px;
-    flex-shrink: 0;
   }
   .nudge-card::before {
     content: ""; position: absolute;
@@ -186,18 +231,21 @@
   }
   .nudge-card:hover { transform: translateX(2px); }
   .nudge-card:hover::before { opacity: 1; }
+
   .nudge-card[data-step="P"]::before { background: var(--c-p); }
   .nudge-card[data-step="A"]::before { background: var(--c-a); }
   .nudge-card[data-step="S"]::before { background: var(--c-s); }
   .nudge-card[data-step="T"]::before { background: var(--c-t); }
   .nudge-card[data-step="O"]::before { background: var(--c-o); }
   .nudge-card[data-step="R"]::before { background: var(--c-r); }
+
   .nudge-card[data-step="P"]:hover { border-color: rgba(184,74,74,0.3); }
   .nudge-card[data-step="A"]:hover { border-color: rgba(194,105,42,0.3); }
   .nudge-card[data-step="S"]:hover { border-color: rgba(160,107,26,0.3); }
   .nudge-card[data-step="T"]:hover { border-color: rgba(42,122,74,0.3); }
   .nudge-card[data-step="O"]:hover { border-color: rgba(42,90,138,0.3); }
   .nudge-card[data-step="R"]:hover { border-color: rgba(106,58,154,0.3); }
+
   .nudge-step {
     font-size: 9px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.1em; flex-shrink: 0;
@@ -208,10 +256,12 @@
   .nudge-step[data-step="T"] { color: var(--c-t); }
   .nudge-step[data-step="O"] { color: var(--c-o); }
   .nudge-step[data-step="R"] { color: var(--c-r); }
+
   .nudge-text {
     font-size: 11.5px; line-height: 1.55;
     color: var(--ink-mid); font-family: 'DM Sans', sans-serif;
   }
+
   .nudge-insert {
     display: none; font-size: 10px; font-weight: 600;
     border: none; border-radius: 5px; padding: 3px 8px;
@@ -219,13 +269,17 @@
     transition: all 0.15s; align-self: flex-start; flex-shrink: 0;
   }
   .nudge-card:hover .nudge-insert { display: block; }
+
   .nudge-card[data-step="P"] .nudge-insert { background: rgba(184,74,74,0.1); color: var(--c-p); }
   .nudge-card[data-step="A"] .nudge-insert { background: rgba(194,105,42,0.1); color: var(--c-a); }
   .nudge-card[data-step="S"] .nudge-insert { background: rgba(160,107,26,0.1); color: var(--c-s); }
   .nudge-card[data-step="T"] .nudge-insert { background: rgba(42,122,74,0.1); color: var(--c-t); }
   .nudge-card[data-step="O"] .nudge-insert { background: rgba(42,90,138,0.1); color: var(--c-o); }
   .nudge-card[data-step="R"] .nudge-insert { background: rgba(106,58,154,0.1); color: var(--c-r); }
-  .nudge-footer { padding: 10px 12px; border-top: 1px solid var(--nudge-border); flex-shrink: 0; }
+
+  .nudge-footer {
+    padding: 10px 12px; border-top: 1px solid var(--nudge-border); flex-shrink: 0;
+  }
   .btn-refresh {
     width: 100%; padding: 8px;
     background: none; border: 1px dashed var(--nudge-border);
@@ -245,6 +299,7 @@
     backdrop-filter: blur(2px);
   }
   .modal-backdrop.show { opacity: 1; pointer-events: all; }
+
   .modal {
     background: var(--surface); border-radius: 14px;
     width: min(480px, 90vw); max-height: 80vh;
@@ -257,12 +312,17 @@
   .modal-backdrop.show .modal { transform: translateY(0) scale(1); }
   .modal::-webkit-scrollbar { width: 3px; }
   .modal::-webkit-scrollbar-thumb { background: var(--ink-faint); }
+
   .modal-header {
     display: flex; align-items: flex-start; justify-content: space-between;
     margin-bottom: 18px; gap: 12px;
   }
-  .modal-title { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
-  .modal-subtitle { font-size: 12px; color: var(--ink-mid); margin-top: 3px; line-height: 1.4; }
+  .modal-title {
+    font-size: 16px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink);
+  }
+  .modal-subtitle {
+    font-size: 12px; color: var(--ink-mid); margin-top: 3px; line-height: 1.4;
+  }
   .modal-close {
     width: 28px; height: 28px; border-radius: 6px;
     border: 1px solid var(--ink-faint); background: none;
@@ -271,17 +331,25 @@
     transition: all 0.15s; flex-shrink: 0;
   }
   .modal-close:hover { background: var(--ink-faint); color: var(--ink); }
+
   .pastor-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
   .pastor-step-row {
     display: flex; gap: 12px; align-items: flex-start;
     padding: 11px 13px; border-radius: 9px;
     border: 1px solid var(--nudge-border);
     background: var(--nudge-bg);
   }
-  .pastor-step-letter { font-size: 13px; font-weight: 700; letter-spacing: 0.02em; width: 20px; flex-shrink: 0; padding-top: 1px; }
+  .pastor-step-letter {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.02em;
+    width: 20px; flex-shrink: 0; padding-top: 1px;
+  }
   .pastor-step-info { flex: 1; }
-  .pastor-step-name { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .pastor-step-name {
+    font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 2px;
+  }
   .pastor-step-desc { font-size: 11.5px; color: var(--ink-mid); line-height: 1.5; }
+
   .modal-why {
     padding: 14px; border-radius: 9px;
     background: var(--accent-dim); border: 1px solid var(--accent-border);
@@ -320,11 +388,13 @@
     z-index: 200; white-space: nowrap;
   }
   .stuck-bar.show { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
+
   .stuck-dot {
     width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
     animation: pulse 1.5s ease-in-out infinite;
   }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
+
   .stuck-btn {
     font-size: 11px; font-weight: 600; border: none;
     border-radius: 6px; padding: 4px 10px;
@@ -499,6 +569,7 @@
       </div>
       <button class="modal-close" onclick="closeModal()">×</button>
     </div>
+
     <div class="pastor-steps">
       <div class="pastor-step-row">
         <div class="pastor-step-letter" style="color:var(--c-p)">P</div>
@@ -543,6 +614,7 @@
         </div>
       </div>
     </div>
+
     <div class="modal-why">
       <div class="modal-why-label">Why it works</div>
       <div class="modal-why-text">PASTOR works because it mirrors how people actually make decisions — they feel a pain, they imagine it getting worse, they look for a solution, they need to trust it, then they act. Writing that follows this sequence doesn't feel like marketing. It feels like someone finally gets it.</div>
@@ -566,6 +638,7 @@ function closeModal() {
 function closeModalOnBackdrop(e) {
   if (e.target === document.getElementById('modalBackdrop')) closeModal();
 }
+// Escape key closes modal
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 // ══════════════════════════════════
@@ -615,7 +688,7 @@ const CELEBRATIONS = [
 
 // ── State ──
 let isDark = false, nudgeVisible = true;
-let stuckTimer = null, stuckDismissed = false;
+let stuckTimer = null, stuckShown = false;
 let lastMilestone = 0;
 let currentNudges = [];
 let usedIndices = { P:[], A:[], S:[], T:[], O:[], R:[] };
@@ -628,188 +701,100 @@ window.addEventListener('DOMContentLoaded', () => {
   pickNudges();
   setInterval(silentSave, 20000);
 
-  // Nudge button reflects panel's visible-by-default state
-  document.getElementById('btnNudge').classList.add('on');
-
   const editor = document.getElementById('editor');
 
-  // Keyboard shortcuts
+  // Global keyboard shortcuts
   document.addEventListener('keydown', e => {
     const mod = e.metaKey || e.ctrlKey;
-    if (mod && e.key === 's') { e.preventDefault(); silentSave(); showToast('Saved ✓'); return; }
-    // Bold / italic — only when editor has focus
-    if (editor.contains(document.getSelection()?.anchorNode) || document.activeElement === editor) {
-      if (mod && e.key === 'b') { e.preventDefault(); document.execCommand('bold'); return; }
-      if (mod && e.key === 'i') { e.preventDefault(); document.execCommand('italic'); return; }
-    }
+    if (mod && e.key === 's') { e.preventDefault(); silentSave(); showToast('Saved ✓'); }
   });
 
-  // Use <p> for Enter, not <div>
+  // Force <p> on Enter (not <div>) for consistent paragraph spacing
   document.execCommand('defaultParagraphSeparator', false, 'p');
 
-  // Bullet shorthand: type "- " at start of a blank line → <ul><li>
+  // Bullet transform: "- " at start of block → bullet list item
+  // Uses execCommand so the action lands in the native undo stack (Cmd+Z works)
   editor.addEventListener('keydown', e => {
     if (e.key !== ' ') return;
     const sel = window.getSelection();
-    if (!sel.rangeCount) return;
+    if (!sel || !sel.rangeCount) return;
     const range = sel.getRangeAt(0);
-    const node = range.startContainer;
-    if (node.nodeType === Node.TEXT_NODE && node.textContent.slice(0, range.startOffset) === '-') {
+    if (!range.collapsed) return; // only act on a plain cursor
+
+    // Walk up to the nearest block-level ancestor inside the editor
+    let block = range.startContainer;
+    while (block && block !== editor && !/^(P|DIV|LI)$/.test(block.nodeName)) {
+      block = block.parentNode;
+    }
+    if (!block || block === editor) return;
+
+    // Get the full text content of the block up to the cursor
+    const preRange = document.createRange();
+    preRange.setStart(block, 0);
+    preRange.setEnd(range.startContainer, range.startOffset);
+    const textBefore = preRange.toString();
+
+    if (textBefore === '-') {
       e.preventDefault();
-      const block = node.parentElement;
-      node.textContent = node.textContent.slice(1);
-      const ul = document.createElement('ul');
-      const li = document.createElement('li');
-      li.innerHTML = '<br>';
-      ul.appendChild(li);
-      block.replaceWith(ul);
-      const newRange = document.createRange();
-      newRange.setStart(li, 0);
-      newRange.collapse(true);
+      // Select the hyphen and replace via execCommand so undo works
+      const delRange = document.createRange();
+      delRange.setStart(range.startContainer, range.startOffset - 1);
+      delRange.setEnd(range.startContainer, range.startOffset);
       sel.removeAllRanges();
-      sel.addRange(newRange);
+      sel.addRange(delRange);
+      document.execCommand('delete');          // remove the '-'
+      document.execCommand('insertUnorderedList'); // toggle on a list
       onType();
     }
   });
 
-  // Linkify on word boundary
-  editor.addEventListener('keyup', e => {
-    if (e.key === ' ' || e.key === 'Enter') linkifyEditor();
-    onType();
-  });
-
+  editor.addEventListener('keyup', onType);
   editor.addEventListener('input', onType);
-
-  // Paste: strip heavy HTML, keep bold/italic/links/lists
-  editor.addEventListener('paste', e => {
-    e.preventDefault();
-    const html = e.clipboardData.getData('text/html');
-    const text = e.clipboardData.getData('text/plain');
-    if (html) {
-      document.execCommand('insertHTML', false, cleanPastedHTML(html));
-    } else {
-      document.execCommand('insertText', false, text);
-    }
-    linkifyEditor();
-    onType();
-  });
 });
-
-// ══════════════════════════════════
-// LINKIFY
-// ══════════════════════════════════
-function linkifyEditor() {
-  const editor = document.getElementById('editor');
-  const urlRegex = /(?<!['"=])(https?:\/\/[^\s<>"']+)/g;
-
-  function walk(node) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      const text = node.textContent;
-      if (!urlRegex.test(text)) return;
-      urlRegex.lastIndex = 0;
-      const frag = document.createDocumentFragment();
-      let last = 0, match;
-      while ((match = urlRegex.exec(text)) !== null) {
-        if (match.index > last) frag.appendChild(document.createTextNode(text.slice(last, match.index)));
-        const a = document.createElement('a');
-        a.href = match[0]; a.textContent = match[0];
-        a.target = '_blank'; a.rel = 'noopener noreferrer';
-        frag.appendChild(a);
-        last = match.index + match[0].length;
-      }
-      if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
-      node.parentNode.replaceChild(frag, node);
-    } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'A') {
-      Array.from(node.childNodes).forEach(walk);
-    }
-  }
-
-  // Save and restore cursor
-  const sel = window.getSelection();
-  let savedRange = null;
-  if (sel.rangeCount) savedRange = sel.getRangeAt(0).cloneRange();
-  walk(editor);
-  if (savedRange) { try { sel.removeAllRanges(); sel.addRange(savedRange); } catch(e) {} }
-}
-
-function cleanPastedHTML(html) {
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  const allowed = new Set(['B','I','EM','STRONG','A','BR','P','UL','OL','LI']);
-  function clean(node) {
-    for (const child of Array.from(node.childNodes)) {
-      if (child.nodeType === Node.ELEMENT_NODE) {
-        if (!allowed.has(child.tagName)) {
-          const frag = document.createDocumentFragment();
-          Array.from(child.childNodes).forEach(c => frag.appendChild(c));
-          child.replaceWith(frag);
-          clean(node);
-          return;
-        } else {
-          // Keep only href on <a>, strip everything else
-          Array.from(child.attributes).forEach(attr => {
-            if (!(child.tagName === 'A' && attr.name === 'href')) child.removeAttribute(attr.name);
-          });
-          clean(child);
-        }
-      }
-    }
-  }
-  clean(div);
-  return div.innerHTML;
-}
 
 // ══════════════════════════════════
 // NUDGES
 // ══════════════════════════════════
 function pickNudges() {
-  // One nudge per PASTOR step = all 6 steps shown, in order
   const picked = [];
+
   for (const step of STEPS) {
-    let pool = ALL_NUDGES
-      .map((n, i) => ({ ...n, i }))
-      .filter(n => n.step === step && !usedIndices[step].includes(n.i));
-    // Reset step pool if exhausted
+    let pool = ALL_NUDGES.map((n,i)=>({...n,i})).filter(n => n.step===step && !usedIndices[step].includes(n.i));
     if (pool.length === 0) {
       usedIndices[step] = [];
-      pool = ALL_NUDGES.map((n, i) => ({ ...n, i })).filter(n => n.step === step);
+      pool = ALL_NUDGES.map((n,i)=>({...n,i})).filter(n=>n.step===step);
     }
-    const pick = pool[Math.floor(Math.random() * pool.length)];
+    const pick = pool[Math.floor(Math.random()*pool.length)];
     usedIndices[step].push(pick.i);
     picked.push(pick);
   }
+
   currentNudges = picked;
   renderNudges();
 }
 
 function refreshNudges() {
   const cards = document.getElementById('nudgeCards');
-  cards.style.opacity = '0.3';
-  cards.style.transform = 'translateX(4px)';
+  cards.style.opacity = '0.3'; cards.style.transform = 'translateX(4px)';
   setTimeout(() => {
     pickNudges();
     cards.style.transition = 'opacity 0.25s, transform 0.25s';
-    cards.style.opacity = '1';
-    cards.style.transform = 'translateX(0)';
+    cards.style.opacity = '1'; cards.style.transform = 'translateX(0)';
     setTimeout(() => { cards.style.transition = ''; }, 300);
   }, 160);
 }
 
 function renderNudges() {
-  document.getElementById('nudgeCards').innerHTML = currentNudges.map((n, i) => `
+  document.getElementById('nudgeCards').innerHTML = currentNudges.map((n,i) => `
     <div class="nudge-card" data-step="${n.step}" onclick="focusEditor()">
       <div class="nudge-step" data-step="${n.step}">${n.step} — ${n.label}</div>
       <div class="nudge-text">${n.text}</div>
       <button class="nudge-insert" onclick="event.stopPropagation(); insertNudge(${i})">↳ Use as prompt</button>
     </div>
   `).join('');
-  updateNudgeSub();
-}
 
-function updateNudgeSub() {
   const words = getWordCount();
   const sub = document.getElementById('nudgeSub');
-  if (!sub) return;
   if (words === 0)       sub.textContent = 'Pick one that speaks to you →';
   else if (words < 150)  sub.textContent = 'Good start. What\'s next?';
   else if (words < 400)  sub.textContent = 'Nice momentum — keep building.';
@@ -820,32 +805,27 @@ function insertNudge(i) {
   const n = currentNudges[i];
   const editor = document.getElementById('editor');
   editor.focus();
-  // Insert as a proper new paragraph at end
-  const p = document.createElement('p');
-  p.textContent = `[ ${n.step} — ${n.label}: ${n.text} ]`;
-  editor.appendChild(p);
-  // Place cursor at end of inserted paragraph
+  // Move cursor to end
   const range = document.createRange();
-  range.selectNodeContents(p);
+  range.selectNodeContents(editor);
   range.collapse(false);
   const sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(range);
+  sel.removeAllRanges(); sel.addRange(range);
+
+  const text = `\n[ ${n.step} — ${n.label}: ${n.text} ]\n`;
+  document.execCommand('insertText', false, text);
   onType();
 }
 
 function focusEditor() {
-  document.getElementById('editor').focus();
-}
-
-function onTitleType() {
-  const chromeEl = document.getElementById('postTitleInline');
-  const title = chromeEl.value.trim();
-  document.title = title ? title + ' — Pagebreak' : 'Pagebreak';
-  // Re-render sidebar card so the title updates live
-  const panel = document.getElementById('postsPanel');
-  if (!panel.classList.contains('hidden')) renderPostsList();
-  onType();
+  const editor = document.getElementById('editor');
+  editor.focus();
+  // Move cursor to end if empty-ish
+  const range = document.createRange();
+  range.selectNodeContents(editor);
+  range.collapse(false);
+  const sel = window.getSelection();
+  sel.removeAllRanges(); sel.addRange(range);
 }
 
 // ══════════════════════════════════
@@ -853,25 +833,16 @@ function onTitleType() {
 // ══════════════════════════════════
 function onType() {
   updateWordCount();
-  updateNudgeSub();
   resetStuckTimer();
   clearTimeout(onType._t);
   onType._t = setTimeout(silentSave, 5000);
+  renderNudges(); // keep subtitle fresh
 }
 
 function getWordCount() {
-  // Walk text nodes directly — avoids innerText's phantom newline-words
-  const editor = document.getElementById('editor');
-  const parts = [];
-  function collect(node) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      parts.push(node.textContent);
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
-      for (const child of node.childNodes) collect(child);
-    }
-  }
-  collect(editor);
-  const full = parts.join(' ').trim();
+  const title = document.getElementById('postTitleInline').value || '';
+  const body  = document.getElementById('editor').innerText || '';
+  const full  = (title + ' ' + body).trim();
   return full ? full.split(/\s+/).filter(w => w.length > 0).length : 0;
 }
 
@@ -887,8 +858,7 @@ function updateWordCount() {
 
 function celebrate(msg) {
   const el = document.getElementById('celebration');
-  el.textContent = msg;
-  el.classList.add('show');
+  el.textContent = msg; el.classList.add('show');
   clearTimeout(celebrate._t);
   celebrate._t = setTimeout(() => el.classList.remove('show'), 2600);
 }
@@ -897,24 +867,33 @@ function celebrate(msg) {
 // STUCK DETECTOR
 // ══════════════════════════════════
 function resetStuckTimer() {
+  stuckShown = false;
+  document.getElementById('stuckBar').classList.remove('show');
   clearTimeout(stuckTimer);
-  // Once dismissed in a session, don't re-show
-  if (stuckDismissed) return;
   if (getWordCount() < 5) return;
   stuckTimer = setTimeout(() => {
+    stuckShown = true;
     document.getElementById('stuckBar').classList.add('show');
   }, 75000);
 }
 
 function dismissStuck() {
   document.getElementById('stuckBar').classList.remove('show');
-  stuckDismissed = true;
+  stuckShown = true;
 }
 
 function openNudges() {
   dismissStuck();
   if (!nudgeVisible) toggleNudge();
   refreshNudges();
+}
+
+function onTitleType() {
+  const title = document.getElementById('postTitleInline').value.trim();
+  document.title = title ? title + ' — Pagebreak' : 'Pagebreak';
+  const panel = document.getElementById('postsPanel');
+  if (!panel.classList.contains('hidden')) renderPostsList();
+  onType();
 }
 
 // ══════════════════════════════════
@@ -1065,7 +1044,6 @@ function silentSave() {
     saved: Date.now(),
     isDark,
   });
-  // Keep sidebar title in sync without full re-render
   const panel = document.getElementById('postsPanel');
   if (!panel.classList.contains('hidden')) renderPostsList();
 }
@@ -1097,7 +1075,6 @@ function loadDoc() {
         }
       }
     }
-    // Initialise lastMilestone so celebrations don't re-fire on reload
     lastMilestone = Math.floor(getWordCount() / 100);
     updateWordCount();
     if (localStorage.getItem('pb_dark') === 'true') { isDark = false; toggleDark(); }
@@ -1106,7 +1083,6 @@ function loadDoc() {
 
 function copyText() {
   const title = document.getElementById('postTitleInline').value;
-  // Walk text nodes with block-level newlines for readable output
   const editor = document.getElementById('editor');
   const parts = [];
   function collect(node) {
@@ -1126,8 +1102,7 @@ function copyText() {
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => t.classList.remove('show'), 2000);
 }
