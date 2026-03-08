@@ -163,6 +163,9 @@
     list-style: disc;
   }
   .editor ul li { margin-bottom: 0.2em; line-height: 1.9; }
+  /* Nested bullets */
+  .editor ul ul { margin-bottom: 0; list-style: circle; }
+  .editor ul ul ul { list-style: square; }
 
   /* URL links */
   .editor a {
@@ -703,7 +706,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const editor = document.getElementById('editor');
 
-  // Global keyboard shortcuts
+  // Global keyboard shortcuts (Cmd+S save — fires on document so it works everywhere)
   document.addEventListener('keydown', e => {
     const mod = e.metaKey || e.ctrlKey;
     if (mod && e.key === 's') { e.preventDefault(); silentSave(); showToast('Saved ✓'); }
@@ -712,45 +715,139 @@ window.addEventListener('DOMContentLoaded', () => {
   // Force <p> on Enter (not <div>) for consistent paragraph spacing
   document.execCommand('defaultParagraphSeparator', false, 'p');
 
-  // Bullet transform: "- " at start of block → bullet list item
-  // Uses execCommand so the action lands in the native undo stack (Cmd+Z works)
   editor.addEventListener('keydown', e => {
-    if (e.key !== ' ') return;
+    const mod = e.metaKey || e.ctrlKey;
     const sel = window.getSelection();
-    if (!sel || !sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-    if (!range.collapsed) return; // only act on a plain cursor
 
-    // Walk up to the nearest block-level ancestor inside the editor
-    let block = range.startContainer;
-    while (block && block !== editor && !/^(P|DIV|LI)$/.test(block.nodeName)) {
-      block = block.parentNode;
-    }
-    if (!block || block === editor) return;
-
-    // Get the full text content of the block up to the cursor
-    const preRange = document.createRange();
-    preRange.setStart(block, 0);
-    preRange.setEnd(range.startContainer, range.startOffset);
-    const textBefore = preRange.toString();
-
-    if (textBefore === '-') {
+    // ── Cmd/Ctrl+B — bold ──────────────────────────────
+    if (mod && e.key === 'b') {
       e.preventDefault();
-      // Select the hyphen and replace via execCommand so undo works
-      const delRange = document.createRange();
-      delRange.setStart(range.startContainer, range.startOffset - 1);
-      delRange.setEnd(range.startContainer, range.startOffset);
-      sel.removeAllRanges();
-      sel.addRange(delRange);
-      document.execCommand('delete');          // remove the '-'
-      document.execCommand('insertUnorderedList'); // toggle on a list
-      onType();
+      document.execCommand('bold');
+      return;
+    }
+
+    // ── Cmd/Ctrl+I — italic ────────────────────────────
+    if (mod && e.key === 'i') {
+      e.preventDefault();
+      document.execCommand('italic');
+      return;
+    }
+
+    // ── Tab / Shift+Tab — indent/outdent bullets ───────
+    if (e.key === 'Tab') {
+      if (!sel || !sel.rangeCount) return;
+      // Only intercept when inside a list item
+      let node = sel.getRangeAt(0).startContainer;
+      while (node && node !== editor) {
+        if (node.nodeName === 'LI') {
+          e.preventDefault();
+          document.execCommand(e.shiftKey ? 'outdent' : 'indent');
+          return;
+        }
+        node = node.parentNode;
+      }
+      // Outside a list — let Tab through (or prevent default to avoid focus jump)
+      e.preventDefault();
+      document.execCommand('insertText', false, '    ');
+      return;
+    }
+
+    // ── Space — bullet auto-transform ("- " → <ul>) ───
+    if (e.key === ' ') {
+      if (!sel || !sel.rangeCount) return;
+      const range = sel.getRangeAt(0);
+      if (!range.collapsed) return;
+
+      // Walk up to the nearest block-level ancestor inside the editor
+      let block = range.startContainer;
+      while (block && block !== editor && !/^(P|DIV|LI)$/.test(block.nodeName)) {
+        block = block.parentNode;
+      }
+      if (!block || block === editor) return;
+
+      const preRange = document.createRange();
+      preRange.setStart(block, 0);
+      preRange.setEnd(range.startContainer, range.startOffset);
+      const textBefore = preRange.toString();
+
+      if (textBefore === '-') {
+        e.preventDefault();
+        const delRange = document.createRange();
+        delRange.setStart(range.startContainer, range.startOffset - 1);
+        delRange.setEnd(range.startContainer, range.startOffset);
+        sel.removeAllRanges();
+        sel.addRange(delRange);
+        document.execCommand('delete');
+        document.execCommand('insertUnorderedList');
+        onType();
+      }
+      return;
+    }
+
+    // ── Enter / Space — linkify trailing URLs ──────────
+    if (e.key === 'Enter' || e.key === ' ') {
+      linkifyAtCursor();
     }
   });
+
+  // Also linkify on paste (after a tick so the pasted content is in the DOM)
+  editor.addEventListener('paste', () => { setTimeout(linkifyAtCursor, 0); });
 
   editor.addEventListener('keyup', onType);
   editor.addEventListener('input', onType);
 });
+
+// ══════════════════════════════════
+// URL LINKIFICATION
+// ══════════════════════════════════
+// Scans the text node immediately before the cursor and wraps any trailing
+// URL in an <a> tag using execCommand so it lands in the undo stack.
+const URL_RE = /https?:\/\/[^\s<>"']+[^\s<>"'.,:;!?')\]]/;
+
+function linkifyAtCursor() {
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  if (!range.collapsed) return;
+
+  // Get the text node the cursor is in (or just before it)
+  let textNode = range.startContainer;
+  if (textNode.nodeType !== Node.TEXT_NODE) return;
+
+  const text = textNode.textContent.slice(0, range.startOffset);
+  const match = URL_RE.exec(text);
+  if (!match) return;
+
+  // Make sure the match runs right up to the cursor (no trailing non-URL chars)
+  if (match.index + match[0].length !== text.length) return;
+
+  // Don't re-linkify if already inside an <a>
+  let parent = textNode.parentNode;
+  while (parent && parent !== document.getElementById('editor')) {
+    if (parent.tagName === 'A') return;
+    parent = parent.parentNode;
+  }
+
+  const url = match[0];
+  const start = match.index;
+
+  // Select the URL text
+  const linkRange = document.createRange();
+  linkRange.setStart(textNode, start);
+  linkRange.setEnd(textNode, start + url.length);
+  sel.removeAllRanges();
+  sel.addRange(linkRange);
+
+  // Wrap with execCommand so it's undoable
+  document.execCommand('createLink', false, url);
+
+  // Restore cursor to after the link
+  const newSel = window.getSelection();
+  if (newSel && newSel.rangeCount) {
+    const r = newSel.getRangeAt(0);
+    r.collapse(false);
+  }
+}
 
 // ══════════════════════════════════
 // NUDGES
@@ -839,11 +936,29 @@ function onType() {
   renderNudges(); // keep subtitle fresh
 }
 
+function getEditorText() {
+  // Walk DOM text nodes — avoids innerText inflating counts with hidden whitespace
+  const editor = document.getElementById('editor');
+  const parts = [];
+  function walk(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      parts.push(node.textContent);
+    } else {
+      // Insert a space at block boundaries so words don't merge across paragraphs
+      const isBlock = node.nodeType === Node.ELEMENT_NODE &&
+        /^(P|DIV|LI|BR|UL|OL)$/.test(node.tagName);
+      if (isBlock) parts.push(' ');
+      for (const child of node.childNodes) walk(child);
+      if (isBlock) parts.push(' ');
+    }
+  }
+  walk(editor);
+  return parts.join('');
+}
+
 function getWordCount() {
-  const title = document.getElementById('postTitleInline').value || '';
-  const body  = document.getElementById('editor').innerText || '';
-  const full  = (title + ' ' + body).trim();
-  return full ? full.split(/\s+/).filter(w => w.length > 0).length : 0;
+  const text = getEditorText().trim();
+  return text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
 }
 
 function updateWordCount() {
@@ -957,7 +1072,7 @@ function openPost(id) {
     document.title = (post.title||'').trim() ? post.title.trim() + ' — Pagebreak' : 'Pagebreak';
     lastMilestone = Math.floor(getWordCount() / 100);
     updateWordCount();
-    updateNudgeSub();
+    renderNudges();
   }
   renderPostsList();
   focusEditor();
@@ -974,7 +1089,7 @@ function newPost() {
   document.title = 'Pagebreak';
   lastMilestone = 0;
   updateWordCount();
-  updateNudgeSub();
+  renderNudges();
   renderPostsList();
   focusEditor();
 }
