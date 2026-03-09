@@ -167,6 +167,12 @@
   .editor ul ul { margin-bottom: 0; list-style: circle; }
   .editor ul ul ul { list-style: square; }
 
+  /* Horizontal rule */
+  .editor hr {
+    border: none; border-top: 1px solid var(--ink-faint);
+    margin: 1.5em 0; display: block;
+  }
+
   /* URL links */
   .editor a {
     color: var(--link);
@@ -499,6 +505,7 @@
   </div>
   <div class="chrome-right">
     <span class="word-count" id="wordCount">0 words</span>
+    <span class="word-count" id="readingLevel" style="min-width:0" title="Estimated reading level (Flesch-Kincaid grade)"></span>
     <button class="icon-btn" id="btnDark" title="Toggle dark mode" onclick="toggleDark()">🌙</button>
     <button class="icon-btn" id="btnNudge" title="Toggle nudges" onclick="toggleNudge()">💡</button>
     <button class="copy-btn" title="Copy all text to clipboard" onclick="copyText()">
@@ -536,7 +543,7 @@
   </div>
 
   <!-- Nudge panel -->
-  <div class="nudge-panel" id="nudgePanel">
+  <div class="nudge-panel hidden" id="nudgePanel">
     <div class="nudge-header">
       <div class="nudge-header-top">
         <div class="nudge-header-label">PASTOR Nudges</div>
@@ -690,8 +697,8 @@ const CELEBRATIONS = [
 ];
 
 // ── State ──
-let isDark = false, nudgeVisible = true;
-let stuckTimer = null, stuckShown = false;
+let isDark = false, nudgeVisible = false;
+let stuckTimer = null;
 let lastMilestone = 0;
 let currentNudges = [];
 let usedIndices = { P:[], A:[], S:[], T:[], O:[], R:[] };
@@ -780,13 +787,37 @@ window.addEventListener('DOMContentLoaded', () => {
         document.execCommand('delete');
         document.execCommand('insertUnorderedList');
         onType();
+        return;
       }
+      // Also linkify any URL immediately before the cursor
+      linkifyAtCursor();
       return;
     }
 
-    // ── Enter / Space — linkify trailing URLs ──────────
-    if (e.key === 'Enter' || e.key === ' ') {
-      linkifyAtCursor();
+    // ── Enter — hr transform ("-----" on empty line → <hr>) and linkify ──
+    if (e.key === 'Enter') {
+      // Check if the current block contains exactly "-----"
+      const rangeCk = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
+      if (rangeCk && rangeCk.collapsed) {
+        let block = rangeCk.startContainer;
+        while (block && block !== editor && !/^(P|DIV|LI)$/.test(block.nodeName)) {
+          block = block.parentNode;
+        }
+        if (block && block !== editor && block.textContent.trim() === '-----') {
+          e.preventDefault();
+          // Select all content in the block and replace with <hr>
+          const blockRange = document.createRange();
+          blockRange.selectNodeContents(block);
+          sel.removeAllRanges();
+          sel.addRange(blockRange);
+          // Insert an hr followed by an empty paragraph so cursor has somewhere to land
+          document.execCommand('insertHTML', false, '<hr><p><br></p>');
+          onType();
+          return;
+        }
+      }
+      setTimeout(linkifyAtCursor, 0);
+      return;
     }
   });
 
@@ -961,9 +992,47 @@ function getWordCount() {
   return text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
 }
 
+// ══════════════════════════════════
+// READING LEVEL (Flesch-Kincaid Grade)
+// ══════════════════════════════════
+function countSyllables(word) {
+  word = word.toLowerCase().replace(/[^a-z]/g, '');
+  if (!word) return 0;
+  if (word.length <= 3) return 1;
+  // Strip silent trailing e
+  word = word.replace(/e$/, '');
+  const vowelGroups = word.match(/[aeiouy]+/g);
+  return vowelGroups ? Math.max(1, vowelGroups.length) : 1;
+}
+
+function getReadingLevel(rawText) {
+  const text = rawText.replace(/\s+/g, ' ').trim();
+  if (!text) return '';
+
+  // Split into sentences (. ! ? as terminators)
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const numSentences = sentences.length;
+  if (numSentences === 0) return '';
+
+  // Split into words
+  const words = text.split(/\s+/).filter(w => w.replace(/[^a-zA-Z]/g, '').length > 0);
+  const numWords = words.length;
+  if (numWords < 10) return ''; // too short to be meaningful
+
+  const numSyllables = words.reduce((sum, w) => sum + countSyllables(w), 0);
+
+  // Flesch-Kincaid Grade Level
+  const grade = 0.39 * (numWords / numSentences) + 11.8 * (numSyllables / numWords) - 15.59;
+  const g = Math.max(1, Math.round(grade));
+  return '· Grade ' + Math.min(g, 16) + (g > 16 ? '+' : '');
+}
+
 function updateWordCount() {
-  const words = getWordCount();
+  const rawText = getEditorText();
+  const trimmed = rawText.trim();
+  const words = trimmed ? trimmed.split(/\s+/).filter(w => w.length > 0).length : 0;
   document.getElementById('wordCount').textContent = words + ' word' + (words !== 1 ? 's' : '');
+  document.getElementById('readingLevel').textContent = getReadingLevel(rawText);
   const milestone = Math.floor(words / 100);
   if (milestone > lastMilestone && words > 0) {
     lastMilestone = milestone;
@@ -982,19 +1051,17 @@ function celebrate(msg) {
 // STUCK DETECTOR
 // ══════════════════════════════════
 function resetStuckTimer() {
-  stuckShown = false;
-  document.getElementById('stuckBar').classList.remove('show');
+  const bar = document.getElementById('stuckBar');
+  if (bar.classList.contains('show')) bar.classList.remove('show');
   clearTimeout(stuckTimer);
   if (getWordCount() < 5) return;
   stuckTimer = setTimeout(() => {
-    stuckShown = true;
     document.getElementById('stuckBar').classList.add('show');
   }, 75000);
 }
 
 function dismissStuck() {
   document.getElementById('stuckBar').classList.remove('show');
-  stuckShown = true;
 }
 
 function openNudges() {
@@ -1157,7 +1224,6 @@ function silentSave() {
     title: document.getElementById('postTitleInline').value,
     body:  document.getElementById('editor').innerHTML,
     saved: Date.now(),
-    isDark,
   });
   const panel = document.getElementById('postsPanel');
   if (!panel.classList.contains('hidden')) renderPostsList();
@@ -1204,7 +1270,9 @@ function copyText() {
     if (node.nodeType === Node.TEXT_NODE) {
       parts.push(node.textContent);
     } else if (node.nodeType === Node.ELEMENT_NODE) {
-      const isBlock = ['P','DIV','LI','BR'].includes(node.tagName);
+      const tag = node.tagName;
+      if (tag === 'HR') { parts.push('\n---\n'); return; }
+      const isBlock = ['P','DIV','LI','BR'].includes(tag);
       for (const child of node.childNodes) collect(child);
       if (isBlock) parts.push('\n');
     }
