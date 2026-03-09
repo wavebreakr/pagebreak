@@ -186,6 +186,20 @@
   .editor b, .editor strong { font-weight: 700; }
   .editor i, .editor em { font-style: italic; }
 
+  /* Headings */
+  .editor h1, .editor h2, .editor h3 {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+    margin-bottom: 0.5em;
+    margin-top: 0.25em;
+    letter-spacing: -0.02em;
+  }
+  .editor h1 { font-size: 2em; }
+  .editor h2 { font-size: 1.5em; }
+  .editor h3 { font-size: 1.2em; }
+
   /* ── Nudge panel ── */
   .nudge-panel {
     width: 272px; flex-shrink: 0;
@@ -473,6 +487,36 @@
   .post-row:hover .post-row-delete { opacity: 1; }
   .post-row-delete:hover { background: rgba(184,74,74,0.12); color: var(--c-p); }
 
+  /* ── Slash command menu ── */
+  .slash-menu {
+    position: fixed;
+    background: var(--surface);
+    border: 1px solid var(--nudge-border);
+    border-radius: 9px;
+    padding: 5px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+    z-index: 500;
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 160px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .slash-menu.show { display: flex; }
+  .slash-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 6px;
+    cursor: pointer; transition: background 0.1s;
+  }
+  .slash-item:hover, .slash-item.active { background: var(--ink-faint); }
+  .slash-item-icon {
+    font-size: 11px; font-weight: 700; color: var(--ink-dim);
+    width: 22px; flex-shrink: 0; font-family: 'DM Sans', sans-serif;
+    letter-spacing: -0.02em;
+  }
+  .slash-item-label { font-size: 12.5px; font-weight: 500; color: var(--ink); }
+  .slash-item-hint { font-size: 10.5px; color: var(--ink-dim); margin-left: auto; }
+
   @media (max-width: 700px) {
     .nudge-panel { display: none; }
     .posts-panel { display: none; }
@@ -725,6 +769,27 @@ window.addEventListener('DOMContentLoaded', () => {
   editor.addEventListener('keydown', e => {
     const mod = e.metaKey || e.ctrlKey;
     const sel = window.getSelection();
+
+    // ── Slash menu navigation ──────────────────────────
+    if (slashMenuOpen) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        slashActiveIndex = (slashActiveIndex + 1) % SLASH_ITEMS.length;
+        updateSlashActive(); return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        slashActiveIndex = (slashActiveIndex - 1 + SLASH_ITEMS.length) % SLASH_ITEMS.length;
+        updateSlashActive(); return;
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        applySlashFormat(SLASH_ITEMS[slashActiveIndex]); return;
+      }
+      if (e.key === 'Escape') { e.preventDefault(); closeSlashMenu(); return; }
+      if (e.key === 'Backspace') { closeSlashMenu(); /* fall through to delete */ }
+      else { closeSlashMenu(); /* any other key — close and type normally */ }
+    }
 
     // ── Cmd/Ctrl+B — bold ──────────────────────────────
     if (mod && e.key === 'b') {
@@ -1289,6 +1354,121 @@ function showToast(msg) {
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => t.classList.remove('show'), 2000);
 }
+// ══════════════════════════════════
+// SLASH COMMAND MENU
+// ══════════════════════════════════
+let slashMenuOpen = false;
+let slashActiveIndex = 0;
+const SLASH_ITEMS = ['h1','h2','h3','p'];
+
+function openSlashMenu() {
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  const rect = range.getBoundingClientRect();
+  const menu = document.getElementById('slashMenu');
+
+  // Position just below the cursor
+  const top = rect.bottom + window.scrollY + 4;
+  const left = rect.left + window.scrollX;
+  menu.style.top = top + 'px';
+  menu.style.left = left + 'px';
+
+  slashActiveIndex = 0;
+  updateSlashActive();
+  menu.classList.add('show');
+  slashMenuOpen = true;
+}
+
+function closeSlashMenu() {
+  document.getElementById('slashMenu').classList.remove('show');
+  slashMenuOpen = false;
+}
+
+function updateSlashActive() {
+  document.querySelectorAll('.slash-item').forEach((el, i) => {
+    el.classList.toggle('active', i === slashActiveIndex);
+  });
+}
+
+function applySlashFormat(format) {
+  closeSlashMenu();
+  const editor = document.getElementById('editor');
+  editor.focus();
+
+  // Delete the triggering slash character
+  const sel = window.getSelection();
+  if (sel && sel.rangeCount) {
+    const range = sel.getRangeAt(0);
+    // Move back one character to select the '/'
+    const delRange = document.createRange();
+    const node = range.startContainer;
+    if (node.nodeType === Node.TEXT_NODE && range.startOffset > 0) {
+      delRange.setStart(node, range.startOffset - 1);
+      delRange.setEnd(node, range.startOffset);
+      sel.removeAllRanges();
+      sel.addRange(delRange);
+      document.execCommand('delete');
+    }
+  }
+
+  // Apply the block format
+  document.execCommand('formatBlock', false, format === 'p' ? 'p' : format);
+  onType();
+}
+
+// Slash detection on input + click-outside dismiss
+window.addEventListener('DOMContentLoaded', () => {
+  const editor = document.getElementById('editor');
+
+  editor.addEventListener('input', () => {
+    if (slashMenuOpen) return;
+
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    if (!range.collapsed) return;
+
+    const node = range.startContainer;
+    if (node.nodeType !== Node.TEXT_NODE) return;
+
+    // Only trigger if '/' is the sole character in the current block
+    let block = node;
+    const ed = document.getElementById('editor');
+    while (block && block !== ed && !/^(P|DIV|H[1-3])$/.test(block.nodeName)) {
+      block = block.parentNode;
+    }
+    if (!block || block === ed) return;
+
+    if (block.textContent.trim() === '/') openSlashMenu();
+  });
+
+  document.addEventListener('mousedown', e => {
+    if (slashMenuOpen && !document.getElementById('slashMenu').contains(e.target)) {
+      closeSlashMenu();
+    }
+  });
+});
 </script>
+<!-- Slash command menu -->
+<div class="slash-menu" id="slashMenu">
+  <div class="slash-item" data-format="h1" onclick="applySlashFormat('h1')">
+    <span class="slash-item-icon">H1</span>
+    <span class="slash-item-label">Heading 1</span>
+  </div>
+  <div class="slash-item" data-format="h2" onclick="applySlashFormat('h2')">
+    <span class="slash-item-icon">H2</span>
+    <span class="slash-item-label">Heading 2</span>
+  </div>
+  <div class="slash-item" data-format="h3" onclick="applySlashFormat('h3')">
+    <span class="slash-item-icon">H3</span>
+    <span class="slash-item-label">Heading 3</span>
+  </div>
+  <div class="slash-item" data-format="p" onclick="applySlashFormat('p')">
+    <span class="slash-item-icon" style="font-size:14px;font-weight:400;">¶</span>
+    <span class="slash-item-label">Paragraph</span>
+  </div>
+</div>
+
 </body>
 </html>
