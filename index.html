@@ -19,12 +19,6 @@
     --accent-border: rgba(194,105,42,0.25);
     --nudge-bg: #fdfcfa;
     --nudge-border: #ede9e2;
-    --c-p: #b84a4a;
-    --c-a: #c2692a;
-    --c-s: #a06b1a;
-    --c-t: #2a7a4a;
-    --c-o: #2a5a8a;
-    --c-r: #6a3a9a;
     --link: #2a6aaa;
   }
   .dark {
@@ -200,189 +194,6 @@
   .editor h2 { font-size: 1.5em; }
   .editor h3 { font-size: 1.2em; }
 
-  /* ── Nudge panel ── */
-  .nudge-panel {
-    width: 272px; flex-shrink: 0;
-    border-left: 1px solid var(--ink-faint);
-    background: var(--nudge-bg);
-    display: flex; flex-direction: column; overflow: hidden;
-    transition: width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s, border-color 0.4s;
-  }
-  .nudge-panel.hidden { width: 0; opacity: 0; border-left-width: 0; }
-
-  .nudge-header {
-    padding: 16px 16px 12px;
-    border-bottom: 1px solid var(--nudge-border); flex-shrink: 0;
-  }
-  .nudge-header-top {
-    display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px;
-  }
-  .nudge-header-label {
-    font-size: 10px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.14em; color: var(--ink-dim);
-  }
-  .nudge-info-btn {
-    width: 18px; height: 18px; border-radius: 50%;
-    border: 1px solid var(--ink-dim); background: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 700; color: var(--ink-dim);
-    font-family: 'DM Sans', sans-serif; letter-spacing: 0;
-    transition: all 0.15s; flex-shrink: 0; line-height: 1;
-  }
-  .nudge-info-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
-  .nudge-header-sub { font-size: 11px; color: var(--ink-mid); line-height: 1.4; }
-
-  .nudge-cards {
-    flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 8px;
-    overflow-y: auto; align-content: flex-start;
-  }
-  .nudge-cards::-webkit-scrollbar { width: 2px; }
-  .nudge-cards::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
-
-  .nudge-card {
-    background: var(--surface); border: 1px solid var(--nudge-border);
-    border-radius: 10px; padding: 12px 14px;
-    cursor: pointer; transition: all 0.18s ease;
-    position: relative; overflow: hidden;
-    display: flex; flex-direction: column; gap: 5px;
-  }
-  .nudge-card::before {
-    content: ""; position: absolute;
-    left: 0; top: 0; bottom: 0; width: 3px;
-    border-radius: 10px 0 0 10px;
-    opacity: 0; transition: opacity 0.18s;
-  }
-  .nudge-card:hover { transform: translateX(2px); }
-  .nudge-card:hover::before { opacity: 1; }
-
-  .nudge-card[data-step="P"]::before { background: var(--c-p); }
-  .nudge-card[data-step="A"]::before { background: var(--c-a); }
-  .nudge-card[data-step="S"]::before { background: var(--c-s); }
-  .nudge-card[data-step="T"]::before { background: var(--c-t); }
-  .nudge-card[data-step="O"]::before { background: var(--c-o); }
-  .nudge-card[data-step="R"]::before { background: var(--c-r); }
-
-  .nudge-card[data-step="P"]:hover { border-color: rgba(184,74,74,0.3); }
-  .nudge-card[data-step="A"]:hover { border-color: rgba(194,105,42,0.3); }
-  .nudge-card[data-step="S"]:hover { border-color: rgba(160,107,26,0.3); }
-  .nudge-card[data-step="T"]:hover { border-color: rgba(42,122,74,0.3); }
-  .nudge-card[data-step="O"]:hover { border-color: rgba(42,90,138,0.3); }
-  .nudge-card[data-step="R"]:hover { border-color: rgba(106,58,154,0.3); }
-
-  .nudge-step {
-    font-size: 9px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.1em; flex-shrink: 0;
-  }
-  .nudge-step[data-step="P"] { color: var(--c-p); }
-  .nudge-step[data-step="A"] { color: var(--c-a); }
-  .nudge-step[data-step="S"] { color: var(--c-s); }
-  .nudge-step[data-step="T"] { color: var(--c-t); }
-  .nudge-step[data-step="O"] { color: var(--c-o); }
-  .nudge-step[data-step="R"] { color: var(--c-r); }
-
-  .nudge-text {
-    font-size: 11.5px; line-height: 1.55;
-    color: var(--ink-mid); font-family: 'DM Sans', sans-serif;
-  }
-
-  .nudge-insert {
-    display: none; font-size: 10px; font-weight: 600;
-    border: none; border-radius: 5px; padding: 3px 8px;
-    cursor: pointer; font-family: 'DM Sans', sans-serif;
-    transition: all 0.15s; align-self: flex-start; flex-shrink: 0;
-  }
-  .nudge-card:hover .nudge-insert { display: block; }
-
-  .nudge-card[data-step="P"] .nudge-insert { background: rgba(184,74,74,0.1); color: var(--c-p); }
-  .nudge-card[data-step="A"] .nudge-insert { background: rgba(194,105,42,0.1); color: var(--c-a); }
-  .nudge-card[data-step="S"] .nudge-insert { background: rgba(160,107,26,0.1); color: var(--c-s); }
-  .nudge-card[data-step="T"] .nudge-insert { background: rgba(42,122,74,0.1); color: var(--c-t); }
-  .nudge-card[data-step="O"] .nudge-insert { background: rgba(42,90,138,0.1); color: var(--c-o); }
-  .nudge-card[data-step="R"] .nudge-insert { background: rgba(106,58,154,0.1); color: var(--c-r); }
-
-  .nudge-footer {
-    padding: 10px 12px; border-top: 1px solid var(--nudge-border); flex-shrink: 0;
-  }
-  .btn-refresh {
-    width: 100%; padding: 8px;
-    background: none; border: 1px dashed var(--nudge-border);
-    border-radius: 7px; cursor: pointer;
-    font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
-    color: var(--ink-dim); transition: all 0.15s; letter-spacing: 0.02em;
-  }
-  .btn-refresh:hover { border-color: var(--accent-border); color: var(--accent); background: var(--accent-dim); }
-
-  /* ── PASTOR modal ── */
-  .modal-backdrop {
-    position: fixed; inset: 0; z-index: 400;
-    background: rgba(0,0,0,0.35);
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.2s ease;
-    backdrop-filter: blur(2px);
-  }
-  .modal-backdrop.show { opacity: 1; pointer-events: all; }
-
-  .modal {
-    background: var(--surface); border-radius: 14px;
-    width: min(480px, 90vw); max-height: 80vh;
-    overflow-y: auto; padding: 28px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-    transform: translateY(8px) scale(0.98);
-    transition: transform 0.2s ease;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .modal-backdrop.show .modal { transform: translateY(0) scale(1); }
-  .modal::-webkit-scrollbar { width: 3px; }
-  .modal::-webkit-scrollbar-thumb { background: var(--ink-faint); }
-
-  .modal-header {
-    display: flex; align-items: flex-start; justify-content: space-between;
-    margin-bottom: 18px; gap: 12px;
-  }
-  .modal-title {
-    font-size: 16px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink);
-  }
-  .modal-subtitle {
-    font-size: 12px; color: var(--ink-mid); margin-top: 3px; line-height: 1.4;
-  }
-  .modal-close {
-    width: 28px; height: 28px; border-radius: 6px;
-    border: 1px solid var(--ink-faint); background: none;
-    cursor: pointer; font-size: 16px; color: var(--ink-mid);
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s; flex-shrink: 0;
-  }
-  .modal-close:hover { background: var(--ink-faint); color: var(--ink); }
-
-  .pastor-steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-
-  .pastor-step-row {
-    display: flex; gap: 12px; align-items: flex-start;
-    padding: 11px 13px; border-radius: 9px;
-    border: 1px solid var(--nudge-border);
-    background: var(--nudge-bg);
-  }
-  .pastor-step-letter {
-    font-size: 13px; font-weight: 700; letter-spacing: 0.02em;
-    width: 20px; flex-shrink: 0; padding-top: 1px;
-  }
-  .pastor-step-info { flex: 1; }
-  .pastor-step-name {
-    font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 2px;
-  }
-  .pastor-step-desc { font-size: 11.5px; color: var(--ink-mid); line-height: 1.5; }
-
-  .modal-why {
-    padding: 14px; border-radius: 9px;
-    background: var(--accent-dim); border: 1px solid var(--accent-border);
-  }
-  .modal-why-label {
-    font-size: 10px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.1em; color: var(--accent); margin-bottom: 6px;
-  }
-  .modal-why-text { font-size: 12px; color: var(--ink-mid); line-height: 1.6; }
-
   /* ── Celebration ── */
   .celebration {
     position: fixed; top: 62px; left: 50%;
@@ -396,36 +207,6 @@
     box-shadow: 0 4px 16px rgba(0,0,0,0.12);
   }
   .celebration.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* ── Stuck bar ── */
-  .stuck-bar {
-    position: fixed; bottom: 24px; left: 50%;
-    transform: translateX(-50%) translateY(8px);
-    background: var(--surface); border: 1px solid var(--nudge-border);
-    border-radius: 12px; padding: 9px 16px;
-    display: flex; align-items: center; gap: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    font-size: 12px; color: var(--ink-mid);
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.4s, transform 0.4s;
-    z-index: 200; white-space: nowrap;
-  }
-  .stuck-bar.show { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
-
-  .stuck-dot {
-    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
-
-  .stuck-btn {
-    font-size: 11px; font-weight: 600; border: none;
-    border-radius: 6px; padding: 4px 10px;
-    cursor: pointer; font-family: 'DM Sans', sans-serif; transition: filter 0.15s;
-  }
-  .stuck-btn.primary { background: var(--accent); color: #fff; }
-  .stuck-btn.primary:hover { filter: brightness(1.1); }
-  .stuck-btn.ghost { background: var(--ink-faint); color: var(--ink-mid); }
 
   /* ── Toast ── */
   .toast {
@@ -485,7 +266,7 @@
     opacity: 0; transition: all 0.15s; flex-shrink: 0;
   }
   .post-row:hover .post-row-delete { opacity: 1; }
-  .post-row-delete:hover { background: rgba(184,74,74,0.12); color: var(--c-p); }
+  .post-row-delete:hover { background: rgba(184,74,74,0.12); color: #b84a4a; }
 
   /* ── Slash command menu ── */
   .slash-menu {
@@ -518,7 +299,6 @@
   .slash-item-hint { font-size: 10.5px; color: var(--ink-dim); margin-left: auto; }
 
   @media (max-width: 700px) {
-    .nudge-panel { display: none; }
     .posts-panel { display: none; }
     .editor-inner { padding: 0 20px; }
     .post-title-inline { max-width: 120px; }
@@ -551,7 +331,6 @@
     <span class="word-count" id="wordCount">0 words</span>
     <span class="word-count" id="readingLevel" style="min-width:0" title="Estimated reading level (Flesch-Kincaid grade)"></span>
     <button class="icon-btn" id="btnDark" title="Toggle dark mode" onclick="toggleDark()">🌙</button>
-    <button class="icon-btn" id="btnNudge" title="Toggle nudges" onclick="toggleNudge()">💡</button>
     <button class="copy-btn" title="Copy all text to clipboard" onclick="copyText()">
       <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <rect x="5" y="4" width="9" height="11" rx="1.5"/>
@@ -586,152 +365,19 @@
     </div>
   </div>
 
-  <!-- Nudge panel -->
-  <div class="nudge-panel hidden" id="nudgePanel">
-    <div class="nudge-header">
-      <div class="nudge-header-top">
-        <div class="nudge-header-label">PASTOR Nudges</div>
-        <button class="nudge-info-btn" onclick="openModal()" title="What is PASTOR?">i</button>
-      </div>
-      <div class="nudge-header-sub" id="nudgeSub">Pick one that speaks to you →</div>
-    </div>
-    <div class="nudge-cards" id="nudgeCards"></div>
-    <div class="nudge-footer">
-      <button class="btn-refresh" onclick="refreshNudges()">↻ &nbsp;Shuffle nudges</button>
-    </div>
-  </div>
 </div>
 
 <!-- Celebration -->
 <div class="celebration" id="celebration"></div>
 
-<!-- Stuck bar -->
-<div class="stuck-bar" id="stuckBar">
-  <div class="stuck-dot"></div>
-  Stuck? Try a nudge.
-  <button class="stuck-btn primary" onclick="openNudges()">Show nudges 💡</button>
-  <button class="stuck-btn ghost" onclick="dismissStuck()">Dismiss</button>
-</div>
-
-<!-- PASTOR Modal -->
-<div class="modal-backdrop" id="modalBackdrop" onclick="closeModalOnBackdrop(event)">
-  <div class="modal">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title">The PASTOR Framework</div>
-        <div class="modal-subtitle">A copywriting formula for content that actually converts</div>
-      </div>
-      <button class="modal-close" onclick="closeModal()">×</button>
-    </div>
-
-    <div class="pastor-steps">
-      <div class="pastor-step-row">
-        <div class="pastor-step-letter" style="color:var(--c-p)">P</div>
-        <div class="pastor-step-info">
-          <div class="pastor-step-name">Problem</div>
-          <div class="pastor-step-desc">Identify and name the exact pain your reader is experiencing. Be specific — the more precisely you describe their problem, the more they feel understood.</div>
-        </div>
-      </div>
-      <div class="pastor-step-row">
-        <div class="pastor-step-letter" style="color:var(--c-a)">A</div>
-        <div class="pastor-step-info">
-          <div class="pastor-step-name">Amplify</div>
-          <div class="pastor-step-desc">Deepen the stakes. What happens if they do nothing? Show the real cost — emotional, financial, or practical — of leaving the problem unsolved.</div>
-        </div>
-      </div>
-      <div class="pastor-step-row">
-        <div class="pastor-step-letter" style="color:var(--c-s)">S</div>
-        <div class="pastor-step-info">
-          <div class="pastor-step-name">Solution</div>
-          <div class="pastor-step-desc">Introduce your answer. Present it clearly and simply, explaining what makes your approach different from what they've already tried.</div>
-        </div>
-      </div>
-      <div class="pastor-step-row">
-        <div class="pastor-step-letter" style="color:var(--c-t)">T</div>
-        <div class="pastor-step-info">
-          <div class="pastor-step-name">Testimony</div>
-          <div class="pastor-step-desc">Prove it works. Share a before-and-after story — your own or someone else's. Real transformation, told honestly, builds trust faster than any claim.</div>
-        </div>
-      </div>
-      <div class="pastor-step-row">
-        <div class="pastor-step-letter" style="color:var(--c-o)">O</div>
-        <div class="pastor-step-info">
-          <div class="pastor-step-name">Offer</div>
-          <div class="pastor-step-desc">Make it irresistible. Spell out exactly what the reader gets, address their biggest objection, and remove any reason to hesitate.</div>
-        </div>
-      </div>
-      <div class="pastor-step-row">
-        <div class="pastor-step-letter" style="color:var(--c-r)">R</div>
-        <div class="pastor-step-info">
-          <div class="pastor-step-name">Response</div>
-          <div class="pastor-step-desc">Ask for one clear action. A single, specific next step — small enough to feel easy, clear enough to act on immediately.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-why">
-      <div class="modal-why-label">Why it works</div>
-      <div class="modal-why-text">PASTOR works because it mirrors how people actually make decisions — they feel a pain, they imagine it getting worse, they look for a solution, they need to trust it, then they act. Writing that follows this sequence doesn't feel like marketing. It feels like someone finally gets it.</div>
-    </div>
-  </div>
-</div>
-
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════
-// PASTOR MODAL
-// ══════════════════════════════════
-function openModal() {
-  document.getElementById('modalBackdrop').classList.add('show');
-}
-function closeModal() {
-  document.getElementById('modalBackdrop').classList.remove('show');
-}
-function closeModalOnBackdrop(e) {
-  if (e.target === document.getElementById('modalBackdrop')) closeModal();
-}
-// Escape key closes modal
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 // ══════════════════════════════════
-// PASTOR NUDGE BANK
+// STATE
 // ══════════════════════════════════
-const ALL_NUDGES = [
-  { step:'P', label:'Problem',   text:'What\'s the exact problem your reader woke up with today? Name it plainly — no jargon.' },
-  { step:'P', label:'Problem',   text:'What would your reader Google at 11pm when they\'re frustrated? That search is your opening line.' },
-  { step:'P', label:'Problem',   text:'Describe the moment someone realises something isn\'t working. What are they feeling right then?' },
-  { step:'P', label:'Problem',   text:'Write the cost of NOT solving this problem — time, money, stress. Make it specific.' },
-  { step:'P', label:'Problem',   text:'Start with "Most people think…" then flip it. That flip IS the problem.' },
-  { step:'A', label:'Amplify',   text:'Fast-forward 6 months. What does their life look like if nothing changes? Write that scene.' },
-  { step:'A', label:'Amplify',   text:'What\'s the hidden cost — the thing they haven\'t even counted yet? Name the thing under the thing.' },
-  { step:'A', label:'Amplify',   text:'Zoom in: what does this problem look like on a typical Tuesday for your reader?' },
-  { step:'A', label:'Amplify',   text:'Write the emotional weight of this problem — not the practical cost, the feeling of carrying it.' },
-  { step:'A', label:'Amplify',   text:'What has your reader already tried? Why didn\'t it work? Show you understand their history.' },
-  { step:'S', label:'Solution',  text:'Introduce your solution in one sentence — like you\'re telling a smart friend who\'s never heard of it.' },
-  { step:'S', label:'Solution',  text:'Break your solution into 3 clear steps. What does the reader actually do?' },
-  { step:'S', label:'Solution',  text:'What makes your approach different from everything they\'ve already tried? Don\'t be modest.' },
-  { step:'S', label:'Solution',  text:'What\'s the fastest win your reader could get from this? Lead with that.' },
-  { step:'S', label:'Solution',  text:'Use an analogy: "This is like [familiar thing] but for [their problem]." Build a paragraph around it.' },
-  { step:'T', label:'Testimony', text:'Write a before-and-after story. Where was someone before this solution? Where are they now?' },
-  { step:'T', label:'Testimony', text:'Share your own experience — the messy, honest version. When did you finally crack this?' },
-  { step:'T', label:'Testimony', text:'What would your reader say to a friend after this worked for them? Write that word-of-mouth moment.' },
-  { step:'T', label:'Testimony', text:'What\'s the most surprising result someone got from this? The one that still makes you smile?' },
-  { step:'T', label:'Testimony', text:'Describe the transformation in sensory terms — what does life feel, look, or sound like after?' },
-  { step:'O', label:'Offer',     text:'What is the reader getting, exactly? List it plainly — no fluff, no padding.' },
-  { step:'O', label:'Offer',     text:'What\'s the one sentence that removes all hesitation? Write the no-brainer.' },
-  { step:'O', label:'Offer',     text:'Address the biggest objection head-on. What\'s the reason someone would say no — and why is that wrong?' },
-  { step:'O', label:'Offer',     text:'Why is now the right time to act? What makes this moment different from 6 months ago?' },
-  { step:'O', label:'Offer',     text:'What does the reader lose by waiting? Write the cost of inaction in concrete terms.' },
-  { step:'R', label:'Response',  text:'What\'s the ONE thing you want your reader to do right now? A single, clear instruction.' },
-  { step:'R', label:'Response',  text:'Write your CTA like you\'re talking to one specific person — "Here\'s what to do next…"' },
-  { step:'R', label:'Response',  text:'Make the next step feel tiny. What\'s the smallest possible action that starts the journey?' },
-  { step:'R', label:'Response',  text:'End with a question that invites a reply. Conversation is the goal, not just consumption.' },
-  { step:'R', label:'Response',  text:'Write a closing line that leaves the reader feeling capable, not overwhelmed.' },
-];
-
-const STEPS = ['P','A','S','T','O','R'];
 const CELEBRATIONS = [
   '100 words ✦', '200 words. You\'re in the zone →',
   '300 words. This is good ✦', '400 words. Keep going →',
@@ -740,19 +386,14 @@ const CELEBRATIONS = [
   '1000 words 🎉 Legendary.',
 ];
 
-// ── State ──
-let isDark = false, nudgeVisible = false;
-let stuckTimer = null;
+let isDark = false;
 let lastMilestone = 0;
-let currentNudges = [];
-let usedIndices = { P:[], A:[], S:[], T:[], O:[], R:[] };
 
 // ══════════════════════════════════
 // INIT
 // ══════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
   loadDoc();
-  pickNudges();
   setInterval(silentSave, 20000);
 
   const editor = document.getElementById('editor');
@@ -946,90 +587,12 @@ function linkifyAtCursor() {
 }
 
 // ══════════════════════════════════
-// NUDGES
-// ══════════════════════════════════
-function pickNudges() {
-  const picked = [];
-
-  for (const step of STEPS) {
-    let pool = ALL_NUDGES.map((n,i)=>({...n,i})).filter(n => n.step===step && !usedIndices[step].includes(n.i));
-    if (pool.length === 0) {
-      usedIndices[step] = [];
-      pool = ALL_NUDGES.map((n,i)=>({...n,i})).filter(n=>n.step===step);
-    }
-    const pick = pool[Math.floor(Math.random()*pool.length)];
-    usedIndices[step].push(pick.i);
-    picked.push(pick);
-  }
-
-  currentNudges = picked;
-  renderNudges();
-}
-
-function refreshNudges() {
-  const cards = document.getElementById('nudgeCards');
-  cards.style.opacity = '0.3'; cards.style.transform = 'translateX(4px)';
-  setTimeout(() => {
-    pickNudges();
-    cards.style.transition = 'opacity 0.25s, transform 0.25s';
-    cards.style.opacity = '1'; cards.style.transform = 'translateX(0)';
-    setTimeout(() => { cards.style.transition = ''; }, 300);
-  }, 160);
-}
-
-function renderNudges() {
-  document.getElementById('nudgeCards').innerHTML = currentNudges.map((n,i) => `
-    <div class="nudge-card" data-step="${n.step}" onclick="focusEditor()">
-      <div class="nudge-step" data-step="${n.step}">${n.step} — ${n.label}</div>
-      <div class="nudge-text">${n.text}</div>
-      <button class="nudge-insert" onclick="event.stopPropagation(); insertNudge(${i})">↳ Use as prompt</button>
-    </div>
-  `).join('');
-
-  const words = getWordCount();
-  const sub = document.getElementById('nudgeSub');
-  if (words === 0)       sub.textContent = 'Pick one that speaks to you →';
-  else if (words < 150)  sub.textContent = 'Good start. What\'s next?';
-  else if (words < 400)  sub.textContent = 'Nice momentum — keep building.';
-  else                   sub.textContent = 'You\'re flowing. Need a push?';
-}
-
-function insertNudge(i) {
-  const n = currentNudges[i];
-  const editor = document.getElementById('editor');
-  editor.focus();
-  // Move cursor to end
-  const range = document.createRange();
-  range.selectNodeContents(editor);
-  range.collapse(false);
-  const sel = window.getSelection();
-  sel.removeAllRanges(); sel.addRange(range);
-
-  const text = `\n[ ${n.step} — ${n.label}: ${n.text} ]\n`;
-  document.execCommand('insertText', false, text);
-  onType();
-}
-
-function focusEditor() {
-  const editor = document.getElementById('editor');
-  editor.focus();
-  // Move cursor to end if empty-ish
-  const range = document.createRange();
-  range.selectNodeContents(editor);
-  range.collapse(false);
-  const sel = window.getSelection();
-  sel.removeAllRanges(); sel.addRange(range);
-}
-
-// ══════════════════════════════════
 // WORD COUNT + MILESTONES
 // ══════════════════════════════════
 function onType() {
   updateWordCount();
-  resetStuckTimer();
   clearTimeout(onType._t);
   onType._t = setTimeout(silentSave, 5000);
-  renderNudges(); // keep subtitle fresh
 }
 
 function getEditorText() {
@@ -1112,29 +675,6 @@ function celebrate(msg) {
   celebrate._t = setTimeout(() => el.classList.remove('show'), 2600);
 }
 
-// ══════════════════════════════════
-// STUCK DETECTOR
-// ══════════════════════════════════
-function resetStuckTimer() {
-  const bar = document.getElementById('stuckBar');
-  if (bar.classList.contains('show')) bar.classList.remove('show');
-  clearTimeout(stuckTimer);
-  if (getWordCount() < 5) return;
-  stuckTimer = setTimeout(() => {
-    document.getElementById('stuckBar').classList.add('show');
-  }, 75000);
-}
-
-function dismissStuck() {
-  document.getElementById('stuckBar').classList.remove('show');
-}
-
-function openNudges() {
-  dismissStuck();
-  if (!nudgeVisible) toggleNudge();
-  refreshNudges();
-}
-
 function onTitleType() {
   const title = document.getElementById('postTitleInline').value.trim();
   document.title = title ? title + ' — Pagebreak' : 'Pagebreak';
@@ -1204,10 +744,9 @@ function openPost(id) {
     document.title = (post.title||'').trim() ? post.title.trim() + ' — Pagebreak' : 'Pagebreak';
     lastMilestone = Math.floor(getWordCount() / 100);
     updateWordCount();
-    renderNudges();
   }
   renderPostsList();
-  focusEditor();
+  document.getElementById('editor').focus();
 }
 
 function newPost() {
@@ -1221,9 +760,8 @@ function newPost() {
   document.title = 'Pagebreak';
   lastMilestone = 0;
   updateWordCount();
-  renderNudges();
   renderPostsList();
-  focusEditor();
+  document.getElementById('editor').focus();
 }
 
 function confirmDeletePost(id) {
@@ -1235,12 +773,12 @@ function confirmDeletePost(id) {
   const name = post?.title || 'Untitled post';
   targetRow.innerHTML = `
     <div class="post-row-info" style="min-width:0">
-      <div class="post-row-title" style="color:var(--c-p);font-size:11px">Delete "${escHtml(name)}"?</div>
+      <div class="post-row-title" style="color:#b84a4a;font-size:11px">Delete "${escHtml(name)}"?</div>
       <div class="post-row-meta">This can't be undone</div>
     </div>
     <button onclick="event.stopPropagation();doDeletePost('${id}')"
       style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;border:none;
-             background:rgba(184,74,74,0.15);color:var(--c-p);cursor:pointer;flex-shrink:0;">Yes</button>
+             background:rgba(184,74,74,0.15);color:#b84a4a;cursor:pointer;flex-shrink:0;">Yes</button>
     <button onclick="event.stopPropagation();renderPostsList()"
       style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;border:none;
              background:var(--ink-faint);color:var(--ink-mid);cursor:pointer;flex-shrink:0;">No</button>
@@ -1267,12 +805,6 @@ function toggleDark() {
   document.getElementById('btnDark').textContent = isDark ? '☀️' : '🌙';
   document.getElementById('btnDark').classList.toggle('on', isDark);
   localStorage.setItem('pb_dark', isDark);
-}
-
-function toggleNudge() {
-  nudgeVisible = !nudgeVisible;
-  document.getElementById('nudgePanel').classList.toggle('hidden', !nudgeVisible);
-  document.getElementById('btnNudge').classList.toggle('on', nudgeVisible);
 }
 
 // ══════════════════════════════════
