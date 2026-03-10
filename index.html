@@ -54,6 +54,8 @@
     font-size: 14px; font-weight: 600; letter-spacing: -0.02em;
     color: var(--ink); flex-shrink: 0;
   }
+  .brand img { transition: filter 0.4s; }
+  .dark .brand img { filter: invert(1); }
 
   .brand-mark {
     width: 18px; height: 18px; background: var(--accent);
@@ -311,12 +313,7 @@
 <div class="chrome" id="chrome">
   <div class="chrome-left">
     <div class="brand">
-      <div class="brand-mark">
-        <svg viewBox="0 0 10 10" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round">
-          <path d="M1 8 L5 1 L9 8 M2.5 6 H7.5"/>
-        </svg>
-      </div>
-      Pagebreak
+      <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/PagebreakLogo2.png" alt="Pagebreak" style="height:18px;width:auto;">
     </div>
     <button class="icon-btn" id="btnPosts" title="All posts" onclick="togglePostsPanel()">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
