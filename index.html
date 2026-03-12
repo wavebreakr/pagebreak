@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pagebreak</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #faf9f7;
@@ -16,9 +16,8 @@
     --ink-faint: #e8e5df;
     --accent: #c2692a;
     --accent-dim: rgba(194,105,42,0.1);
-    --accent-border: rgba(194,105,42,0.25);
-    --nudge-bg: #fdfcfa;
-    --nudge-border: #ede9e2;
+    --panel-bg: #fdfcfa;
+    --panel-border: #ede9e2;
     --link: #2a6aaa;
   }
   .dark {
@@ -28,8 +27,8 @@
     --ink-mid: #968f84;
     --ink-dim: #4a4740;
     --ink-faint: #2a2825;
-    --nudge-bg: #181714;
-    --nudge-border: #2a2825;
+    --panel-bg: #181714;
+    --panel-border: #2a2825;
     --link: #5a9fd4;
   }
 
@@ -50,22 +49,13 @@
   .chrome-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 
   .brand {
-    display: flex; align-items: center; gap: 7px;
-    font-size: 14px; font-weight: 600; letter-spacing: -0.02em;
-    color: var(--ink); flex-shrink: 0;
-  }
-  .brand img { transition: filter 0.4s; }
-  .dark .brand img { filter: invert(1); }
-
-  .brand-mark {
-    width: 18px; height: 18px; background: var(--accent);
-    border-radius: 4px; display: flex; align-items: center; justify-content: center;
+    display: flex; align-items: center;
     flex-shrink: 0;
   }
-  .brand-mark svg { width: 10px; height: 10px; }
+  .brand img { height: 22px; width: auto; display: block; }
+  .dark .brand img { filter: invert(1); }
 
   .post-title-inline {
-    font-family: 'DM Sans', sans-serif;
     font-size: 13px; font-weight: 400;
     color: var(--ink-dim); background: none; border: none; outline: none;
     width: 220px; max-width: 30vw;
@@ -81,7 +71,6 @@
   .word-count {
     font-size: 12px; font-weight: 500; color: var(--ink-dim);
     font-variant-numeric: tabular-nums; min-width: 54px; text-align: right;
-    transition: color 0.3s;
   }
 
   .icon-btn {
@@ -224,7 +213,7 @@
   .posts-panel {
     width: 220px; flex-shrink: 0;
     border-right: 1px solid var(--ink-faint);
-    background: var(--nudge-bg);
+    background: var(--panel-bg);
     display: flex; flex-direction: column; overflow: hidden;
     transition: width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s, border-color 0.4s;
     order: -1;
@@ -232,7 +221,7 @@
   .posts-panel.hidden { width: 0; opacity: 0; border-right-width: 0; }
   .posts-panel-header {
     padding: 16px 14px 12px;
-    border-bottom: 1px solid var(--nudge-border); flex-shrink: 0;
+    border-bottom: 1px solid var(--panel-border); flex-shrink: 0;
     display: flex; align-items: center; justify-content: space-between;
   }
   .posts-panel-label {
@@ -274,7 +263,7 @@
   .slash-menu {
     position: fixed;
     background: var(--surface);
-    border: 1px solid var(--nudge-border);
+    border: 1px solid var(--panel-border);
     border-radius: 9px;
     padding: 5px;
     box-shadow: 0 8px 28px rgba(0,0,0,0.12);
@@ -283,7 +272,6 @@
     flex-direction: column;
     gap: 2px;
     min-width: 160px;
-    font-family: 'DM Sans', sans-serif;
   }
   .slash-menu.show { display: flex; }
   .slash-item {
@@ -298,7 +286,6 @@
     letter-spacing: -0.02em;
   }
   .slash-item-label { font-size: 12.5px; font-weight: 500; color: var(--ink); }
-  .slash-item-hint { font-size: 10.5px; color: var(--ink-dim); margin-left: auto; }
 
   @media (max-width: 700px) {
     .posts-panel { display: none; }
@@ -310,10 +297,10 @@
 <body>
 
 <!-- Chrome -->
-<div class="chrome" id="chrome">
+<div class="chrome">
   <div class="chrome-left">
     <div class="brand">
-      <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/PagebreakLogo2.png" alt="Pagebreak" style="height:22px;width:auto;">
+      <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/PagebreakLogo2.png" alt="Pagebreak" />
     </div>
     <button class="icon-btn" id="btnPosts" title="All posts" onclick="togglePostsPanel()">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
@@ -520,7 +507,6 @@ window.addEventListener('DOMContentLoaded', () => {
         }
       }
       setTimeout(linkifyAtCursor, 0);
-      return;
     }
   });
 
@@ -610,11 +596,6 @@ function getEditorText() {
   }
   walk(editor);
   return parts.join('');
-}
-
-function getWordCount() {
-  const text = getEditorText().trim();
-  return text ? text.split(/\s+/).filter(w => w.length > 0).length : 0;
 }
 
 // ══════════════════════════════════
@@ -737,9 +718,9 @@ function openPost(id) {
   const post = getPost(id);
   if (post) {
     document.getElementById('postTitleInline').value = post.title || '';
-    document.getElementById('editor').innerHTML = post.body || '';
+    document.getElementById('editor').innerHTML = sanitizeBody(post.body || '');
     document.title = (post.title||'').trim() ? post.title.trim() + ' — Pagebreak' : 'Pagebreak';
-    lastMilestone = Math.floor(getWordCount() / 100);
+    lastMilestone = Math.floor(getEditorText().trim().split(/\s+/).filter(w => w.length > 0).length / 100);
     updateWordCount();
   }
   renderPostsList();
@@ -807,6 +788,21 @@ function toggleDark() {
 // ══════════════════════════════════
 // SAVE / LOAD / COPY
 // ══════════════════════════════════
+
+// Strip inline color/background styles injected by the browser's contenteditable
+// so saved HTML always defers to CSS variables and renders correctly in both modes.
+function sanitizeBody(html) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  tmp.querySelectorAll('[style]').forEach(el => {
+    el.style.removeProperty('color');
+    el.style.removeProperty('background-color');
+    el.style.removeProperty('background');
+    if (!el.getAttribute('style').trim()) el.removeAttribute('style');
+  });
+  return tmp.innerHTML;
+}
+
 function silentSave() {
   let id = getActiveId();
   if (!id) {
@@ -816,7 +812,7 @@ function silentSave() {
   }
   savePost(id, {
     title: document.getElementById('postTitleInline').value,
-    body:  document.getElementById('editor').innerHTML,
+    body:  sanitizeBody(document.getElementById('editor').innerHTML),
     saved: Date.now(),
   });
   const panel = document.getElementById('postsPanel');
@@ -836,7 +832,7 @@ function loadDoc() {
       savePost(id, { title: d.title||'', body: d.body||'', saved: Date.now() });
       localStorage.removeItem('pb_v4');
       document.getElementById('postTitleInline').value = d.title || '';
-      document.getElementById('editor').innerHTML = d.body || '';
+      document.getElementById('editor').innerHTML = sanitizeBody(d.body || '');
       document.title = (d.title||'').trim() ? d.title.trim() + ' — Pagebreak' : 'Pagebreak';
     } else {
       let activeId = getActiveId();
@@ -845,12 +841,12 @@ function loadDoc() {
         const post = getPost(activeId);
         if (post) {
           document.getElementById('postTitleInline').value = post.title || '';
-          document.getElementById('editor').innerHTML = post.body || '';
+          document.getElementById('editor').innerHTML = sanitizeBody(post.body || '');
           document.title = (post.title||'').trim() ? post.title.trim() + ' — Pagebreak' : 'Pagebreak';
         }
       }
     }
-    lastMilestone = Math.floor(getWordCount() / 100);
+    lastMilestone = Math.floor(getEditorText().trim().split(/\s+/).filter(w => w.length > 0).length / 100);
     updateWordCount();
     if (localStorage.getItem('pb_dark') === 'true') { isDark = false; toggleDark(); }
   } catch(e) {}
@@ -942,7 +938,7 @@ function applySlashFormat(format) {
   }
 
   // Apply the block format
-  document.execCommand('formatBlock', false, format === 'p' ? 'p' : format);
+  document.execCommand('formatBlock', false, format);
   onType();
 }
 
