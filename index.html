@@ -510,8 +510,12 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Also linkify on paste (after a tick so the pasted content is in the DOM)
-  editor.addEventListener('paste', () => { setTimeout(linkifyAtCursor, 0); });
+  // Strip formatting on paste — insert plain text only
+  editor.addEventListener('paste', e => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
+  });
 
   editor.addEventListener('keyup', onType);
   editor.addEventListener('input', onType);
