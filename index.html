@@ -72,6 +72,31 @@
     font-size: 12px; font-weight: 500; color: var(--ink-dim);
     font-variant-numeric: tabular-nums; min-width: 54px; text-align: right;
   }
+  #wordCount {
+    cursor: pointer; border-radius: 4px;
+    padding: 2px 4px; margin: -2px -4px;
+    transition: background 0.15s;
+  }
+  #wordCount:hover { background: var(--ink-faint); color: var(--ink-mid); }
+
+  .target-input {
+    font-size: 12px; font-weight: 500; color: var(--ink-mid);
+    font-variant-numeric: tabular-nums;
+    width: 72px; text-align: right;
+    background: var(--ink-faint); border: none; outline: none;
+    border-radius: 4px; padding: 2px 5px;
+    display: none;
+  }
+  .target-input.show { display: block; }
+
+  .word-target-progress {
+    position: absolute; bottom: 0; left: 0;
+    height: 2px; width: 0%;
+    background: var(--accent);
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1), background 0.3s;
+    border-radius: 0 1px 1px 0;
+  }
+  .word-target-progress.done { background: #5a9e6f; }
 
   .icon-btn {
     width: 30px; height: 30px;
@@ -86,7 +111,6 @@
 
   /* Copy button — text label style */
   .copy-btn {
-    font-family: 'DM Sans', sans-serif;
     font-size: 11px; font-weight: 500;
     padding: 0 10px; height: 30px;
     border: 1px solid var(--ink-faint); border-radius: 6px;
@@ -96,6 +120,13 @@
   }
   .copy-btn:hover { background: var(--ink-faint); color: var(--ink); }
   .copy-btn svg { width: 12px; height: 12px; stroke: currentColor; flex-shrink: 0; }
+
+  .save-status {
+    font-size: 11px; color: var(--ink-dim);
+    opacity: 0; transition: opacity 0.4s;
+    white-space: nowrap; letter-spacing: 0.01em;
+  }
+  .save-status.show { opacity: 1; }
 
   /* ── Layout ── */
   .writing-area {
@@ -282,7 +313,7 @@
   .slash-item:hover, .slash-item.active { background: var(--ink-faint); }
   .slash-item-icon {
     font-size: 11px; font-weight: 700; color: var(--ink-dim);
-    width: 22px; flex-shrink: 0; font-family: 'DM Sans', sans-serif;
+    width: 22px; flex-shrink: 0;
     letter-spacing: -0.02em;
   }
   .slash-item-label { font-size: 12.5px; font-weight: 500; color: var(--ink); }
@@ -312,17 +343,27 @@
       placeholder="Untitled post…" maxlength="80" oninput="onTitleType()" />
   </div>
   <div class="chrome-right">
-    <span class="word-count" id="wordCount">0 words</span>
+    <span class="save-status" id="saveStatus">Saved</span>
+    <span class="word-count" id="wordCount" title="Click to set a word target" onclick="openTargetInput()">0 words</span>
+    <input class="target-input" id="targetInput" type="number" min="1" max="99999"
+      placeholder="Target…" title="Word target — press Enter to set, Escape to clear" />
     <span class="word-count" id="readingLevel" style="min-width:0" title="Estimated reading level (Flesch-Kincaid grade)"></span>
-    <button class="icon-btn" id="btnDark" title="Toggle dark mode" onclick="toggleDark()">🌙</button>
     <button class="copy-btn" title="Copy all text to clipboard" onclick="copyText()">
       <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <rect x="5" y="4" width="9" height="11" rx="1.5"/>
         <path d="M11 4V3a1 1 0 0 0-1-1H3a1.5 1.5 0 0 0-1.5 1.5v8A1 1 0 0 0 3 12.5h2"/>
       </svg>
-      Copy text
+      Copy
     </button>
+    <button class="copy-btn" title="Download as .txt" onclick="downloadText()">
+      <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3v7M5 7l3 3 3-3"/><path d="M3 12h10"/>
+      </svg>
+      Download
+    </button>
+    <button class="icon-btn" id="btnDark" title="Toggle dark mode" onclick="toggleDark()">🌙</button>
   </div>
+  <div class="word-target-progress" id="wordTargetProgress"></div>
 </div>
 
 <!-- Writing area -->
@@ -372,6 +413,10 @@ const CELEBRATIONS = [
 
 let isDark = false;
 let lastMilestone = 0;
+let wordTarget = 0;
+let slashMenuOpen = false;
+let slashActiveIndex = 0;
+const SLASH_ITEMS = ['h1','h2','h3','p'];
 
 // ══════════════════════════════════
 // INIT
@@ -385,7 +430,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // Global keyboard shortcuts (Cmd+S save — fires on document so it works everywhere)
   document.addEventListener('keydown', e => {
     const mod = e.metaKey || e.ctrlKey;
-    if (mod && e.key === 's') { e.preventDefault(); silentSave(); showToast('Saved ✓'); }
+    if (mod && e.key === 's') { e.preventDefault(); silentSave(); }
   });
 
   // Force <p> on Enter (not <div>) for consistent paragraph spacing
@@ -517,15 +562,47 @@ window.addEventListener('DOMContentLoaded', () => {
     document.execCommand('insertText', false, text);
   });
 
-  editor.addEventListener('keyup', onType);
-  editor.addEventListener('input', onType);
-});
+  // Word target input
+  const targetInput = document.getElementById('targetInput');
+  targetInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter')  { e.preventDefault(); commitTarget(); }
+    if (e.key === 'Escape') { e.preventDefault(); clearTarget(); }
+  });
+  targetInput.addEventListener('blur', () => {
+    // Only commit on blur if the input is still visible (i.e. Escape didn't just close it)
+    if (targetInput.classList.contains('show')) commitTarget();
+  });
 
+  editor.addEventListener('keyup', onType);
+  editor.addEventListener('input', () => {
+    onType();
+    // Slash command detection — open menu when '/' is the only character in the block
+    if (slashMenuOpen) return;
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    if (!range.collapsed) return;
+    const node = range.startContainer;
+    if (node.nodeType !== Node.TEXT_NODE) return;
+    let block = node;
+    while (block && block !== editor && !/^(P|DIV|H[1-3])$/.test(block.nodeName)) {
+      block = block.parentNode;
+    }
+    if (!block || block === editor) return;
+    if (block.textContent.trim() === '/') openSlashMenu();
+  });
+
+  document.addEventListener('mousedown', e => {
+    if (slashMenuOpen && !document.getElementById('slashMenu').contains(e.target)) {
+      closeSlashMenu();
+    }
+  });
+});
 // ══════════════════════════════════
 // URL LINKIFICATION
-// ══════════════════════════════════
 // Scans the text node immediately before the cursor and wraps any trailing
 // URL in an <a> tag using execCommand so it lands in the undo stack.
+// ══════════════════════════════════
 const URL_RE = /https?:\/\/[^\s<>"']+[^\s<>"'.,:;!?')\]]/;
 
 function linkifyAtCursor() {
@@ -534,7 +611,6 @@ function linkifyAtCursor() {
   const range = sel.getRangeAt(0);
   if (!range.collapsed) return;
 
-  // Get the text node the cursor is in (or just before it)
   let textNode = range.startContainer;
   if (textNode.nodeType !== Node.TEXT_NODE) return;
 
@@ -542,35 +618,29 @@ function linkifyAtCursor() {
   const match = URL_RE.exec(text);
   if (!match) return;
 
-  // Make sure the match runs right up to the cursor (no trailing non-URL chars)
+  // Match must run right up to the cursor
   if (match.index + match[0].length !== text.length) return;
 
   // Don't re-linkify if already inside an <a>
+  const editor = document.getElementById('editor');
   let parent = textNode.parentNode;
-  while (parent && parent !== document.getElementById('editor')) {
+  while (parent && parent !== editor) {
     if (parent.tagName === 'A') return;
     parent = parent.parentNode;
   }
 
   const url = match[0];
-  const start = match.index;
-
-  // Select the URL text
   const linkRange = document.createRange();
-  linkRange.setStart(textNode, start);
-  linkRange.setEnd(textNode, start + url.length);
+  linkRange.setStart(textNode, match.index);
+  linkRange.setEnd(textNode, match.index + url.length);
   sel.removeAllRanges();
   sel.addRange(linkRange);
 
-  // Wrap with execCommand so it's undoable
   document.execCommand('createLink', false, url);
 
   // Restore cursor to after the link
   const newSel = window.getSelection();
-  if (newSel && newSel.rangeCount) {
-    const r = newSel.getRangeAt(0);
-    r.collapse(false);
-  }
+  if (newSel && newSel.rangeCount) newSel.getRangeAt(0).collapse(false);
 }
 
 // ══════════════════════════════════
@@ -619,15 +689,13 @@ function getReadingLevel(rawText) {
   const text = rawText.replace(/\s+/g, ' ').trim();
   if (!text) return '';
 
-  // Split into sentences (. ! ? as terminators)
   const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
   const numSentences = sentences.length;
   if (numSentences === 0) return '';
 
-  // Split into words
   const words = text.split(/\s+/).filter(w => w.replace(/[^a-zA-Z]/g, '').length > 0);
   const numWords = words.length;
-  if (numWords < 10) return ''; // too short to be meaningful
+  if (numWords < 10) return '';
 
   const numSyllables = words.reduce((sum, w) => sum + countSyllables(w), 0);
 
@@ -641,13 +709,56 @@ function updateWordCount() {
   const rawText = getEditorText();
   const trimmed = rawText.trim();
   const words = trimmed ? trimmed.split(/\s+/).filter(w => w.length > 0).length : 0;
-  document.getElementById('wordCount').textContent = words + ' word' + (words !== 1 ? 's' : '');
+  const label = wordTarget
+    ? words + ' / ' + wordTarget + ' word' + (wordTarget !== 1 ? 's' : '')
+    : words + ' word' + (words !== 1 ? 's' : '');
+  document.getElementById('wordCount').textContent = label;
   document.getElementById('readingLevel').textContent = getReadingLevel(rawText);
+  updateTargetProgress(words);
   const milestone = Math.floor(words / 100);
   if (milestone > lastMilestone && words > 0) {
     lastMilestone = milestone;
     celebrate(CELEBRATIONS[Math.min(milestone - 1, CELEBRATIONS.length - 1)]);
   }
+}
+
+function openTargetInput() {
+  const input = document.getElementById('targetInput');
+  input.value = wordTarget || '';
+  input.classList.add('show');
+  document.getElementById('wordCount').style.display = 'none';
+  input.focus();
+  input.select();
+}
+
+function commitTarget() {
+  const input = document.getElementById('targetInput');
+  const val = parseInt(input.value, 10);
+  wordTarget = (val > 0) ? val : 0;
+  if (wordTarget) localStorage.setItem('pb_target', wordTarget);
+  else localStorage.removeItem('pb_target');
+  closeTargetInput();
+  updateWordCount();
+}
+
+function clearTarget() {
+  wordTarget = 0;
+  localStorage.removeItem('pb_target');
+  closeTargetInput();
+  updateWordCount();
+}
+
+function closeTargetInput() {
+  document.getElementById('targetInput').classList.remove('show');
+  document.getElementById('wordCount').style.display = '';
+}
+
+function updateTargetProgress(words) {
+  const bar = document.getElementById('wordTargetProgress');
+  if (!wordTarget) { bar.style.width = '0%'; return; }
+  const pct = Math.min(words / wordTarget * 100, 100);
+  bar.style.width = pct + '%';
+  bar.classList.toggle('done', words >= wordTarget);
 }
 
 function celebrate(msg) {
@@ -734,8 +845,13 @@ function openPost(id) {
 function newPost() {
   silentSave();
   const id = genId();
-  saveAllPostIds([...getAllPostIds(), id]);
-  savePost(id, { title:'', body:'', saved: Date.now() });
+  try {
+    saveAllPostIds([...getAllPostIds(), id]);
+    savePost(id, { title:'', body:'', saved: Date.now() });
+  } catch(e) {
+    showSaveStatus('⚠ Save failed', true);
+    return;
+  }
   setActiveId(id);
   document.getElementById('postTitleInline').value = '';
   document.getElementById('editor').innerHTML = '';
@@ -747,9 +863,7 @@ function newPost() {
 }
 
 function confirmDeletePost(id) {
-  const rows = document.querySelectorAll('.post-row');
-  let targetRow = null;
-  rows.forEach(r => { if (r.dataset.postId === id) targetRow = r; });
+  const targetRow = document.querySelector(`.post-row[data-post-id="${id}"]`);
   if (!targetRow) return;
   const post = getPost(id);
   const name = post?.title || 'Untitled post';
@@ -809,18 +923,32 @@ function sanitizeBody(html) {
 
 function silentSave() {
   let id = getActiveId();
-  if (!id) {
-    id = genId();
-    saveAllPostIds([...getAllPostIds(), id]);
-    setActiveId(id);
+  try {
+    if (!id) {
+      id = genId();
+      saveAllPostIds([...getAllPostIds(), id]);
+      setActiveId(id);
+    }
+    savePost(id, {
+      title: document.getElementById('postTitleInline').value,
+      body:  sanitizeBody(document.getElementById('editor').innerHTML),
+      saved: Date.now(),
+    });
+    showSaveStatus('Saved');
+  } catch(e) {
+    showSaveStatus('⚠ Save failed', true);
   }
-  savePost(id, {
-    title: document.getElementById('postTitleInline').value,
-    body:  sanitizeBody(document.getElementById('editor').innerHTML),
-    saved: Date.now(),
-  });
   const panel = document.getElementById('postsPanel');
   if (!panel.classList.contains('hidden')) renderPostsList();
+}
+
+function showSaveStatus(msg, isError) {
+  const el = document.getElementById('saveStatus');
+  el.textContent = msg;
+  el.style.color = isError ? '#b84a4a' : '';
+  el.classList.add('show');
+  clearTimeout(showSaveStatus._t);
+  showSaveStatus._t = setTimeout(() => el.classList.remove('show'), isError ? 4000 : 2000);
 }
 
 function loadDoc() {
@@ -851,13 +979,15 @@ function loadDoc() {
       }
     }
     lastMilestone = Math.floor(getEditorText().trim().split(/\s+/).filter(w => w.length > 0).length / 100);
+    const savedTarget = parseInt(localStorage.getItem('pb_target'), 10);
+    if (savedTarget > 0) wordTarget = savedTarget;
     updateWordCount();
     if (localStorage.getItem('pb_dark') === 'true') { isDark = false; toggleDark(); }
   } catch(e) {}
 }
 
-function copyText() {
-  const title = document.getElementById('postTitleInline').value;
+// Shared plain-text extractor used by copy and download
+function collectText() {
   const editor = document.getElementById('editor');
   const parts = [];
   function collect(node) {
@@ -865,16 +995,35 @@ function copyText() {
       parts.push(node.textContent);
     } else if (node.nodeType === Node.ELEMENT_NODE) {
       const tag = node.tagName;
-      if (tag === 'HR') { parts.push('\n---\n'); return; }
-      const isBlock = ['P','DIV','LI','BR'].includes(tag);
+      if (tag === 'HR') { parts.push('\n\n---\n\n'); return; }
+      const isBlock = ['P','DIV','LI','BR','H1','H2','H3'].includes(tag);
       for (const child of node.childNodes) collect(child);
       if (isBlock) parts.push('\n');
     }
   }
   collect(editor);
-  const body = parts.join('').replace(/\n{3,}/g, '\n\n').trim();
+  return parts.join('').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+function copyText() {
+  const title = document.getElementById('postTitleInline').value.trim();
+  const body = collectText();
   navigator.clipboard.writeText((title ? title + '\n\n' : '') + body)
-    .then(() => showToast('Copied to clipboard ✓'));
+    .then(() => showToast('Copied ✓'))
+    .catch(() => showToast('Copy failed — try Cmd+A, Cmd+C'));
+}
+
+function downloadText() {
+  const title = document.getElementById('postTitleInline').value.trim();
+  const body = collectText();
+  const content = (title ? title + '\n\n' : '') + body;
+  const filename = (title || 'post').replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.txt';
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type: 'text/plain' }));
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Downloaded ✓');
 }
 
 function showToast(msg) {
@@ -886,10 +1035,6 @@ function showToast(msg) {
 // ══════════════════════════════════
 // SLASH COMMAND MENU
 // ══════════════════════════════════
-let slashMenuOpen = false;
-let slashActiveIndex = 0;
-const SLASH_ITEMS = ['h1','h2','h3','p'];
-
 function openSlashMenu() {
   const sel = window.getSelection();
   if (!sel || !sel.rangeCount) return;
@@ -946,54 +1091,22 @@ function applySlashFormat(format) {
   onType();
 }
 
-// Slash detection on input + click-outside dismiss
-window.addEventListener('DOMContentLoaded', () => {
-  const editor = document.getElementById('editor');
-
-  editor.addEventListener('input', () => {
-    if (slashMenuOpen) return;
-
-    const sel = window.getSelection();
-    if (!sel || !sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-    if (!range.collapsed) return;
-
-    const node = range.startContainer;
-    if (node.nodeType !== Node.TEXT_NODE) return;
-
-    // Only trigger if '/' is the sole character in the current block
-    let block = node;
-    const ed = document.getElementById('editor');
-    while (block && block !== ed && !/^(P|DIV|H[1-3])$/.test(block.nodeName)) {
-      block = block.parentNode;
-    }
-    if (!block || block === ed) return;
-
-    if (block.textContent.trim() === '/') openSlashMenu();
-  });
-
-  document.addEventListener('mousedown', e => {
-    if (slashMenuOpen && !document.getElementById('slashMenu').contains(e.target)) {
-      closeSlashMenu();
-    }
-  });
-});
 </script>
 <!-- Slash command menu -->
 <div class="slash-menu" id="slashMenu">
-  <div class="slash-item" data-format="h1" onclick="applySlashFormat('h1')">
+  <div class="slash-item" onclick="applySlashFormat('h1')">
     <span class="slash-item-icon">H1</span>
     <span class="slash-item-label">Heading 1</span>
   </div>
-  <div class="slash-item" data-format="h2" onclick="applySlashFormat('h2')">
+  <div class="slash-item" onclick="applySlashFormat('h2')">
     <span class="slash-item-icon">H2</span>
     <span class="slash-item-label">Heading 2</span>
   </div>
-  <div class="slash-item" data-format="h3" onclick="applySlashFormat('h3')">
+  <div class="slash-item" onclick="applySlashFormat('h3')">
     <span class="slash-item-icon">H3</span>
     <span class="slash-item-label">Heading 3</span>
   </div>
-  <div class="slash-item" data-format="p" onclick="applySlashFormat('p')">
+  <div class="slash-item" onclick="applySlashFormat('p')">
     <span class="slash-item-icon" style="font-size:14px;font-weight:400;">¶</span>
     <span class="slash-item-label">Paragraph</span>
   </div>
