@@ -403,17 +403,9 @@
 // ══════════════════════════════════
 // STATE
 // ══════════════════════════════════
-const CELEBRATIONS = [
-  '100 words ✦', '200 words. You\'re in the zone →',
-  '300 words. This is good ✦', '400 words. Keep going →',
-  '500 words ✦ Halfway to a great post.', '600 words. Unstoppable →',
-  '700 words ✦', '800 words →', '900 words ✦',
-  '1000 words 🎉 Legendary.',
-];
-
 let isDark = false;
-let lastMilestone = 0;
 let wordTarget = 0;
+let targetCelebrated = false; // tracks whether we've fired the celebration for the current target
 let slashMenuOpen = false;
 let slashActiveIndex = 0;
 const SLASH_ITEMS = ['h1','h2','h3','p'];
@@ -644,7 +636,7 @@ function linkifyAtCursor() {
 }
 
 // ══════════════════════════════════
-// WORD COUNT + MILESTONES
+// WORD COUNT + TARGET CELEBRATION
 // ══════════════════════════════════
 function onType() {
   updateWordCount();
@@ -715,10 +707,15 @@ function updateWordCount() {
   document.getElementById('wordCount').textContent = label;
   document.getElementById('readingLevel').textContent = getReadingLevel(rawText);
   updateTargetProgress(words);
-  const milestone = Math.floor(words / 100);
-  if (milestone > lastMilestone && words > 0) {
-    lastMilestone = milestone;
-    celebrate(CELEBRATIONS[Math.min(milestone - 1, CELEBRATIONS.length - 1)]);
+
+  // Celebrate only when the word target is hit exactly for the first time
+  if (wordTarget > 0 && words === wordTarget && !targetCelebrated) {
+    targetCelebrated = true;
+    celebrate(words + ' words — target reached! ✦');
+  }
+  // Reset the flag if they drop back below the target (so hitting it again re-fires)
+  if (wordTarget > 0 && words < wordTarget) {
+    targetCelebrated = false;
   }
 }
 
@@ -735,6 +732,8 @@ function commitTarget() {
   const input = document.getElementById('targetInput');
   const val = parseInt(input.value, 10);
   wordTarget = (val > 0) ? val : 0;
+  // Reset celebration state whenever the target changes
+  targetCelebrated = false;
   if (wordTarget) localStorage.setItem('pb_target', wordTarget);
   else localStorage.removeItem('pb_target');
   closeTargetInput();
@@ -743,6 +742,7 @@ function commitTarget() {
 
 function clearTarget() {
   wordTarget = 0;
+  targetCelebrated = false;
   localStorage.removeItem('pb_target');
   closeTargetInput();
   updateWordCount();
@@ -835,7 +835,7 @@ function openPost(id) {
     document.getElementById('postTitleInline').value = post.title || '';
     document.getElementById('editor').innerHTML = sanitizeBody(post.body || '');
     document.title = (post.title||'').trim() ? post.title.trim() + ' — Pagebreak' : 'Pagebreak';
-    lastMilestone = Math.floor(getEditorText().trim().split(/\s+/).filter(w => w.length > 0).length / 100);
+    targetCelebrated = false;
     updateWordCount();
   }
   renderPostsList();
@@ -856,7 +856,7 @@ function newPost() {
   document.getElementById('postTitleInline').value = '';
   document.getElementById('editor').innerHTML = '';
   document.title = 'Pagebreak';
-  lastMilestone = 0;
+  targetCelebrated = false;
   updateWordCount();
   renderPostsList();
   document.getElementById('editor').focus();
@@ -978,7 +978,6 @@ function loadDoc() {
         }
       }
     }
-    lastMilestone = Math.floor(getEditorText().trim().split(/\s+/).filter(w => w.length > 0).length / 100);
     const savedTarget = parseInt(localStorage.getItem('pb_target'), 10);
     if (savedTarget > 0) wordTarget = savedTarget;
     updateWordCount();
