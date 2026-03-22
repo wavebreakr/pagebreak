@@ -8,8 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* Base palette — warm, paper-like, same DNA as pb-5 */
+    /* ── Theme: Paper (default) — warm, editorial ── */
     --bg-canvas: #edeae2;
+    --editor-bg: #faf9f7;
     --ink: #1c1b18;
     --ink-mid: #6b6860;
     --ink-dim: #a8a49c;
@@ -19,15 +20,59 @@
     --panel-bg: rgba(250,248,244,0.82);
     --panel-border: rgba(0,0,0,0.08);
     --link: #2a6aaa;
-    /* Glass recipe */
     --glass-bg: rgba(255,255,255,0.58);
     --glass-border: rgba(255,255,255,0.75);
     --glass-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 8px 32px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
     --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.8) inset, 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
     --blur: blur(18px) saturate(1.6);
+    --caret: #c2692a;
   }
+
+  /* ── Theme: Slate — cool airy blue-grey ── */
+  .theme-slate {
+    --bg-canvas: #dce3eb;
+    --editor-bg: #f0f4f8;
+    --ink: #18202a;
+    --ink-mid: #5a6878;
+    --ink-dim: #98a6b5;
+    --ink-faint: rgba(30,60,100,0.07);
+    --accent: #2e6da4;
+    --accent-dim: rgba(46,109,164,0.1);
+    --panel-bg: rgba(236,242,248,0.85);
+    --panel-border: rgba(30,60,100,0.09);
+    --link: #1a5c9e;
+    --glass-bg: rgba(230,238,248,0.62);
+    --glass-border: rgba(255,255,255,0.72);
+    --glass-shadow: 0 1px 0 rgba(255,255,255,0.88) inset, 0 8px 32px rgba(20,50,90,0.1), 0 1px 2px rgba(20,50,90,0.07);
+    --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.8) inset, 0 2px 8px rgba(20,50,90,0.08), 0 1px 2px rgba(20,50,90,0.05);
+    --blur: blur(18px) saturate(1.5);
+    --caret: #2e6da4;
+  }
+
+  /* ── Theme: Meadow — soft sage green ── */
+  .theme-meadow {
+    --bg-canvas: #d8e5da;
+    --editor-bg: #f2f7f2;
+    --ink: #18241a;
+    --ink-mid: #567060;
+    --ink-dim: #91aa98;
+    --ink-faint: rgba(20,70,30,0.07);
+    --accent: #3a7d52;
+    --accent-dim: rgba(58,125,82,0.1);
+    --panel-bg: rgba(238,246,240,0.85);
+    --panel-border: rgba(20,70,30,0.09);
+    --link: #2c6e44;
+    --glass-bg: rgba(228,242,232,0.62);
+    --glass-border: rgba(255,255,255,0.72);
+    --glass-shadow: 0 1px 0 rgba(255,255,255,0.88) inset, 0 8px 32px rgba(20,60,30,0.1), 0 1px 2px rgba(20,60,30,0.07);
+    --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.8) inset, 0 2px 8px rgba(20,60,30,0.08), 0 1px 2px rgba(20,60,30,0.05);
+    --blur: blur(18px) saturate(1.5);
+    --caret: #3a7d52;
+  }
+
   .dark {
     --bg-canvas: #18160f;
+    --editor-bg: #141412;
     --ink: #e8e4db;
     --ink-mid: #968f84;
     --ink-dim: #4a4740;
@@ -40,6 +85,24 @@
     --glass-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 8px 32px rgba(0,0,0,0.32), 0 1px 2px rgba(0,0,0,0.2);
     --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.05) inset, 0 2px 8px rgba(0,0,0,0.28), 0 1px 2px rgba(0,0,0,0.16);
     --blur: blur(20px) saturate(1.4);
+  }
+  .dark.theme-slate {
+    --bg-canvas: #0f151c;
+    --editor-bg: #0c1018;
+    --ink: #dce6f0;
+    --ink-mid: #7a92a8;
+    --ink-dim: #384858;
+    --glass-bg: rgba(20,32,48,0.65);
+    --glass-border: rgba(120,170,220,0.1);
+  }
+  .dark.theme-meadow {
+    --bg-canvas: #0f1810;
+    --editor-bg: #0c1410;
+    --ink: #d8eadc;
+    --ink-mid: #6a8870;
+    --ink-dim: #344838;
+    --glass-bg: rgba(18,36,22,0.65);
+    --glass-border: rgba(100,180,120,0.1);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -192,10 +255,9 @@
   /* ── Editor wrap — clean airy writing surface ── */
   .editor-wrap {
     flex: 1; overflow-y: auto; padding: 52px 0 120px;
-    background: #faf9f7;
+    background: var(--editor-bg);
     transition: background 0.4s;
   }
-  .dark .editor-wrap { background: #141412; }
   .editor-wrap::-webkit-scrollbar { width: 3px; }
   .editor-wrap::-webkit-scrollbar-thumb {
     background: rgba(0,0,0,0.12); border-radius: 2px;
@@ -211,7 +273,7 @@
     font-size: 18px; font-weight: 400; line-height: 1.9;
     color: var(--ink);
     outline: none; min-height: calc(100vh - 200px);
-    caret-color: var(--accent);
+    caret-color: var(--caret);
     transition: color 0.3s; letter-spacing: 0.005em;
     word-break: break-word;
   }
@@ -383,6 +445,86 @@
   }
   .slash-item-label { font-size: 12.5px; font-weight: 500; color: var(--ink); }
 
+  /* ── Theme picker button + dropdown ── */
+  .theme-btn-wrap {
+    position: relative;
+  }
+  .theme-indicator {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #f5f2ea, #d8d3c6);
+    border: 1.5px solid rgba(0,0,0,0.15);
+    flex-shrink: 0; pointer-events: none;
+    transition: background 0.3s;
+  }
+  #btnTheme {
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .theme-dropdown {
+    position: absolute; top: calc(100% + 8px); right: 0;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    box-shadow: var(--glass-shadow);
+    padding: 5px;
+    display: flex; flex-direction: column; gap: 2px;
+    min-width: 130px;
+    opacity: 0; pointer-events: none;
+    transform: translateY(-4px) scale(0.97);
+    transform-origin: top right;
+    transition: opacity 0.15s, transform 0.15s;
+    z-index: 200;
+  }
+  .theme-dropdown.open {
+    opacity: 1; pointer-events: all;
+    transform: translateY(0) scale(1);
+  }
+  .theme-option {
+    display: flex; align-items: center; gap: 9px;
+    padding: 6px 10px; border-radius: 8px;
+    cursor: pointer; transition: background 0.12s;
+  }
+  .theme-option:hover { background: rgba(255,255,255,0.6); }
+  .dark .theme-option:hover { background: rgba(255,255,255,0.08); }
+  .theme-option.active { background: var(--accent-dim); }
+  .theme-option-dot {
+    width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+    border: 1.5px solid rgba(0,0,0,0.12);
+  }
+  .theme-option-dot.dot-paper  { background: radial-gradient(circle at 35% 35%, #f5f2ea, #d8d3c6); }
+  .theme-option-dot.dot-slate  { background: radial-gradient(circle at 35% 35%, #e4ecf4, #bfcfdf); }
+  .theme-option-dot.dot-meadow { background: radial-gradient(circle at 35% 35%, #e4f0e6, #bdd4c2); }
+  .theme-option-label { font-size: 12px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+
+  /* ── Ethereal mesh gradients for Slate + Meadow ── */
+  .theme-slate .editor-wrap {
+    background:
+      radial-gradient(ellipse 80% 60% at 15% 20%, rgba(190,215,245,0.45) 0%, transparent 65%),
+      radial-gradient(ellipse 60% 50% at 85% 75%, rgba(180,205,235,0.35) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 50% 50%, rgba(210,228,248,0.2) 0%, transparent 70%),
+      var(--editor-bg);
+  }
+  .theme-meadow .editor-wrap {
+    background:
+      radial-gradient(ellipse 80% 60% at 15% 20%, rgba(185,225,195,0.45) 0%, transparent 65%),
+      radial-gradient(ellipse 60% 50% at 85% 75%, rgba(175,215,185,0.35) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 50% 50%, rgba(205,235,210,0.2) 0%, transparent 70%),
+      var(--editor-bg);
+  }
+  .dark.theme-slate .editor-wrap {
+    background:
+      radial-gradient(ellipse 70% 50% at 10% 15%, rgba(40,80,130,0.3) 0%, transparent 65%),
+      radial-gradient(ellipse 55% 45% at 88% 80%, rgba(30,60,110,0.25) 0%, transparent 60%),
+      var(--editor-bg);
+  }
+  .dark.theme-meadow .editor-wrap {
+    background:
+      radial-gradient(ellipse 70% 50% at 10% 15%, rgba(30,80,45,0.3) 0%, transparent 65%),
+      radial-gradient(ellipse 55% 45% at 88% 80%, rgba(25,65,35,0.25) 0%, transparent 60%),
+      var(--editor-bg);
+  }
+
   @media (max-width: 700px) {
     .posts-panel { display: none; }
     .editor-inner { padding: 0 20px; }
@@ -426,6 +568,26 @@
       </svg>
       Download
     </button>
+    <div class="theme-btn-wrap">
+      <button class="icon-btn" id="btnTheme" title="Switch theme" onclick="toggleThemeDropdown()">
+        <div class="theme-indicator" id="themeIndicator"></div>
+        <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="8" height="8" style="opacity:0.5"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="theme-dropdown" id="themeDropdown">
+        <div class="theme-option active" id="opt-paper" onclick="setTheme('paper')">
+          <div class="theme-option-dot dot-paper"></div>
+          <span class="theme-option-label">Paper</span>
+        </div>
+        <div class="theme-option" id="opt-slate" onclick="setTheme('slate')">
+          <div class="theme-option-dot dot-slate"></div>
+          <span class="theme-option-label">Slate</span>
+        </div>
+        <div class="theme-option" id="opt-meadow" onclick="setTheme('meadow')">
+          <div class="theme-option-dot dot-meadow"></div>
+          <span class="theme-option-label">Meadow</span>
+        </div>
+      </div>
+    </div>
     <button class="icon-btn" id="btnDark" title="Toggle dark mode" onclick="toggleDark()">🌙</button>
   </div>
   <div class="word-target-progress" id="wordTargetProgress"></div>
@@ -469,6 +631,7 @@
 // STATE
 // ══════════════════════════════════
 let isDark = false;
+let currentTheme = 'paper'; // 'paper' | 'slate' | 'meadow'
 let wordTarget = 0;
 let targetCelebrated = false; // tracks whether we've fired the celebration for the current target
 let slashMenuOpen = false;
@@ -651,6 +814,11 @@ window.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('mousedown', e => {
     if (slashMenuOpen && !document.getElementById('slashMenu').contains(e.target)) {
       closeSlashMenu();
+    }
+    const dd = document.getElementById('themeDropdown');
+    const btn = document.getElementById('btnTheme');
+    if (dd && dd.classList.contains('open') && !dd.contains(e.target) && !btn.contains(e.target)) {
+      closeThemeDropdown();
     }
   });
 });
@@ -958,6 +1126,41 @@ function doDeletePost(id) {
 }
 
 // ══════════════════════════════════
+// THEME
+// ══════════════════════════════════
+const THEME_DOTS = {
+  paper:  'radial-gradient(circle at 35% 35%, #f5f2ea, #d8d3c6)',
+  slate:  'radial-gradient(circle at 35% 35%, #e4ecf4, #bfcfdf)',
+  meadow: 'radial-gradient(circle at 35% 35%, #e4f0e6, #bdd4c2)',
+};
+
+function setTheme(theme, save = true) {
+  currentTheme = theme;
+  document.body.classList.remove('theme-slate', 'theme-meadow');
+  if (theme === 'slate')  document.body.classList.add('theme-slate');
+  if (theme === 'meadow') document.body.classList.add('theme-meadow');
+  // Update indicator dot
+  const ind = document.getElementById('themeIndicator');
+  if (ind) ind.style.background = THEME_DOTS[theme] || THEME_DOTS.paper;
+  // Update active option
+  document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('active'));
+  const opt = document.getElementById('opt-' + theme);
+  if (opt) opt.classList.add('active');
+  // Close dropdown
+  closeThemeDropdown();
+  if (save) localStorage.setItem('pb_theme', theme);
+}
+
+function toggleThemeDropdown() {
+  const dd = document.getElementById('themeDropdown');
+  dd.classList.toggle('open');
+}
+
+function closeThemeDropdown() {
+  document.getElementById('themeDropdown').classList.remove('open');
+}
+
+// ══════════════════════════════════
 // TOGGLES
 // ══════════════════════════════════
 function toggleDark() {
@@ -1046,7 +1249,8 @@ function loadDoc() {
     const savedTarget = parseInt(localStorage.getItem('pb_target'), 10);
     if (savedTarget > 0) wordTarget = savedTarget;
     updateWordCount();
-    if (localStorage.getItem('pb_dark') === 'true') {
+    const savedTheme = localStorage.getItem('pb_theme') || 'paper';
+    setTheme(savedTheme, false);    if (localStorage.getItem('pb_dark') === 'true') {
       isDark = true;
       document.body.classList.add('dark');
       document.getElementById('btnDark').textContent = '☀️';
