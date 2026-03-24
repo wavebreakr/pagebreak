@@ -124,13 +124,8 @@
     position: fixed; top: 0; left: 0; right: 0; height: 48px;
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 16px; gap: 12px;
-    background: var(--glass-bg);
-    backdrop-filter: var(--blur);
-    -webkit-backdrop-filter: var(--blur);
-    border-bottom: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
+    background: transparent;
     z-index: 100;
-    transition: background 0.4s, border-color 0.4s;
   }
   .chrome-left  { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
   .chrome-right { display: flex; align-items: center; gap: 6px;  flex-shrink: 0; }
@@ -139,7 +134,7 @@
   .brand img { height: 28px; width: auto; display: block; }
   .dark .brand img { filter: invert(1); }
 
-  .chrome-sep { width: 1px; height: 16px; background: var(--glass-border); flex-shrink: 0; }
+  .chrome-sep { width: 1px; height: 16px; background: transparent; flex-shrink: 0; }
 
   .post-title-inline {
     font-size: 13px;
@@ -157,7 +152,7 @@
   #wordCount {
     cursor: pointer; border-radius: 6px;
     padding: 2px 6px; margin: -2px -6px;
-    transition: background 0.15s;
+    transition: background 0.15s, color 0.15s;
     text-decoration: underline;
     text-decoration-style: dotted;
     text-decoration-color: var(--ink-dim);
@@ -240,12 +235,12 @@
 
   /* ── Layout ── */
   .writing-area {
-    position: fixed; top: 48px; left: 0; right: 0; bottom: 0;
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     display: flex; overflow: hidden;
   }
 
   .editor-wrap {
-    flex: 1; overflow-y: auto; padding: 52px 0 120px;
+    flex: 1; overflow-y: auto; padding: 100px 0 120px;
     background: var(--editor-bg);
     transition: background 0.4s;
     /* Standard Firefox scrollbar styling */
@@ -503,7 +498,7 @@
 <div class="chrome">
   <div class="chrome-left">
     <div class="brand">
-      <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/Pagebreak-Logo-3.png" alt="Pagebreak">
+      <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/PagebreakLogo2.png" alt="Pagebreak">
     </div>
     <button class="icon-btn" id="btnPosts" title="All posts" aria-label="Toggle posts panel" onclick="togglePostsPanel()">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
