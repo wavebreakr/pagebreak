@@ -126,7 +126,9 @@
     padding: 0 16px; gap: 12px;
     background: transparent;
     z-index: 100;
+    transition: left 0.35s cubic-bezier(0.4,0,0.2,1);
   }
+  .chrome.panel-open { left: 220px; }
   .chrome-left  { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
   .chrome-right { display: flex; align-items: center; gap: 6px;  flex-shrink: 0; }
 
@@ -1014,6 +1016,7 @@ function togglePostsPanel() {
   if (isHidden) { silentSave(); renderPostsList(); }
   elPostsPanel.classList.toggle('hidden', !isHidden);
   elBtnPosts.classList.toggle('on', isHidden);
+  document.querySelector('.chrome').classList.toggle('panel-open', isHidden);
 }
 
 function renderPostsList() {
