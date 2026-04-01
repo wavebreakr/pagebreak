@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pagebreak</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -101,14 +101,6 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; overflow: hidden; }
 
-  /* iOS safe area — falls back to 0 on non-notch devices */
-  :root {
-    --safe-top:    env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-    --safe-left:   env(safe-area-inset-left, 0px);
-    --safe-right:  env(safe-area-inset-right, 0px);
-  }
-
   body {
     font-family: 'DM Sans', sans-serif;
     color: var(--ink);
@@ -129,13 +121,9 @@
 
   /* ── Chrome ── */
   .chrome {
-    position: fixed; top: 0; left: 0; right: 0;
-    height: calc(48px + var(--safe-top));
-    padding-top: var(--safe-top);
+    position: fixed; top: 0; left: 0; right: 0; height: 48px;
     display: flex; align-items: center; justify-content: space-between;
-    padding-left: max(16px, var(--safe-left));
-    padding-right: max(16px, var(--safe-right));
-    gap: 12px;
+    padding: 0 16px; gap: 12px;
     background: transparent;
     z-index: 100;
     transition: left 0.35s cubic-bezier(0.4,0,0.2,1);
@@ -247,6 +235,16 @@
   }
   .save-status.show { opacity: 1; }
 
+  /* ── Scroll top fade ── */
+  .scroll-top-fade {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 100px;
+    background: linear-gradient(to bottom, var(--editor-bg) 0%, var(--editor-bg) 48px, transparent 100px);
+    pointer-events: none; z-index: 50;
+    transition: left 0.35s cubic-bezier(0.4,0,0.2,1), background 0.4s;
+  }
+  .scroll-top-fade.panel-open { left: 220px; }
+
   /* ── Layout ── */
   .writing-area {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -254,9 +252,7 @@
   }
 
   .editor-wrap {
-    flex: 1; overflow-y: auto;
-    padding-top: calc(100px + var(--safe-top));
-    padding-bottom: calc(120px + var(--safe-bottom));
+    flex: 1; overflow-y: auto; padding: 100px 0 120px;
     background: var(--editor-bg);
     transition: background 0.4s;
     /* Standard Firefox scrollbar styling */
@@ -357,7 +353,6 @@
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
     display: flex; flex-direction: column; overflow: hidden;
     transition: width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s, border-color 0.4s;
-    padding-top: var(--safe-top);
     /* order:-1 places sidebar before editor visually; DOM order keeps editor first for screen readers */
     order: -1;
   }
@@ -503,67 +498,10 @@
       var(--editor-bg);
   }
 
-  /* ── Mobile menu button (hidden on desktop) ── */
-  .mobile-menu-btn { display: none; }
-
-  /* ── Mobile drawer ── */
-  .mobile-drawer {
-    display: none; /* shown via JS on mobile */
-    position: fixed;
-    top: calc(48px + var(--safe-top));
-    left: 0; right: 0;
-    background: var(--glass-bg);
-    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border-bottom: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    z-index: 99;
-    padding: 10px 16px calc(10px + var(--safe-bottom));
-    flex-direction: column; gap: 2px;
-    transform: translateY(-8px);
-    opacity: 0;
-    transition: opacity 0.18s, transform 0.18s cubic-bezier(0.4,0,0.2,1);
-    pointer-events: none;
-  }
-  .mobile-drawer.open {
-    opacity: 1; transform: translateY(0); pointer-events: auto;
-  }
-  .drawer-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 4px;
-    border-bottom: 1px solid var(--ink-faint);
-    font-size: 13px; font-weight: 500; color: var(--ink);
-  }
-  .drawer-row:last-child { border-bottom: none; }
-  .drawer-row-label { color: var(--ink-mid); font-size: 12px; }
-  .drawer-actions { display: flex; align-items: center; gap: 6px; }
-
-  /* Theme dots row inside drawer */
-  .drawer-theme-options {
-    display: flex; gap: 6px;
-  }
-  .drawer-theme-dot {
-    width: 22px; height: 22px; border-radius: 50%;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: border-color 0.15s, transform 0.15s;
-  }
-  .drawer-theme-dot:hover { transform: scale(1.15); }
-  .drawer-theme-dot.active { border-color: var(--accent); }
-  .drawer-theme-dot.dot-paper  { background: radial-gradient(circle at 35% 35%, #f5f2ea, #d8d3c6); }
-  .drawer-theme-dot.dot-slate  { background: radial-gradient(circle at 35% 35%, #e4ecf4, #bfcfdf); }
-  .drawer-theme-dot.dot-meadow { background: radial-gradient(circle at 35% 35%, #e4f0e6, #bdd4c2); }
-
   @media (max-width: 700px) {
     .posts-panel { display: none; }
     .editor-inner { padding: 0 20px; }
-    .post-title-inline { width: 140px; max-width: 140px; }
-
-    /* Hide the full desktop chrome-right; show hamburger instead */
-    .chrome-right { display: none; }
-    .mobile-menu-btn { display: flex; }
-
-    /* Show drawer as flex when active */
-    .mobile-drawer { display: flex; }
+    .post-title-inline { max-width: 120px; }
   }
 </style>
 </head>
@@ -643,62 +581,10 @@
       <span aria-hidden="true">🌙</span>
     </button>
   </div>
-  <!-- Hamburger — only visible on mobile via media query -->
-  <button class="icon-btn mobile-menu-btn" id="btnMobileMenu"
-    title="Menu" aria-label="Open menu" aria-expanded="false"
-    onclick="toggleMobileDrawer()">
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="14" height="14" aria-hidden="true">
-      <line x1="2" y1="4.5" x2="14" y2="4.5"/>
-      <line x1="2" y1="8"   x2="14" y2="8"/>
-      <line x1="2" y1="11.5" x2="14" y2="11.5"/>
-    </svg>
-  </button>
   <div class="word-target-progress" id="wordTargetProgress" role="progressbar" aria-hidden="true"></div>
 </div>
 
-<!-- Mobile drawer — slides down from chrome on mobile only -->
-<div class="mobile-drawer" id="mobileDrawer" aria-label="Options menu">
-  <div class="drawer-row">
-    <span class="drawer-row-label">Words</span>
-    <div class="drawer-actions">
-      <span class="word-count" id="drawerWordCount" style="min-width:0">0 words</span>
-    </div>
-  </div>
-  <div class="drawer-row">
-    <span class="drawer-row-label">Theme</span>
-    <div class="drawer-theme-options">
-      <span class="drawer-theme-dot dot-paper  active" id="drawerDotPaper"  title="Paper"  onclick="setTheme('paper');  updateDrawerDots('paper')"></span>
-      <span class="drawer-theme-dot dot-slate"         id="drawerDotSlate"  title="Slate"  onclick="setTheme('slate');  updateDrawerDots('slate')"></span>
-      <span class="drawer-theme-dot dot-meadow"        id="drawerDotMeadow" title="Meadow" onclick="setTheme('meadow'); updateDrawerDots('meadow')"></span>
-    </div>
-  </div>
-  <div class="drawer-row">
-    <span class="drawer-row-label">Dark mode</span>
-    <button class="icon-btn" id="drawerBtnDark" title="Toggle dark mode" aria-label="Toggle dark mode" onclick="toggleDark()">
-      <span aria-hidden="true">🌙</span>
-    </button>
-  </div>
-  <div class="drawer-row">
-    <span class="drawer-row-label">Copy</span>
-    <button class="copy-btn" onclick="copyText(); closeMobileDrawer()">
-      <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="5" y="4" width="9" height="11" rx="1.5"/>
-        <path d="M11 4V3a1 1 0 0 0-1-1H3a1.5 1.5 0 0 0-1.5 1.5v8A1 1 0 0 0 3 12.5h2"/>
-      </svg>
-      Copy text
-    </button>
-  </div>
-  <div class="drawer-row">
-    <span class="drawer-row-label">Export</span>
-    <button class="copy-btn" onclick="downloadText(); closeMobileDrawer()">
-      <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M8 3v7M5 7l3 3 3-3"/>
-        <path d="M3 12h10"/>
-      </svg>
-      Download
-    </button>
-  </div>
-</div>
+<div class="scroll-top-fade" id="scrollTopFade" aria-hidden="true"></div>
 
 <div class="writing-area">
   <div class="posts-panel hidden" id="postsPanel">
@@ -708,7 +594,7 @@
     </div>
     <div class="posts-list" id="postsList" role="list"></div>
   </div>
-  <div class="editor-wrap">
+  <div class="editor-wrap" id="editorWrap">
     <div class="editor-inner">
       <div class="editor" id="editor"
         contenteditable="true"
@@ -753,19 +639,19 @@ let targetCelebrated = false;
 let slashMenuOpen    = false;
 let slashActiveIndex = 0;
 let isComposing      = false; // IME composition guard
+let isTyping         = false; // typewriter scroll guard — only scroll on keystrokes, not clicks
+let _typingTimer     = null;
 const SLASH_ITEMS    = ['h1', 'h2', 'h3', 'p'];
 
 // Autosave timer — module-level so both onType and onTitleType share it
 let _saveTimer = null;
 
 // Cached element references — populated once in DOMContentLoaded
-let elEditor, elPostsPanel, elWordCount, elReadingLevel,
+let elEditor, elEditorWrap, elPostsPanel, elWordCount, elReadingLevel,
     elTargetInput, elSaveStatus, elProgressBar, elCelebration, elToast,
     elPostTitle, elPostsList, elSlashMenu, elThemeDropdown,
     elThemeIndicator, elBtnDark, elBtnPosts, elBtnTheme,
-    elOptPaper, elOptSlate, elOptMeadow,
-    elMobileDrawer, elBtnMobileMenu, elDrawerBtnDark,
-    elDrawerDotPaper, elDrawerDotSlate, elDrawerDotMeadow, elDrawerWordCount;
+    elOptPaper, elOptSlate, elOptMeadow, elScrollFade;
 
 // Module-level constants for DOM-walking hot paths (avoids per-call allocations)
 const BLOCK_RE   = /^(P|DIV|LI|BR|UL|OL)$/;
@@ -776,6 +662,7 @@ const PARA_RE    = /^(P|DIV|LI)$/;
 // ── Init ───────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   elEditor        = document.getElementById('editor');
+  elEditorWrap    = document.getElementById('editorWrap');
   elPostsPanel    = document.getElementById('postsPanel');
   elWordCount     = document.getElementById('wordCount');
   elReadingLevel  = document.getElementById('readingLevel');
@@ -795,13 +682,7 @@ window.addEventListener('DOMContentLoaded', () => {
   elOptPaper      = document.getElementById('opt-paper');
   elOptSlate      = document.getElementById('opt-slate');
   elOptMeadow     = document.getElementById('opt-meadow');
-  elMobileDrawer  = document.getElementById('mobileDrawer');
-  elBtnMobileMenu = document.getElementById('btnMobileMenu');
-  elDrawerBtnDark = document.getElementById('drawerBtnDark');
-  elDrawerDotPaper  = document.getElementById('drawerDotPaper');
-  elDrawerDotSlate  = document.getElementById('drawerDotSlate');
-  elDrawerDotMeadow = document.getElementById('drawerDotMeadow');
-  elDrawerWordCount = document.getElementById('drawerWordCount');
+  elScrollFade    = document.getElementById('scrollTopFade');
 
   // defaultParagraphSeparator must be set before any content is loaded
   // NOTE: execCommand is deprecated but remains the only viable API for
@@ -823,6 +704,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
   elEditor.addEventListener('keydown', onEditorKeydown);
   elEditor.addEventListener('input', onEditorInput);
+
+  // Set isTyping on keydown so the input handler knows it was keyboard-driven.
+  // Clear it shortly after so click-repositioning doesn't trigger scrollToCursor.
+  elEditor.addEventListener('keydown', () => {
+    isTyping = true;
+    clearTimeout(_typingTimer);
+    _typingTimer = setTimeout(() => { isTyping = false; }, 1000);
+  });
 
   // Track IME composition to avoid false slash-menu triggers on CJK input
   elEditor.addEventListener('compositionstart', () => { isComposing = true; });
@@ -851,13 +740,25 @@ window.addEventListener('DOMContentLoaded', () => {
         !elBtnTheme.contains(e.target)) {
       closeThemeDropdown();
     }
-    if (elMobileDrawer && elMobileDrawer.classList.contains('open') &&
-        !elMobileDrawer.contains(e.target) &&
-        !elBtnMobileMenu.contains(e.target)) {
-      closeMobileDrawer();
-    }
   });
 });
+
+// ── Typewriter scroll ──────────────────────────────────
+// Keeps the cursor at ~50% of the visible editor height while typing.
+// Only fires during keyboard input (isTyping guard) to avoid disrupting
+// click-to-reposition behaviour.
+function scrollToCursor() {
+  if (!isTyping) return;
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return;
+  const rect = sel.getRangeAt(0).getBoundingClientRect();
+  if (!rect.height) return; // no valid cursor position
+  const wrapRect = elEditorWrap.getBoundingClientRect();
+  const target   = wrapRect.top + wrapRect.height * 0.5;
+  const delta    = rect.top - target;
+  // Dead zone of 4px prevents micro-jitter when cursor is already near centre
+  if (Math.abs(delta) > 4) elEditorWrap.scrollTop += delta;
+}
 
 // ── Editor keydown handler ─────────────────────────────
 function onEditorKeydown(e) {
@@ -961,6 +862,7 @@ function onEditorKeydown(e) {
 // ── Editor input handler ───────────────────────────────
 function onEditorInput() {
   onType();
+  requestAnimationFrame(scrollToCursor);
   // Skip slash detection during IME composition (CJK input)
   if (slashMenuOpen || isComposing) return;
   const sel = window.getSelection();
@@ -1059,7 +961,6 @@ function updateWordCount() {
   elWordCount.textContent = wordTarget
     ? `${words} / ${wordTarget} word${wordTarget !== 1 ? 's' : ''}`
     : `${words} word${words !== 1 ? 's' : ''}`;
-  if (elDrawerWordCount) elDrawerWordCount.textContent = elWordCount.textContent;
   elReadingLevel.textContent = getReadingLevel(rawText);
   updateTargetProgress(words);
   if (wordTarget > 0 && words === wordTarget && !targetCelebrated) {
@@ -1158,6 +1059,7 @@ function togglePostsPanel() {
   elPostsPanel.classList.toggle('hidden', !isHidden);
   elBtnPosts.classList.toggle('on', isHidden);
   document.querySelector('.chrome').classList.toggle('panel-open', isHidden);
+  elScrollFade.classList.toggle('panel-open', isHidden);
 }
 
 function renderPostsList() {
@@ -1278,8 +1180,6 @@ function setTheme(theme, save = true) {
     Object.values(_themeOpts).forEach(el => el.classList.remove('active'));
     if (_themeOpts[theme]) _themeOpts[theme].classList.add('active');
   }
-  // Keep mobile drawer dots in sync
-  updateDrawerDots(theme);
   // Only close the dropdown on user-initiated theme changes, not on load
   if (save) {
     closeThemeDropdown();
@@ -1300,9 +1200,8 @@ function closeThemeDropdown() {
 function setDark(on) {
   isDark = on;
   document.body.classList.toggle('dark', on);
-  const icon = on ? '☀️' : '🌙';
-  elBtnDark.querySelector('span').textContent = icon;
-  if (elDrawerBtnDark) elDrawerBtnDark.querySelector('span').textContent = icon;
+  // The emoji is aria-hidden; the button's aria-label is the accessible name
+  elBtnDark.querySelector('span').textContent = on ? '☀️' : '🌙';
   elBtnDark.classList.toggle('on', on);
 }
 
@@ -1487,25 +1386,6 @@ function applySlashFormat(format) {
   }
   document.execCommand('formatBlock', false, format);
   onType();
-}
-
-// ── Mobile drawer ──────────────────────────────────────
-function toggleMobileDrawer() {
-  const isOpen = elMobileDrawer.classList.toggle('open');
-  elBtnMobileMenu.setAttribute('aria-expanded', isOpen);
-  elBtnMobileMenu.classList.toggle('on', isOpen);
-}
-
-function closeMobileDrawer() {
-  elMobileDrawer.classList.remove('open');
-  elBtnMobileMenu.setAttribute('aria-expanded', 'false');
-  elBtnMobileMenu.classList.remove('on');
-}
-
-function updateDrawerDots(theme) {
-  [elDrawerDotPaper, elDrawerDotSlate, elDrawerDotMeadow].forEach(el => el && el.classList.remove('active'));
-  const map = { paper: elDrawerDotPaper, slate: elDrawerDotSlate, meadow: elDrawerDotMeadow };
-  if (map[theme]) map[theme].classList.add('active');
 }
 </script>
 </body>
