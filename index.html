@@ -21,54 +21,11 @@
     --accent-dim:     rgba(194,105,42,0.1);
     --panel-bg:       rgba(250,248,244,0.82);
     --panel-border:   rgba(0,0,0,0.08);
-    --link:           #2a6aaa;
     --glass-bg:       rgba(255,255,255,0.58);
     --glass-border:   rgba(255,255,255,0.75);
     --glass-shadow:    0 1px 0 rgba(255,255,255,0.9) inset, 0 8px 32px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
     --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.8) inset, 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
     --blur:           blur(18px) saturate(1.6);
-  }
-
-  /* ── Theme: Slate ── */
-  .theme-slate {
-    --bg-canvas:      #dce3eb;
-    --editor-bg:      #f0f4f8;
-    --ink:            #18202a;
-    --ink-mid:        #5a6878;
-    --ink-dim:        #98a6b5;
-    --ink-faint:      rgba(30,60,100,0.07);
-    --accent:         #2e6da4;
-    --accent-light:   #5090c8;
-    --accent-dim:     rgba(46,109,164,0.1);
-    --panel-bg:       rgba(236,242,248,0.85);
-    --panel-border:   rgba(30,60,100,0.09);
-    --link:           #1a5c9e;
-    --glass-bg:       rgba(230,238,248,0.62);
-    --glass-border:   rgba(255,255,255,0.72);
-    --glass-shadow:    0 1px 0 rgba(255,255,255,0.88) inset, 0 8px 32px rgba(20,50,90,0.1), 0 1px 2px rgba(20,50,90,0.07);
-    --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.8) inset, 0 2px 8px rgba(20,50,90,0.08), 0 1px 2px rgba(20,50,90,0.05);
-    --blur:           blur(18px) saturate(1.5);
-  }
-
-  /* ── Theme: Meadow ── */
-  .theme-meadow {
-    --bg-canvas:      #d8e5da;
-    --editor-bg:      #f2f7f2;
-    --ink:            #18241a;
-    --ink-mid:        #567060;
-    --ink-dim:        #91aa98;
-    --ink-faint:      rgba(20,70,30,0.07);
-    --accent:         #3a7d52;
-    --accent-light:   #5ea872;
-    --accent-dim:     rgba(58,125,82,0.1);
-    --panel-bg:       rgba(238,246,240,0.85);
-    --panel-border:   rgba(20,70,30,0.09);
-    --link:           #2c6e44;
-    --glass-bg:       rgba(228,242,232,0.62);
-    --glass-border:   rgba(255,255,255,0.72);
-    --glass-shadow:    0 1px 0 rgba(255,255,255,0.88) inset, 0 8px 32px rgba(20,60,30,0.1), 0 1px 2px rgba(20,60,30,0.07);
-    --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.8) inset, 0 2px 8px rgba(20,60,30,0.08), 0 1px 2px rgba(20,60,30,0.05);
-    --blur:           blur(18px) saturate(1.5);
   }
 
   .dark {
@@ -80,22 +37,11 @@
     --ink-faint:      rgba(255,255,255,0.06);
     --panel-bg:       rgba(24,22,16,0.85);
     --panel-border:   rgba(255,255,255,0.07);
-    --link:           #5a9fd4;
     --glass-bg:       rgba(38,35,28,0.62);
     --glass-border:   rgba(255,255,255,0.1);
     --glass-shadow:    0 1px 0 rgba(255,255,255,0.06) inset, 0 8px 32px rgba(0,0,0,0.32), 0 1px 2px rgba(0,0,0,0.2);
     --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.05) inset, 0 2px 8px rgba(0,0,0,0.28), 0 1px 2px rgba(0,0,0,0.16);
     --blur:           blur(20px) saturate(1.4);
-  }
-  .dark.theme-slate {
-    --bg-canvas: #0f151c; --editor-bg: #0c1018;
-    --ink: #dce6f0; --ink-mid: #7a92a8; --ink-dim: #384858;
-    --glass-bg: rgba(20,32,48,0.65); --glass-border: rgba(120,170,220,0.1);
-  }
-  .dark.theme-meadow {
-    --bg-canvas: #0f1810; --editor-bg: #0c1410;
-    --ink: #d8eadc; --ink-mid: #6a8870; --ink-dim: #344838;
-    --glass-bg: rgba(18,36,22,0.65); --glass-border: rgba(100,180,120,0.1);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -136,7 +82,6 @@
   .brand img { height: 28px; width: auto; display: block; }
   .dark .brand img { filter: invert(1); }
 
-  .chrome-sep { width: 1px; height: 16px; background: transparent; flex-shrink: 0; }
 
   .post-title-inline {
     font-size: 13px;
@@ -161,8 +106,6 @@
     text-underline-offset: 3px;
   }
   #wordCount:hover { background: var(--ink-faint); color: var(--ink-mid); text-decoration-color: var(--ink-mid); }
-  /* Reading level sits inline; zero min-width so it only takes space it needs */
-  #readingLevel { min-width: 0; }
 
   .target-input {
     font-size: 12px; font-weight: 500; color: var(--ink-mid);
@@ -282,25 +225,14 @@
     color: var(--ink-dim); font-style: italic; pointer-events: none;
   }
 
-  /* margin-top spacing so the first child never has a gap above it */
+  /* Uniform paragraph spacing — editor-wrap top padding provides the top breathing room */
   .editor p,
   .editor div { margin-top: 1.15em; }
-  .editor p:first-child,
-  .editor div:first-child { margin-top: 0; }
 
   .editor ul { padding-left: 1.4em; margin-top: 1.15em; list-style: disc; }
-  .editor ul:first-child { margin-top: 0; }
   .editor ul li { margin-bottom: 0.2em; line-height: 1.9; }
   .editor ul ul { margin-top: 0; list-style: circle; }
   .editor ul ul ul { list-style: square; }
-
-  .editor hr { border: none; border-top: 1px solid var(--ink-faint); margin: 1.5em 0; }
-
-  .editor a {
-    color: var(--link); text-decoration: underline;
-    text-underline-offset: 2px; cursor: pointer;
-  }
-  .editor a:hover { opacity: 0.8; }
 
   .editor strong { font-weight: 700; }
   .editor em { font-style: italic; }
@@ -310,9 +242,6 @@
     line-height: 1.3; margin-top: 1.15em; margin-bottom: 0.5em;
     letter-spacing: -0.02em;
   }
-  .editor h1:first-child,
-  .editor h2:first-child,
-  .editor h3:first-child { margin-top: 0; }
   .editor h1 { font-size: 2em; }
   .editor h2 { font-size: 1.5em; }
   .editor h3 { font-size: 1.2em; }
@@ -406,98 +335,6 @@
   .post-row:hover .post-row-delete { opacity: 1; }
   .post-row-delete:hover { background: rgba(184,74,74,0.12); color: #b84a4a; }
 
-  /* ── Slash menu ── */
-  .slash-menu {
-    position: fixed;
-    background: var(--glass-bg);
-    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border); border-radius: 12px; padding: 5px;
-    box-shadow: var(--glass-shadow); z-index: 500;
-    display: none; flex-direction: column; gap: 2px; min-width: 160px;
-  }
-  .slash-menu.show { display: flex; }
-  .slash-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 7px 10px; border-radius: 8px;
-    cursor: pointer; transition: background 0.12s;
-  }
-  .slash-item:hover,
-  .slash-item.active { background: var(--ink-faint); }
-  .slash-item-icon {
-    font-size: 11px; font-weight: 700; color: var(--ink-dim);
-    width: 22px; flex-shrink: 0; letter-spacing: -0.02em;
-  }
-  /* The paragraph symbol (¶) needs a slightly larger size */
-  .slash-item-icon--para { font-size: 14px; font-weight: 400; }
-  .slash-item-label { font-size: 12.5px; font-weight: 500; color: var(--ink); }
-
-  /* ── Theme picker ── */
-  .theme-btn-wrap { position: relative; }
-  .theme-indicator {
-    width: 10px; height: 10px; border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #f5f2ea, #d8d3c6);
-    border: 1.5px solid rgba(0,0,0,0.15);
-    flex-shrink: 0; pointer-events: none; transition: background 0.3s;
-  }
-  #btnTheme { display: flex; align-items: center; justify-content: center; gap: 5px; }
-
-  .theme-dropdown {
-    position: absolute; top: calc(100% + 8px); right: 0;
-    background: var(--glass-bg);
-    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border); border-radius: 12px; padding: 5px;
-    box-shadow: var(--glass-shadow);
-    display: flex; flex-direction: column; gap: 2px; min-width: 130px;
-    opacity: 0; pointer-events: none;
-    transform: translateY(-4px) scale(0.97); transform-origin: top right;
-    transition: opacity 0.15s, transform 0.15s; z-index: 200;
-  }
-  .theme-dropdown.open { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
-
-  .theme-option {
-    display: flex; align-items: center; gap: 9px;
-    padding: 6px 10px; border-radius: 8px;
-    cursor: pointer; transition: background 0.12s;
-  }
-  .theme-option:hover { background: var(--ink-faint); }
-  .theme-option.active { background: var(--accent-dim); }
-  .theme-option-dot {
-    width: 12px; height: 12px; border-radius: 50%;
-    flex-shrink: 0; border: 1.5px solid rgba(0,0,0,0.12);
-  }
-  .theme-option-dot.dot-paper  { background: radial-gradient(circle at 35% 35%, #f5f2ea, #d8d3c6); }
-  .theme-option-dot.dot-slate  { background: radial-gradient(circle at 35% 35%, #e4ecf4, #bfcfdf); }
-  .theme-option-dot.dot-meadow { background: radial-gradient(circle at 35% 35%, #e4f0e6, #bdd4c2); }
-  .theme-option-label { font-size: 12px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
-
-  /* ── Mesh gradients for Slate + Meadow ── */
-  .theme-slate .editor-wrap {
-    background:
-      radial-gradient(ellipse 80% 60% at 15% 20%, rgba(190,215,245,0.45) 0%, transparent 65%),
-      radial-gradient(ellipse 60% 50% at 85% 75%, rgba(180,205,235,0.35) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 40% at 50% 50%, rgba(210,228,248,0.2)  0%, transparent 70%),
-      var(--editor-bg);
-  }
-  .theme-meadow .editor-wrap {
-    background:
-      radial-gradient(ellipse 80% 60% at 15% 20%, rgba(185,225,195,0.45) 0%, transparent 65%),
-      radial-gradient(ellipse 60% 50% at 85% 75%, rgba(175,215,185,0.35) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 40% at 50% 50%, rgba(205,235,210,0.2)  0%, transparent 70%),
-      var(--editor-bg);
-  }
-  .dark.theme-slate .editor-wrap {
-    background:
-      radial-gradient(ellipse 70% 50% at 10% 15%, rgba(40,80,130,0.3)  0%, transparent 65%),
-      radial-gradient(ellipse 55% 45% at 88% 80%, rgba(30,60,110,0.25) 0%, transparent 60%),
-      var(--editor-bg);
-  }
-  .dark.theme-meadow .editor-wrap {
-    background:
-      radial-gradient(ellipse 70% 50% at 10% 15%, rgba(30,80,45,0.3)  0%, transparent 65%),
-      radial-gradient(ellipse 55% 45% at 88% 80%, rgba(25,65,35,0.25) 0%, transparent 60%),
-      var(--editor-bg);
-  }
-
   @media (max-width: 700px) {
     .posts-panel { display: none; }
     .editor-inner { padding: 0 20px; }
@@ -519,7 +356,6 @@
         <line x1="2" y1="12" x2="9" y2="12"/>
       </svg>
     </button>
-    <div class="chrome-sep"></div>
     <input class="post-title-inline" id="postTitleInline" type="text"
       placeholder="Untitled post…" maxlength="80" oninput="onTitleType()"
       aria-label="Post title">
@@ -535,7 +371,6 @@
     <input class="target-input" id="targetInput" type="number" min="1" max="99999"
       placeholder="Target…"
       aria-label="Word target — press Enter to set, Escape to clear">
-    <span class="word-count" id="readingLevel" title="Estimated reading level (Flesch-Kincaid grade)" aria-live="polite"></span>
     <button class="copy-btn" title="Copy all text to clipboard" aria-label="Copy to clipboard" onclick="copyText()">
       <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="5" y="4" width="9" height="11" rx="1.5"/>
@@ -543,40 +378,6 @@
       </svg>
       Copy
     </button>
-    <button class="copy-btn" title="Download as .txt" aria-label="Download as text file" onclick="downloadText()">
-      <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M8 3v7M5 7l3 3 3-3"/>
-        <path d="M3 12h10"/>
-      </svg>
-      Download
-    </button>
-    <div class="theme-btn-wrap">
-      <button class="icon-btn" id="btnTheme"
-        title="Switch theme"
-        aria-label="Switch theme"
-        aria-haspopup="true"
-        aria-expanded="false"
-        onclick="toggleThemeDropdown()">
-        <span class="theme-indicator" id="themeIndicator" aria-hidden="true"></span>
-        <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="8" height="8" style="opacity:0.5" aria-hidden="true">
-          <path d="M1 1l4 4 4-4"/>
-        </svg>
-      </button>
-      <div class="theme-dropdown" id="themeDropdown" role="menu">
-        <div class="theme-option active" id="opt-paper" role="menuitem" onclick="setTheme('paper')">
-          <span class="theme-option-dot dot-paper" aria-hidden="true"></span>
-          <span class="theme-option-label">Paper</span>
-        </div>
-        <div class="theme-option" id="opt-slate" role="menuitem" onclick="setTheme('slate')">
-          <span class="theme-option-dot dot-slate" aria-hidden="true"></span>
-          <span class="theme-option-label">Slate</span>
-        </div>
-        <div class="theme-option" id="opt-meadow" role="menuitem" onclick="setTheme('meadow')">
-          <span class="theme-option-dot dot-meadow" aria-hidden="true"></span>
-          <span class="theme-option-label">Meadow</span>
-        </div>
-      </div>
-    </div>
     <button class="icon-btn" id="btnDark" title="Toggle dark mode" aria-label="Toggle dark mode" onclick="toggleDark()">
       <span aria-hidden="true">🌙</span>
     </button>
@@ -610,25 +411,6 @@
 <div class="celebration" id="celebration" aria-live="polite" aria-atomic="true"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<div class="slash-menu" id="slashMenu" role="menu" aria-label="Insert block type">
-  <div class="slash-item" role="menuitem" onclick="applySlashFormat('h1')">
-    <span class="slash-item-icon" aria-hidden="true">H1</span>
-    <span class="slash-item-label">Heading 1</span>
-  </div>
-  <div class="slash-item" role="menuitem" onclick="applySlashFormat('h2')">
-    <span class="slash-item-icon" aria-hidden="true">H2</span>
-    <span class="slash-item-label">Heading 2</span>
-  </div>
-  <div class="slash-item" role="menuitem" onclick="applySlashFormat('h3')">
-    <span class="slash-item-icon" aria-hidden="true">H3</span>
-    <span class="slash-item-label">Heading 3</span>
-  </div>
-  <div class="slash-item" role="menuitem" onclick="applySlashFormat('p')">
-    <span class="slash-item-icon slash-item-icon--para" aria-hidden="true">&para;</span>
-    <span class="slash-item-label">Paragraph</span>
-  </div>
-</div>
-
 <script>
 'use strict';
 
@@ -636,22 +418,17 @@
 let isDark           = false;
 let wordTarget       = 0;
 let targetCelebrated = false;
-let slashMenuOpen    = false;
-let slashActiveIndex = 0;
 let isComposing      = false; // IME composition guard
 let isTyping         = false; // typewriter scroll guard — only scroll on keystrokes, not clicks
 let _typingTimer     = null;
-const SLASH_ITEMS    = ['h1', 'h2', 'h3', 'p'];
 
 // Autosave timer — module-level so both onType and onTitleType share it
 let _saveTimer = null;
 
 // Cached element references — populated once in DOMContentLoaded
-let elEditor, elEditorWrap, elPostsPanel, elWordCount, elReadingLevel,
+let elEditor, elEditorWrap, elPostsPanel, elWordCount,
     elTargetInput, elSaveStatus, elProgressBar, elCelebration, elToast,
-    elPostTitle, elPostsList, elSlashMenu, elThemeDropdown,
-    elThemeIndicator, elBtnDark, elBtnPosts, elBtnTheme,
-    elOptPaper, elOptSlate, elOptMeadow, elScrollFade;
+    elPostTitle, elPostsList, elBtnDark, elBtnPosts, elScrollFade;
 
 // Module-level constants for DOM-walking hot paths (avoids per-call allocations)
 const BLOCK_RE   = /^(P|DIV|LI|BR|UL|OL)$/;
@@ -665,7 +442,6 @@ window.addEventListener('DOMContentLoaded', () => {
   elEditorWrap    = document.getElementById('editorWrap');
   elPostsPanel    = document.getElementById('postsPanel');
   elWordCount     = document.getElementById('wordCount');
-  elReadingLevel  = document.getElementById('readingLevel');
   elTargetInput   = document.getElementById('targetInput');
   elSaveStatus    = document.getElementById('saveStatus');
   elProgressBar   = document.getElementById('wordTargetProgress');
@@ -673,15 +449,8 @@ window.addEventListener('DOMContentLoaded', () => {
   elToast         = document.getElementById('toast');
   elPostTitle     = document.getElementById('postTitleInline');
   elPostsList     = document.getElementById('postsList');
-  elSlashMenu     = document.getElementById('slashMenu');
-  elThemeDropdown = document.getElementById('themeDropdown');
-  elThemeIndicator= document.getElementById('themeIndicator');
   elBtnDark       = document.getElementById('btnDark');
   elBtnPosts      = document.getElementById('btnPosts');
-  elBtnTheme      = document.getElementById('btnTheme');
-  elOptPaper      = document.getElementById('opt-paper');
-  elOptSlate      = document.getElementById('opt-slate');
-  elOptMeadow     = document.getElementById('opt-meadow');
   elScrollFade    = document.getElementById('scrollTopFade');
 
   // defaultParagraphSeparator must be set before any content is loaded
@@ -713,7 +482,7 @@ window.addEventListener('DOMContentLoaded', () => {
     _typingTimer = setTimeout(() => { isTyping = false; }, 1000);
   });
 
-  // Track IME composition to avoid false slash-menu triggers on CJK input
+  // Track IME composition to avoid false triggers on CJK input
   elEditor.addEventListener('compositionstart', () => { isComposing = true; });
   elEditor.addEventListener('compositionend',   () => { isComposing = false; });
 
@@ -731,19 +500,9 @@ window.addEventListener('DOMContentLoaded', () => {
   elTargetInput.addEventListener('blur', () => {
     if (elTargetInput.classList.contains('show')) commitTarget();
   });
-
-  // Close menus on outside click
-  document.addEventListener('mousedown', e => {
-    if (slashMenuOpen && !elSlashMenu.contains(e.target)) closeSlashMenu();
-    if (elThemeDropdown.classList.contains('open') &&
-        !elThemeDropdown.contains(e.target) &&
-        !elBtnTheme.contains(e.target)) {
-      closeThemeDropdown();
-    }
-  });
 });
 
-// ── Typewriter scroll ──────────────────────────────────
+
 // Keeps the cursor at ~50% of the visible editor height while typing.
 // Only fires during keyboard input (isTyping guard) to avoid disrupting
 // click-to-reposition behaviour.
@@ -762,23 +521,6 @@ function scrollToCursor() {
 
 // ── Editor keydown handler ─────────────────────────────
 function onEditorKeydown(e) {
-  // Slash menu navigation — handle before anything else
-  if (slashMenuOpen) {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      slashActiveIndex = (slashActiveIndex + 1) % SLASH_ITEMS.length;
-      updateSlashActive(); return;
-    }
-    if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      slashActiveIndex = (slashActiveIndex - 1 + SLASH_ITEMS.length) % SLASH_ITEMS.length;
-      updateSlashActive(); return;
-    }
-    if (e.key === 'Enter')  { e.preventDefault(); applySlashFormat(SLASH_ITEMS[slashActiveIndex]); return; }
-    if (e.key === 'Escape') { e.preventDefault(); closeSlashMenu(); return; }
-    closeSlashMenu(); // any other key — close and fall through to normal handling
-  }
-
   const mod = e.metaKey || e.ctrlKey;
 
   // Bold / Italic
@@ -828,34 +570,7 @@ function onEditorKeydown(e) {
       document.execCommand('insertUnorderedList');
       onType(); return;
     }
-    // Pass sel to avoid a redundant window.getSelection() call inside linkifyAtCursor
-    linkifyAtCursor(sel);
-    // Note: we return here but do NOT call e.preventDefault(), so the browser
-    // still inserts the space character via its default keydown handling.
     return;
-  }
-
-  // Enter — "-----" → <hr>
-  if (e.key === 'Enter') {
-    const range = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
-    if (range && range.collapsed) {
-      let block = range.startContainer;
-      while (block && block !== elEditor && !PARA_RE.test(block.nodeName)) {
-        block = block.parentNode;
-      }
-      if (block && block !== elEditor && block.textContent.trim() === '-----') {
-        e.preventDefault();
-        const r = document.createRange();
-        r.selectNodeContents(block);
-        sel.removeAllRanges(); sel.addRange(r);
-        document.execCommand('insertHTML', false, '<hr><p><br></p>');
-        onType(); return;
-      }
-    }
-    // Linkify after the browser creates the new line.
-    // This is mostly a no-op (cursor offset is 0 on the new line) but
-    // handles the edge case of pressing Enter mid-URL.
-    setTimeout(() => linkifyAtCursor(), 0);
   }
 }
 
@@ -863,45 +578,8 @@ function onEditorKeydown(e) {
 function onEditorInput() {
   onType();
   requestAnimationFrame(scrollToCursor);
-  // Skip slash detection during IME composition (CJK input)
-  if (slashMenuOpen || isComposing) return;
-  const sel = window.getSelection();
-  if (!sel || !sel.rangeCount) return;
-  const range = sel.getRangeAt(0);
-  if (!range.collapsed || range.startContainer.nodeType !== Node.TEXT_NODE) return;
-  let block = range.startContainer;
-  while (block && block !== elEditor && !/^(P|DIV|H[1-3])$/.test(block.nodeName)) {
-    block = block.parentNode;
-  }
-  if (block && block !== elEditor && block.textContent.trim() === '/') openSlashMenu();
 }
 
-// ── URL Linkification ──────────────────────────────────
-const URL_RE = /https?:\/\/[^\s<>"']+[^\s<>"'.,;:!?')\]]/;
-
-function linkifyAtCursor(sel) {
-  if (!sel) sel = window.getSelection();
-  if (!sel || !sel.rangeCount) return;
-  const range = sel.getRangeAt(0);
-  if (!range.collapsed) return;
-  const textNode = range.startContainer;
-  if (textNode.nodeType !== Node.TEXT_NODE) return;
-  const text  = textNode.textContent.slice(0, range.startOffset);
-  const match = URL_RE.exec(text);
-  if (!match || match.index + match[0].length !== text.length) return;
-  // Don't re-linkify if already inside an <a>
-  let node = textNode.parentNode;
-  while (node && node !== elEditor) {
-    if (node.tagName === 'A') return;
-    node = node.parentNode;
-  }
-  const linkRange = document.createRange();
-  linkRange.setStart(textNode, match.index);
-  linkRange.setEnd(textNode, match.index + match[0].length);
-  sel.removeAllRanges(); sel.addRange(linkRange);
-  document.execCommand('createLink', false, match[0]);
-  sel.getRangeAt(0).collapse(false);
-}
 
 // ── Word count + target ────────────────────────────────
 function onType() {
@@ -926,33 +604,6 @@ function getEditorText() {
   return parts.join('');
 }
 
-// ── Reading level (Flesch-Kincaid Grade) ──────────────
-// NOTE: Syllable counting is a heuristic and will undercount for words like
-// "create" (silent-e removal can merge syllables). Sentence counting splits
-// on .!? so abbreviations like "Dr." or "U.S.A." inflate the count. These
-// are known limitations of the algorithm; it's directionally correct.
-function countSyllables(word) {
-  word = word.toLowerCase().replace(/[^a-z]/g, '');
-  if (!word) return 0;
-  if (word.length <= 3) return 1;
-  word = word.replace(/e$/, '');
-  const groups = word.match(/[aeiouy]+/g);
-  return groups ? Math.max(1, groups.length) : 1;
-}
-
-function getReadingLevel(rawText) {
-  const text = rawText.replace(/\s+/g, ' ').trim();
-  if (!text) return '';
-  // Count sentences without allocating an array — just count matches
-  const sentenceCount = (text.match(/[.!?]+/g) || []).filter(m => m).length;
-  if (!sentenceCount) return '';
-  const words = text.split(/\s+/).filter(w => /[a-zA-Z]/.test(w));
-  if (words.length < 10) return '';
-  const syllables = words.reduce((sum, w) => sum + countSyllables(w), 0);
-  const grade = 0.39 * (words.length / sentenceCount) + 11.8 * (syllables / words.length) - 15.59;
-  const g = Math.min(Math.max(1, Math.round(grade)), 16);
-  return '· Grade ' + g + (g === 16 ? '+' : '');
-}
 
 function updateWordCount() {
   const rawText = getEditorText();
@@ -961,7 +612,6 @@ function updateWordCount() {
   elWordCount.textContent = wordTarget
     ? `${words} / ${wordTarget} word${wordTarget !== 1 ? 's' : ''}`
     : `${words} word${words !== 1 ? 's' : ''}`;
-  elReadingLevel.textContent = getReadingLevel(rawText);
   updateTargetProgress(words);
   if (wordTarget > 0 && words === wordTarget && !targetCelebrated) {
     targetCelebrated = true;
@@ -1162,40 +812,6 @@ function doDeletePost(id) {
   renderPostsList();
 }
 
-// ── Theme ──────────────────────────────────────────────
-const THEME_DOTS = {
-  paper:  'radial-gradient(circle at 35% 35%, #f5f2ea, #d8d3c6)',
-  slate:  'radial-gradient(circle at 35% 35%, #e4ecf4, #bfcfdf)',
-  meadow: 'radial-gradient(circle at 35% 35%, #e4f0e6, #bdd4c2)',
-};
-// Cached map of theme id → option element, populated after DOM is ready
-let _themeOpts;
-
-function setTheme(theme, save = true) {
-  document.body.classList.remove('theme-slate', 'theme-meadow');
-  if (theme !== 'paper') document.body.classList.add('theme-' + theme);
-  elThemeIndicator.style.background = THEME_DOTS[theme] || THEME_DOTS.paper;
-  // Update active option using the cached map
-  if (_themeOpts) {
-    Object.values(_themeOpts).forEach(el => el.classList.remove('active'));
-    if (_themeOpts[theme]) _themeOpts[theme].classList.add('active');
-  }
-  // Only close the dropdown on user-initiated theme changes, not on load
-  if (save) {
-    closeThemeDropdown();
-    localStorage.setItem('pb_theme', theme);
-  }
-}
-
-function toggleThemeDropdown() {
-  const isOpen = elThemeDropdown.classList.toggle('open');
-  elBtnTheme.setAttribute('aria-expanded', isOpen);
-}
-function closeThemeDropdown() {
-  elThemeDropdown.classList.remove('open');
-  elBtnTheme.setAttribute('aria-expanded', 'false');
-}
-
 // ── Dark mode ──────────────────────────────────────────
 function setDark(on) {
   isDark = on;
@@ -1213,7 +829,7 @@ function toggleDark() {
 // ── Save / Load ────────────────────────────────────────
 
 // Strip inline color/background injected by Chromium's contenteditable so
-// saved HTML defers to CSS variables and renders correctly across themes.
+// saved HTML defers to CSS variables correctly in light and dark mode.
 function sanitizeBody(html) {
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
@@ -1260,9 +876,6 @@ function showSaveStatus(msg, isError = false) {
 
 function loadDoc() {
   try {
-    // Build the cached theme-option element map now that the DOM is ready
-    _themeOpts = { paper: elOptPaper, slate: elOptSlate, meadow: elOptMeadow };
-
     const ids = getAllPostIds();
 
     // Migrate legacy single-doc save (pb_v4) into the multi-post system
@@ -1288,9 +901,6 @@ function loadDoc() {
     if (savedTarget > 0) wordTarget = savedTarget;
     updateWordCount();
 
-    // Pass save=false so setTheme doesn't close dropdown or re-write localStorage
-    setTheme(localStorage.getItem('pb_theme') || 'paper', false);
-
     // 'pb_dark' is stored as the string "true" or "false"
     if (localStorage.getItem('pb_dark') === 'true') setDark(true);
 
@@ -1299,14 +909,13 @@ function loadDoc() {
   } catch { /* corrupt localStorage — start fresh */ }
 }
 
-// ── Copy / Download ────────────────────────────────────
+// ── Copy ───────────────────────────────────────────────
 function collectText() {
   const parts = [];
   function collect(node) {
     if (node.nodeType === Node.TEXT_NODE) {
       parts.push(node.textContent);
     } else if (node.nodeType === Node.ELEMENT_NODE) {
-      if (node.tagName === 'HR') { parts.push('\n\n---\n\n'); return; }
       for (const child of node.childNodes) collect(child);
       if (BLOCK_TAGS.has(node.tagName)) parts.push('\n');
     }
@@ -1323,20 +932,6 @@ function copyText() {
     .catch(() => showToast('Copy failed — try Cmd+A, Cmd+C'));
 }
 
-function downloadText() {
-  const title    = elPostTitle.value.trim();
-  const content  = (title ? title + '\n\n' : '') + collectText();
-  const filename = (title || 'post').replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.txt';
-  const a        = document.createElement('a');
-  a.href         = URL.createObjectURL(new Blob([content], { type: 'text/plain' }));
-  a.download     = filename;
-  a.click();
-  // Delay revocation to give the browser time to initiate the download,
-  // particularly in Firefox where immediate revocation can abort the transfer.
-  setTimeout(() => URL.revokeObjectURL(a.href), 100);
-  showToast('Downloaded ✓');
-}
-
 function showToast(msg) {
   elToast.textContent = msg;
   elToast.classList.add('show');
@@ -1344,49 +939,6 @@ function showToast(msg) {
   showToast._t = setTimeout(() => elToast.classList.remove('show'), 2000);
 }
 
-// ── Slash command menu ─────────────────────────────────
-function openSlashMenu() {
-  const sel = window.getSelection();
-  if (!sel || !sel.rangeCount) return;
-  const rect = sel.getRangeAt(0).getBoundingClientRect();
-  elSlashMenu.style.top  = (rect.bottom + window.scrollY + 4) + 'px';
-  elSlashMenu.style.left = (rect.left   + window.scrollX)     + 'px';
-  slashActiveIndex = 0;
-  updateSlashActive();
-  elSlashMenu.classList.add('show');
-  slashMenuOpen = true;
-}
-
-function closeSlashMenu() {
-  elSlashMenu.classList.remove('show');
-  slashMenuOpen = false;
-}
-
-function updateSlashActive() {
-  // Scope to elSlashMenu to avoid querying the whole document on every arrow key
-  elSlashMenu.querySelectorAll('.slash-item').forEach((el, i) => {
-    el.classList.toggle('active', i === slashActiveIndex);
-  });
-}
-
-function applySlashFormat(format) {
-  closeSlashMenu();
-  elEditor.focus();
-  const sel = window.getSelection();
-  if (sel && sel.rangeCount) {
-    const range = sel.getRangeAt(0);
-    const node  = range.startContainer;
-    if (node.nodeType === Node.TEXT_NODE && range.startOffset > 0) {
-      const del = document.createRange();
-      del.setStart(node, range.startOffset - 1);
-      del.setEnd(node, range.startOffset);
-      sel.removeAllRanges(); sel.addRange(del);
-      document.execCommand('delete');
-    }
-  }
-  document.execCommand('formatBlock', false, format);
-  onType();
-}
 </script>
 </body>
 </html>
