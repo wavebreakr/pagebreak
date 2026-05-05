@@ -67,19 +67,19 @@
 
   /* ── Chrome ── */
   .chrome {
-    position: fixed; top: 0; left: 0; right: 0; height: 48px;
+    position: fixed; top: 0; left: 0; right: 0; height: 60px;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 16px; gap: 12px;
+    padding: 0 20px; gap: 12px;
     background: transparent;
     z-index: 100;
     transition: left 0.35s cubic-bezier(0.4,0,0.2,1);
   }
   .chrome.panel-open { left: 220px; }
   .chrome-left  { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  .chrome-right { display: flex; align-items: center; gap: 6px;  flex-shrink: 0; }
+  .chrome-right { display: flex; align-items: center; gap: 10px;  flex-shrink: 0; }
 
   .brand { display: flex; align-items: center; flex-shrink: 0; }
-  .brand img { height: 28px; width: auto; display: block; }
+  .brand img { height: 34px; width: auto; display: block; }
   .dark .brand img { filter: invert(1); }
 
 
@@ -128,8 +128,8 @@
 
   /* Glass icon button */
   .icon-btn {
-    width: 30px; height: 30px;
-    border: 1px solid var(--glass-border); border-radius: 8px;
+    width: 34px; height: 34px;
+    border: 1px solid var(--glass-border); border-radius: 9px;
     background: var(--glass-bg); box-shadow: var(--glass-shadow-sm);
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
@@ -154,7 +154,7 @@
   /* Glass text button */
   .copy-btn {
     font-size: 11px; font-weight: 500;
-    padding: 0 11px; height: 30px;
+    padding: 0 13px; height: 34px;
     border: 1px solid var(--glass-border); border-radius: 8px;
     background: var(--glass-bg); box-shadow: var(--glass-shadow-sm);
     cursor: pointer; color: var(--ink-mid);
@@ -182,7 +182,7 @@
   .scroll-top-fade {
     position: fixed; top: 0; left: 0; right: 0;
     height: 100px;
-    background: linear-gradient(to bottom, var(--editor-bg) 0%, var(--editor-bg) 48px, transparent 100px);
+    background: linear-gradient(to bottom, var(--editor-bg) 0%, var(--editor-bg) 60px, transparent 100px);
     pointer-events: none; z-index: 50;
     transition: left 0.35s cubic-bezier(0.4,0,0.2,1), background 0.4s;
   }
@@ -195,7 +195,7 @@
   }
 
   .editor-wrap {
-    flex: 1; overflow-y: auto; padding: 100px 0 120px;
+    flex: 1; overflow-y: auto; padding: 112px 0 120px;
     background: var(--editor-bg);
     transition: background 0.4s;
     /* Standard Firefox scrollbar styling */
@@ -248,7 +248,7 @@
 
   /* ── Celebration pill ── */
   .celebration {
-    position: fixed; top: 62px; left: 50%;
+    position: fixed; top: 74px; left: 50%;
     transform: translateX(-50%) translateY(-12px);
     background: var(--glass-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
@@ -346,9 +346,6 @@
 
 <div class="chrome">
   <div class="chrome-left">
-    <div class="brand">
-      <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/PagebreakLogo2.png" alt="Pagebreak">
-    </div>
     <button class="icon-btn" id="btnPosts" title="All posts" aria-label="Toggle posts panel" onclick="togglePostsPanel()">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
         <line x1="2" y1="4" x2="14" y2="4"/>
@@ -356,6 +353,9 @@
         <line x1="2" y1="12" x2="9" y2="12"/>
       </svg>
     </button>
+    <div class="brand">
+      <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/PagebreakLogo2.png" alt="Pagebreak">
+    </div>
     <input class="post-title-inline" id="postTitleInline" type="text"
       placeholder="Untitled post…" maxlength="80" oninput="onTitleType()"
       aria-label="Post title">
