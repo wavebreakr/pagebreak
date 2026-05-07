@@ -19,7 +19,7 @@
     --accent:         #c2692a;
     --accent-light:   #e8874a;
     --accent-dim:     rgba(194,105,42,0.1);
-    --panel-bg:       rgba(250,248,244,0.82);
+    --panel-bg:       rgba(250,248,244,0.92);
     --panel-border:   rgba(0,0,0,0.08);
     --glass-bg:       rgba(255,255,255,0.58);
     --glass-border:   rgba(255,255,255,0.75);
@@ -35,7 +35,7 @@
     --ink-mid:        #968f84;
     --ink-dim:        #4a4740;
     --ink-faint:      rgba(255,255,255,0.06);
-    --panel-bg:       rgba(24,22,16,0.85);
+    --panel-bg:       rgba(24,22,16,0.95);
     --panel-border:   rgba(255,255,255,0.07);
     --glass-bg:       rgba(38,35,28,0.62);
     --glass-border:   rgba(255,255,255,0.1);
@@ -65,26 +65,23 @@
     background-size: 180px;
   }
 
-  /* ── Chrome ── */
+  /* ── Chrome — stays fixed and never shifts ── */
   .chrome {
     position: fixed; top: 0; left: 0; right: 0; height: 60px;
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 20px; gap: 12px;
     background: transparent;
-    z-index: 100;
-    transition: left 0.35s cubic-bezier(0.4,0,0.2,1);
+    z-index: 200;
   }
-  .chrome.panel-open { left: 220px; }
   .chrome-left  { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  .chrome-right { display: flex; align-items: center; gap: 10px;  flex-shrink: 0; }
+  .chrome-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 
   .brand { display: flex; align-items: center; flex-shrink: 0; }
   .brand img { height: 34px; width: auto; display: block; }
   .dark .brand img { filter: invert(1); }
 
-
   .post-title-inline {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--ink-dim); background: none; border: none; outline: none;
     width: 220px; max-width: 30vw;
     transition: color 0.2s;
@@ -93,7 +90,7 @@
   .post-title-inline:focus { color: var(--ink-mid); }
 
   .word-count {
-    font-size: 12px; font-weight: 500; color: var(--ink-dim);
+    font-size: 13px; font-weight: 500; color: var(--ink-dim);
     font-variant-numeric: tabular-nums; min-width: 54px; text-align: right;
   }
   #wordCount {
@@ -108,7 +105,7 @@
   #wordCount:hover { background: var(--ink-faint); color: var(--ink-mid); text-decoration-color: var(--ink-mid); }
 
   .target-input {
-    font-size: 12px; font-weight: 500; color: var(--ink-mid);
+    font-size: 13px; font-weight: 500; color: var(--ink-mid);
     font-variant-numeric: tabular-nums; width: 72px; text-align: right;
     background: var(--ink-faint); border: none; outline: none;
     border-radius: 6px; padding: 2px 5px;
@@ -153,7 +150,7 @@
 
   /* Glass text button */
   .copy-btn {
-    font-size: 11px; font-weight: 500;
+    font-size: 12px; font-weight: 500;
     padding: 0 13px; height: 34px;
     border: 1px solid var(--glass-border); border-radius: 8px;
     background: var(--glass-bg); box-shadow: var(--glass-shadow-sm);
@@ -172,121 +169,34 @@
   .copy-btn svg { width: 12px; height: 12px; stroke: currentColor; flex-shrink: 0; }
 
   .save-status {
-    font-size: 11px; color: var(--ink-dim);
+    font-size: 12px; color: var(--ink-dim);
     opacity: 0; transition: opacity 0.4s;
     white-space: nowrap; letter-spacing: 0.01em;
   }
   .save-status.show { opacity: 1; }
 
-  /* ── Scroll top fade ── */
+  /* ── Scroll top fade — never shifts, covers full width ── */
   .scroll-top-fade {
     position: fixed; top: 0; left: 0; right: 0;
     height: 100px;
     background: linear-gradient(to bottom, var(--editor-bg) 0%, var(--editor-bg) 60px, transparent 100px);
     pointer-events: none; z-index: 50;
-    transition: left 0.35s cubic-bezier(0.4,0,0.2,1), background 0.4s;
-  }
-  .scroll-top-fade.panel-open { left: 220px; }
-
-  /* ── Layout ── */
-  .writing-area {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    display: flex; overflow: hidden;
-  }
-
-  .editor-wrap {
-    flex: 1; overflow-y: auto; padding: 112px 0 120px;
-    background: var(--editor-bg);
     transition: background 0.4s;
-    /* Standard Firefox scrollbar styling */
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0,0,0,0.12) transparent;
-  }
-  .editor-wrap::-webkit-scrollbar { width: 3px; }
-  .editor-wrap::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
-
-  .editor-inner { max-width: 640px; margin: 0 auto; padding: 0 36px; }
-
-  /* ── Editor ──
-     min-height accounts for: 48px chrome + 52px top padding + ~100px breathing room */
-  .editor {
-    font-family: 'Lora', serif;
-    font-size: 18px; line-height: 1.9;
-    color: var(--ink); caret-color: var(--accent);
-    outline: none; min-height: calc(100vh - 200px);
-    transition: color 0.3s;
-    letter-spacing: 0.005em;
-    /* break-word is a legacy alias; overflow-wrap is the standard equivalent */
-    overflow-wrap: break-word;
-    word-break: normal;
-  }
-  .editor:empty::before {
-    content: attr(data-placeholder);
-    color: var(--ink-dim); font-style: italic; pointer-events: none;
   }
 
-  /* Uniform paragraph spacing — editor-wrap top padding provides the top breathing room */
-  .editor p,
-  .editor div { margin-top: 1.15em; }
-
-  .editor ul { padding-left: 1.4em; margin-top: 1.15em; list-style: disc; }
-  .editor ul li { margin-bottom: 0.2em; line-height: 1.9; }
-  .editor ul ul { margin-top: 0; list-style: circle; }
-  .editor ul ul ul { list-style: square; }
-
-  .editor strong { font-weight: 700; }
-  .editor em { font-style: italic; }
-
-  .editor h1, .editor h2, .editor h3 {
-    font-family: 'Lora', serif; font-weight: 600; color: var(--ink);
-    line-height: 1.3; margin-top: 1.15em; margin-bottom: 0.5em;
-    letter-spacing: -0.02em;
-  }
-  .editor h1 { font-size: 2em; }
-  .editor h2 { font-size: 1.5em; }
-  .editor h3 { font-size: 1.2em; }
-
-  /* ── Celebration pill ── */
-  .celebration {
-    position: fixed; top: 74px; left: 50%;
-    transform: translateX(-50%) translateY(-12px);
-    background: var(--glass-bg);
-    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
-    color: var(--ink); font-size: 13px; font-weight: 500;
-    padding: 8px 20px; border-radius: 24px;
-    opacity: 0; pointer-events: none; z-index: 300;
-    transition: opacity 0.3s, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
-    white-space: nowrap; letter-spacing: -0.01em;
-  }
-  .celebration.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* ── Toast ── */
-  .toast {
-    position: fixed; bottom: 24px; right: 24px;
-    font-size: 12px; font-weight: 500; color: var(--ink-mid);
-    background: var(--glass-bg);
-    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
-    border-radius: 10px; padding: 7px 14px;
-    opacity: 0; transition: opacity 0.3s, transform 0.3s;
-    transform: translateY(6px); pointer-events: none; z-index: 300;
-  }
-  .toast.show { opacity: 1; transform: translateY(0); }
-
-  /* ── Posts sidebar ── */
+  /* ── Posts panel — overlays editor, does not push layout ── */
   .posts-panel {
-    width: 220px; flex-shrink: 0;
+    position: fixed; top: 60px; left: 0; bottom: 0;
+    width: 220px;
     border-right: 1px solid var(--panel-border);
     background: var(--panel-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
     display: flex; flex-direction: column; overflow: hidden;
-    transition: width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s, border-color 0.4s;
-    /* order:-1 places sidebar before editor visually; DOM order keeps editor first for screen readers */
-    order: -1;
+    z-index: 150;
+    transform: translateX(0);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s, border-color 0.4s;
   }
-  /* When hidden, border is invisible due to overflow:hidden, but zeroing it prevents transition artefacts */
-  .posts-panel.hidden { width: 0; opacity: 0; border-right-width: 0; }
+  .posts-panel.hidden { transform: translateX(-100%); opacity: 0; }
 
   .posts-panel-header {
     padding: 16px 14px 12px; flex-shrink: 0;
@@ -334,6 +244,89 @@
   }
   .post-row:hover .post-row-delete { opacity: 1; }
   .post-row-delete:hover { background: rgba(184,74,74,0.12); color: #b84a4a; }
+
+  /* ── Layout ── */
+  .writing-area {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  }
+
+  .editor-wrap {
+    width: 100%; height: 100%; overflow-y: auto;
+    padding: 112px 0 120px;
+    background: var(--editor-bg);
+    transition: background 0.4s;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.12) transparent;
+  }
+  .editor-wrap::-webkit-scrollbar { width: 3px; }
+  .editor-wrap::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
+
+  .editor-inner { max-width: 640px; margin: 0 auto; padding: 0 36px; }
+
+  /* ── Editor ── */
+  .editor {
+    font-family: 'Lora', serif;
+    font-size: 18px; line-height: 1.9;
+    color: var(--ink); caret-color: var(--accent);
+    outline: none; min-height: calc(100vh - 200px);
+    transition: color 0.3s;
+    letter-spacing: 0.005em;
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+  .editor:empty::before {
+    content: attr(data-placeholder);
+    color: var(--ink-dim); font-style: italic; pointer-events: none;
+  }
+
+  /* Uniform paragraph spacing */
+  .editor p,
+  .editor div { margin-top: 1.15em; }
+
+  .editor ul { padding-left: 1.4em; margin-top: 1.15em; list-style: disc; }
+  .editor ul li { margin-bottom: 0.2em; line-height: 1.9; }
+  .editor ul ul { margin-top: 0; list-style: circle; }
+  .editor ul ul ul { list-style: square; }
+
+  .editor strong { font-weight: 700; }
+  .editor em { font-style: italic; }
+
+  .editor h1, .editor h2, .editor h3 {
+    font-family: 'Lora', serif; font-weight: 600; color: var(--ink);
+    line-height: 1.3; margin-top: 1.15em; margin-bottom: 0.5em;
+    letter-spacing: -0.02em;
+  }
+  .editor h1 { font-size: 2em; }
+  .editor h2 { font-size: 1.5em; }
+  .editor h3 { font-size: 1.2em; }
+
+  /* ── Celebration pill ── */
+  .celebration {
+    position: fixed; top: 74px; left: 50%;
+    transform: translateX(-50%) translateY(-12px);
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+    color: var(--ink); font-size: 13px; font-weight: 500;
+    padding: 8px 20px; border-radius: 24px;
+    opacity: 0; pointer-events: none; z-index: 300;
+    transition: opacity 0.3s, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    white-space: nowrap; letter-spacing: -0.01em;
+  }
+  .celebration.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    font-size: 12px; font-weight: 500; color: var(--ink-mid);
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+    border-radius: 10px; padding: 7px 14px;
+    opacity: 0; transition: opacity 0.3s, transform 0.3s;
+    transform: translateY(6px); pointer-events: none; z-index: 300;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
 
   @media (max-width: 700px) {
     .posts-panel { display: none; }
@@ -387,14 +380,15 @@
 
 <div class="scroll-top-fade" id="scrollTopFade" aria-hidden="true"></div>
 
-<div class="writing-area">
-  <div class="posts-panel hidden" id="postsPanel">
-    <div class="posts-panel-header">
-      <span class="posts-panel-label">Posts</span>
-      <button class="icon-btn icon-btn--sm" onclick="newPost()" title="New post" aria-label="New post">＋</button>
-    </div>
-    <div class="posts-list" id="postsList" role="list"></div>
+<div class="posts-panel hidden" id="postsPanel">
+  <div class="posts-panel-header">
+    <span class="posts-panel-label">Posts</span>
+    <button class="icon-btn icon-btn--sm" onclick="newPost()" title="New post" aria-label="New post">＋</button>
   </div>
+  <div class="posts-list" id="postsList" role="list"></div>
+</div>
+
+<div class="writing-area">
   <div class="editor-wrap" id="editorWrap">
     <div class="editor-inner">
       <div class="editor" id="editor"
@@ -418,44 +412,40 @@
 let isDark           = false;
 let wordTarget       = 0;
 let targetCelebrated = false;
-let isComposing      = false; // IME composition guard
 let isTyping         = false; // typewriter scroll guard — only scroll on keystrokes, not clicks
 let _typingTimer     = null;
+let _saveTimer       = null;  // shared debounce for both onType and onTitleType
 
-// Autosave timer — module-level so both onType and onTitleType share it
-let _saveTimer = null;
-
-// Cached element references — populated once in DOMContentLoaded
+// ── Element cache ──────────────────────────────────────
 let elEditor, elEditorWrap, elPostsPanel, elWordCount,
     elTargetInput, elSaveStatus, elProgressBar, elCelebration, elToast,
-    elPostTitle, elPostsList, elBtnDark, elBtnPosts, elScrollFade;
+    elPostTitle, elPostsList, elBtnDark, elBtnPosts;
 
-// Module-level constants for DOM-walking hot paths (avoids per-call allocations)
+// ── Constants for DOM-walking hot paths ────────────────
+// Avoids per-call regex/Set allocations
 const BLOCK_RE   = /^(P|DIV|LI|BR|UL|OL)$/;
 const BLOCK_TAGS = new Set(['P', 'DIV', 'LI', 'BR', 'H1', 'H2', 'H3', 'UL', 'OL']);
-// Inline regex for block-walking in keydown handlers (P/DIV/LI only)
 const PARA_RE    = /^(P|DIV|LI)$/;
 
 // ── Init ───────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  elEditor        = document.getElementById('editor');
-  elEditorWrap    = document.getElementById('editorWrap');
-  elPostsPanel    = document.getElementById('postsPanel');
-  elWordCount     = document.getElementById('wordCount');
-  elTargetInput   = document.getElementById('targetInput');
-  elSaveStatus    = document.getElementById('saveStatus');
-  elProgressBar   = document.getElementById('wordTargetProgress');
-  elCelebration   = document.getElementById('celebration');
-  elToast         = document.getElementById('toast');
-  elPostTitle     = document.getElementById('postTitleInline');
-  elPostsList     = document.getElementById('postsList');
-  elBtnDark       = document.getElementById('btnDark');
-  elBtnPosts      = document.getElementById('btnPosts');
-  elScrollFade    = document.getElementById('scrollTopFade');
+  elEditor      = document.getElementById('editor');
+  elEditorWrap  = document.getElementById('editorWrap');
+  elPostsPanel  = document.getElementById('postsPanel');
+  elWordCount   = document.getElementById('wordCount');
+  elTargetInput = document.getElementById('targetInput');
+  elSaveStatus  = document.getElementById('saveStatus');
+  elProgressBar = document.getElementById('wordTargetProgress');
+  elCelebration = document.getElementById('celebration');
+  elToast       = document.getElementById('toast');
+  elPostTitle   = document.getElementById('postTitleInline');
+  elPostsList   = document.getElementById('postsList');
+  elBtnDark     = document.getElementById('btnDark');
+  elBtnPosts    = document.getElementById('btnPosts');
 
-  // defaultParagraphSeparator must be set before any content is loaded
-  // NOTE: execCommand is deprecated but remains the only viable API for
-  // contenteditable editing at this level without a full editor framework.
+  // defaultParagraphSeparator must be set before any content is loaded.
+  // execCommand is deprecated but remains the only viable API for
+  // contenteditable paragraph handling without a full editor framework.
   document.execCommand('defaultParagraphSeparator', false, 'p');
 
   loadDoc();
@@ -463,7 +453,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // Autosave every 20s as a backstop for the 5s debounce
   setInterval(silentSave, 20000);
 
-  // Save on tab close/refresh — localStorage.setItem is synchronous so this works
+  // Save on tab close/refresh — localStorage.setItem is synchronous
   window.addEventListener('beforeunload', silentSave);
 
   // Cmd/Ctrl+S
@@ -474,25 +464,21 @@ window.addEventListener('DOMContentLoaded', () => {
   elEditor.addEventListener('keydown', onEditorKeydown);
   elEditor.addEventListener('input', onEditorInput);
 
-  // Set isTyping on keydown so the input handler knows it was keyboard-driven.
-  // Clear it shortly after so click-repositioning doesn't trigger scrollToCursor.
+  // Set isTyping on keydown so scrollToCursor only fires on keyboard input,
+  // not click-to-reposition. Clears after 1s of inactivity.
   elEditor.addEventListener('keydown', () => {
     isTyping = true;
     clearTimeout(_typingTimer);
     _typingTimer = setTimeout(() => { isTyping = false; }, 1000);
   });
 
-  // Track IME composition to avoid false triggers on CJK input
-  elEditor.addEventListener('compositionstart', () => { isComposing = true; });
-  elEditor.addEventListener('compositionend',   () => { isComposing = false; });
-
-  // Plain-text paste only
+  // Plain-text paste only — strips all rich formatting on paste
   elEditor.addEventListener('paste', e => {
     e.preventDefault();
     document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
   });
 
-  // Word target input handlers
+  // Word target input: Enter commits, Escape clears, blur commits
   elTargetInput.addEventListener('keydown', e => {
     if (e.key === 'Enter')  { e.preventDefault(); commitTarget(); }
     if (e.key === 'Escape') { e.preventDefault(); clearTarget(); }
@@ -502,32 +488,29 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-
+// ── Typewriter scroll ──────────────────────────────────
 // Keeps the cursor at ~50% of the visible editor height while typing.
-// Only fires during keyboard input (isTyping guard) to avoid disrupting
-// click-to-reposition behaviour.
+// The isTyping guard prevents firing on click-to-reposition.
 function scrollToCursor() {
   if (!isTyping) return;
   const sel = window.getSelection();
   if (!sel || !sel.rangeCount) return;
   const rect = sel.getRangeAt(0).getBoundingClientRect();
-  if (!rect.height) return; // no valid cursor position
+  if (!rect.height) return;
   const wrapRect = elEditorWrap.getBoundingClientRect();
-  const target   = wrapRect.top + wrapRect.height * 0.5;
-  const delta    = rect.top - target;
-  // Dead zone of 4px prevents micro-jitter when cursor is already near centre
+  const delta    = rect.top - (wrapRect.top + wrapRect.height * 0.5);
+  // 4px dead zone prevents micro-jitter when cursor is already near centre
   if (Math.abs(delta) > 4) elEditorWrap.scrollTop += delta;
 }
 
-// ── Editor keydown handler ─────────────────────────────
+// ── Editor event handlers ──────────────────────────────
 function onEditorKeydown(e) {
   const mod = e.metaKey || e.ctrlKey;
 
-  // Bold / Italic
   if (mod && e.key === 'b') { e.preventDefault(); document.execCommand('bold');   return; }
   if (mod && e.key === 'i') { e.preventDefault(); document.execCommand('italic'); return; }
 
-  // Tab — indent/outdent in lists, otherwise insert spaces
+  // Tab — indent/outdent in lists, otherwise insert four spaces
   if (e.key === 'Tab') {
     e.preventDefault();
     const sel = window.getSelection();
@@ -545,10 +528,9 @@ function onEditorKeydown(e) {
     return;
   }
 
-  const sel = window.getSelection();
-
-  // Space — "- " → unordered list
+  // Space — "- " at start of a paragraph → unordered list
   if (e.key === ' ') {
+    const sel = window.getSelection();
     if (!sel || !sel.rangeCount) return;
     const range = sel.getRangeAt(0);
     if (!range.collapsed) return;
@@ -568,18 +550,15 @@ function onEditorKeydown(e) {
       sel.removeAllRanges(); sel.addRange(del);
       document.execCommand('delete');
       document.execCommand('insertUnorderedList');
-      onType(); return;
+      onType();
     }
-    return;
   }
 }
 
-// ── Editor input handler ───────────────────────────────
 function onEditorInput() {
   onType();
   requestAnimationFrame(scrollToCursor);
 }
-
 
 // ── Word count + target ────────────────────────────────
 function onType() {
@@ -604,23 +583,22 @@ function getEditorText() {
   return parts.join('');
 }
 
-
 function updateWordCount() {
-  const rawText = getEditorText();
-  const trimmed = rawText.trim();
+  const trimmed = getEditorText().trim();
   const words   = trimmed ? trimmed.split(/\s+/).length : 0;
   elWordCount.textContent = wordTarget
     ? `${words} / ${wordTarget} word${wordTarget !== 1 ? 's' : ''}`
     : `${words} word${words !== 1 ? 's' : ''}`;
   updateTargetProgress(words);
-  if (wordTarget > 0 && words === wordTarget && !targetCelebrated) {
-    targetCelebrated = true;
-    celebrate(`${words} words — target reached! ✦`);
+  if (wordTarget > 0) {
+    if (words === wordTarget && !targetCelebrated) {
+      targetCelebrated = true;
+      celebrate(`${words} words — target reached! ✦`);
+    }
+    // Reset below target; lock above so overshooting doesn't re-fire on the way down
+    if (words < wordTarget) targetCelebrated = false;
+    if (words > wordTarget) targetCelebrated = true;
   }
-  // Reset flag when below target; also lock it when above (so overshooting
-  // doesn't re-fire the celebration on the way back down through the target)
-  if (wordTarget > 0 && words < wordTarget) targetCelebrated = false;
-  if (wordTarget > 0 && words > wordTarget) targetCelebrated = true;
 }
 
 function openTargetInput() {
@@ -635,11 +613,7 @@ function commitTarget() {
   const val = parseInt(elTargetInput.value, 10);
   wordTarget = val > 0 ? val : 0;
   targetCelebrated = false;
-  if (wordTarget) {
-    localStorage.setItem('pb_target', wordTarget);
-  } else {
-    localStorage.removeItem('pb_target');
-  }
+  wordTarget ? localStorage.setItem('pb_target', wordTarget) : localStorage.removeItem('pb_target');
   closeTargetInput();
   updateWordCount();
 }
@@ -674,7 +648,6 @@ function onTitleType() {
   const title = elPostTitle.value.trim();
   document.title = title ? title + ' — Pagebreak' : 'Pagebreak';
   if (!elPostsPanel.classList.contains('hidden')) renderPostsList();
-  // Schedule save — title changes don't affect word count
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(silentSave, 5000);
 }
@@ -690,8 +663,7 @@ function saveAllPostIds(ids) { localStorage.setItem('pb_posts', JSON.stringify(i
 function getActiveId()       { return localStorage.getItem('pb_active') || null; }
 function setActiveId(id)     { localStorage.setItem('pb_active', id); }
 function getPost(id) {
-  // localStorage.getItem returns null for missing keys; JSON.parse(null) === null (no error).
-  // The try/catch only fires on malformed JSON.
+  // JSON.parse(null) === null, so no error on missing keys; try/catch only fires on malformed JSON
   try { return JSON.parse(localStorage.getItem(id)); } catch { return null; }
 }
 function savePost(id, data)  { localStorage.setItem(id, JSON.stringify(data)); }
@@ -708,8 +680,6 @@ function togglePostsPanel() {
   if (isHidden) { silentSave(); renderPostsList(); }
   elPostsPanel.classList.toggle('hidden', !isHidden);
   elBtnPosts.classList.toggle('on', isHidden);
-  document.querySelector('.chrome').classList.toggle('panel-open', isHidden);
-  elScrollFade.classList.toggle('panel-open', isHidden);
 }
 
 function renderPostsList() {
@@ -723,12 +693,10 @@ function renderPostsList() {
     const post = getPost(id);
     if (!post) return '';
     const title = post.title || 'Untitled post';
-    // Strip HTML tags to count words; regex is safe here because content
-    // has already passed through sanitizeBody
+    // Strip HTML tags for word count; safe here because content has passed through sanitizeBody
     const words = post.body
       ? post.body.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length
       : 0;
-    // Use navigator.language for locale-appropriate date formatting
     const date = post.saved
       ? new Date(post.saved).toLocaleDateString(navigator.language, { day: 'numeric', month: 'short' })
       : '';
@@ -746,7 +714,7 @@ function renderPostsList() {
   }).join('');
 }
 
-// Shared helper — populates editor and chrome title from saved post data
+// Populates editor and chrome title from saved post data
 function setEditorContent(body, title) {
   const t = (title || '').trim();
   elPostTitle.value  = title || '';
@@ -781,7 +749,6 @@ function newPost() {
 }
 
 function confirmDeletePost(id) {
-  // Scope the query to the posts list, not the whole document
   const row = elPostsList.querySelector(`.post-row[data-post-id="${id}"]`);
   if (!row) return;
   const name = getPost(id)?.title || 'Untitled post';
@@ -800,7 +767,6 @@ function confirmDeletePost(id) {
 }
 
 function doDeletePost(id) {
-  // Save current work before any deletion, including when deleting a different post
   silentSave();
   const activeId = getActiveId();
   deletePost(id);
@@ -816,7 +782,6 @@ function doDeletePost(id) {
 function setDark(on) {
   isDark = on;
   document.body.classList.toggle('dark', on);
-  // The emoji is aria-hidden; the button's aria-label is the accessible name
   elBtnDark.querySelector('span').textContent = on ? '☀️' : '🌙';
   elBtnDark.classList.toggle('on', on);
 }
@@ -828,8 +793,8 @@ function toggleDark() {
 
 // ── Save / Load ────────────────────────────────────────
 
-// Strip inline color/background injected by Chromium's contenteditable so
-// saved HTML defers to CSS variables correctly in light and dark mode.
+// Strips inline color/background injected by Chromium's contenteditable so
+// saved HTML defers to CSS variables in both light and dark mode.
 function sanitizeBody(html) {
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
@@ -837,9 +802,7 @@ function sanitizeBody(html) {
     el.style.removeProperty('color');
     el.style.removeProperty('background-color');
     el.style.removeProperty('background');
-    // getAttribute can return null if a prior removeProperty already cleared it
-    const remaining = el.getAttribute('style') || '';
-    if (!remaining.trim()) el.removeAttribute('style');
+    if (!(el.getAttribute('style') || '').trim()) el.removeAttribute('style');
   });
   return tmp.innerHTML;
 }
@@ -858,8 +821,6 @@ function silentSave() {
       saved: Date.now(),
     });
     showSaveStatus('Saved');
-    // Only re-render the list if the panel is open — inside try so we only
-    // update the UI after confirming the save succeeded
     if (!elPostsPanel.classList.contains('hidden')) renderPostsList();
   } catch {
     showSaveStatus('⚠ Save failed', true);
@@ -901,10 +862,8 @@ function loadDoc() {
     if (savedTarget > 0) wordTarget = savedTarget;
     updateWordCount();
 
-    // 'pb_dark' is stored as the string "true" or "false"
     if (localStorage.getItem('pb_dark') === 'true') setDark(true);
 
-    // Do an initial save to ensure a freshly-opened session has a record
     silentSave();
   } catch { /* corrupt localStorage — start fresh */ }
 }
@@ -938,7 +897,6 @@ function showToast(msg) {
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => elToast.classList.remove('show'), 2000);
 }
-
 </script>
 </body>
 </html>
