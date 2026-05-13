@@ -1102,6 +1102,7 @@ function loadDoc() {
 
     // Do an initial save to ensure a freshly-opened session has a record
     silentSave();
+    requestAnimationFrame(() => elEditor.focus());
   } catch { /* corrupt localStorage — start fresh */ }
 }
 
