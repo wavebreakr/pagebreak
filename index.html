@@ -77,11 +77,11 @@
   .chrome-right { display: flex; align-items: center; gap: 10px;  flex-shrink: 0; }
 
   .brand { display: flex; align-items: center; flex-shrink: 0; }
-  .brand img { height: 34px; width: auto; display: block; }
+  .brand img { height: 38px; width: auto; display: block; }
   .dark .brand img { filter: invert(1); }
 
   .post-title-inline {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--ink-dim); background: none; border: none; outline: none;
     width: 220px; max-width: 30vw;
     transition: color 0.2s;
@@ -90,7 +90,7 @@
   .post-title-inline:focus { color: var(--ink-mid); }
 
   .word-count {
-    font-size: 13px; font-weight: 500; color: var(--ink-dim);
+    font-size: 14px; font-weight: 500; color: var(--ink-dim);
     font-variant-numeric: tabular-nums; min-width: 54px; text-align: right;
   }
   #wordCount {
@@ -105,7 +105,7 @@
   #wordCount:hover { background: var(--ink-faint); color: var(--ink-mid); text-decoration-color: var(--ink-mid); }
 
   .target-input {
-    font-size: 13px; font-weight: 500; color: var(--ink-mid);
+    font-size: 14px; font-weight: 500; color: var(--ink-mid);
     font-variant-numeric: tabular-nums; width: 72px; text-align: right;
     background: var(--ink-faint); border: none; outline: none;
     border-radius: 6px; padding: 2px 5px;
@@ -150,7 +150,7 @@
 
   /* Glass text button */
   .copy-btn {
-    font-size: 12px; font-weight: 500;
+    font-size: 13px; font-weight: 500;
     padding: 0 13px; height: 34px;
     border: 1px solid var(--glass-border); border-radius: 8px;
     background: var(--glass-bg); box-shadow: var(--glass-shadow-sm);
@@ -169,7 +169,7 @@
   .copy-btn svg { width: 12px; height: 12px; stroke: currentColor; flex-shrink: 0; }
 
   .save-status {
-    font-size: 12px; color: var(--ink-dim);
+    font-size: 13px; color: var(--ink-dim);
     opacity: 0; transition: opacity 0.4s;
     white-space: nowrap; letter-spacing: 0.01em;
   }
@@ -490,7 +490,6 @@
 'use strict';
 
 // ── State ──────────────────────────────────────────────
-let isDark           = false;
 let wordTarget       = 0;
 let targetCelebrated = false;
 let isComposing      = false; // IME composition guard
@@ -511,10 +510,9 @@ let elEditor, elEditorWrap, elPostsPanel, elWordCount,
     elTargetInput, elSaveStatus, elProgressBar, elCelebration, elToast,
     elPostTitle, elPostsList, elBtnDark, elBtnPosts, elSlashMenu;
 
-// Module-level constants for DOM-walking hot paths (avoids per-call allocations)
-const BLOCK_RE   = /^(P|DIV|LI|BR|UL|OL)$/;
+// Block tag sets used in DOM-walking hot paths
 const BLOCK_TAGS = new Set(['P', 'DIV', 'LI', 'BR', 'H1', 'H2', 'H3', 'UL', 'OL']);
-// Inline regex for block-walking in keydown handlers (P/DIV/LI only)
+// PARA_RE: paragraph-like blocks only (list detection, slash-menu trigger)
 const PARA_RE    = /^(P|DIV|LI)$/;
 
 // ── Init ───────────────────────────────────────────────
@@ -777,16 +775,18 @@ function onType() {
   _saveTimer = setTimeout(silentSave, 5000);
 }
 
-function getEditorText() {
+// Walk the editor tree and collect text. sep=' ' for word-counting (blocks
+// get whitespace boundaries), sep='\n' for copy (blocks become line breaks).
+function walkEditorText(sep) {
   const parts = [];
   function walk(node) {
     if (node.nodeType === Node.TEXT_NODE) {
       parts.push(node.textContent);
     } else if (node.nodeType === Node.ELEMENT_NODE) {
-      const isBlock = BLOCK_RE.test(node.tagName);
-      if (isBlock) parts.push(' ');
+      const isBlock = BLOCK_TAGS.has(node.tagName);
+      if (isBlock) parts.push(sep);
       for (const child of node.childNodes) walk(child);
-      if (isBlock) parts.push(' ');
+      if (isBlock) parts.push(sep);
     }
   }
   walk(elEditor);
@@ -795,7 +795,7 @@ function getEditorText() {
 
 
 function updateWordCount() {
-  const rawText = getEditorText();
+  const rawText = walkEditorText(' ');
   const trimmed = rawText.trim();
   const words   = trimmed ? trimmed.split(/\s+/).length : 0;
   elWordCount.textContent = wordTarget
@@ -1001,7 +1001,6 @@ function doDeletePost(id) {
 
 // ── Dark mode ──────────────────────────────────────────
 function setDark(on) {
-  isDark = on;
   document.body.classList.toggle('dark', on);
   // The emoji is aria-hidden; the button's aria-label is the accessible name
   elBtnDark.querySelector('span').textContent = on ? '☀️' : '🌙';
@@ -1009,8 +1008,9 @@ function setDark(on) {
 }
 
 function toggleDark() {
-  setDark(!isDark);
-  localStorage.setItem('pb_dark', isDark);
+  const on = !document.body.classList.contains('dark');
+  setDark(on);
+  localStorage.setItem('pb_dark', on);
 }
 
 // ── Save / Load ────────────────────────────────────────
@@ -1097,24 +1097,9 @@ function loadDoc() {
   } catch { /* corrupt localStorage — start fresh */ }
 }
 
-// ── Copy ───────────────────────────────────────────────
-function collectText() {
-  const parts = [];
-  function collect(node) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      parts.push(node.textContent);
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
-      for (const child of node.childNodes) collect(child);
-      if (BLOCK_TAGS.has(node.tagName)) parts.push('\n');
-    }
-  }
-  collect(elEditor);
-  return parts.join('').replace(/\n{3,}/g, '\n\n').trim();
-}
-
 function copyText() {
   const title = elPostTitle.value.trim();
-  const body  = collectText();
+  const body  = walkEditorText('\n').replace(/\n{3,}/g, '\n\n').trim();
   navigator.clipboard.writeText((title ? title + '\n\n' : '') + body)
     .then(() => showToast('Copied ✓'))
     .catch(() => showToast('Copy failed — try Cmd+A, Cmd+C'));
