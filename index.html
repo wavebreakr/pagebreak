@@ -67,7 +67,7 @@
 
   /* ── Chrome ── */
   .chrome {
-    position: fixed; top: 0; left: 0; right: 0; height: 60px;
+    position: fixed; top: 0; left: 0; right: 0; height: 64px;
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 20px; gap: 12px;
     background: transparent;
@@ -77,11 +77,11 @@
   .chrome-right { display: flex; align-items: center; gap: 10px;  flex-shrink: 0; }
 
   .brand { display: flex; align-items: center; flex-shrink: 0; }
-  .brand img { height: 38px; width: auto; display: block; }
+  .brand img { height: 42px; width: auto; display: block; }
   .dark .brand img { filter: invert(1); }
 
   .post-title-inline {
-    font-size: 15px;
+    font-size: 16px;
     color: var(--ink-dim); background: none; border: none; outline: none;
     width: 220px; max-width: 30vw;
     transition: color 0.2s;
@@ -90,7 +90,7 @@
   .post-title-inline:focus { color: var(--ink-mid); }
 
   .word-count {
-    font-size: 14px; font-weight: 500; color: var(--ink-dim);
+    font-size: 15px; font-weight: 500; color: var(--ink-dim);
     font-variant-numeric: tabular-nums; min-width: 54px; text-align: right;
   }
   #wordCount {
@@ -105,7 +105,7 @@
   #wordCount:hover { background: var(--ink-faint); color: var(--ink-mid); text-decoration-color: var(--ink-mid); }
 
   .target-input {
-    font-size: 14px; font-weight: 500; color: var(--ink-mid);
+    font-size: 15px; font-weight: 500; color: var(--ink-mid);
     font-variant-numeric: tabular-nums; width: 72px; text-align: right;
     background: var(--ink-faint); border: none; outline: none;
     border-radius: 6px; padding: 2px 5px;
@@ -150,7 +150,7 @@
 
   /* Glass text button */
   .copy-btn {
-    font-size: 13px; font-weight: 500;
+    font-size: 14px; font-weight: 500;
     padding: 0 13px; height: 34px;
     border: 1px solid var(--glass-border); border-radius: 8px;
     background: var(--glass-bg); box-shadow: var(--glass-shadow-sm);
@@ -169,7 +169,7 @@
   .copy-btn svg { width: 12px; height: 12px; stroke: currentColor; flex-shrink: 0; }
 
   .save-status {
-    font-size: 13px; color: var(--ink-dim);
+    font-size: 14px; color: var(--ink-dim);
     opacity: 0; transition: opacity 0.4s;
     white-space: nowrap; letter-spacing: 0.01em;
   }
@@ -179,7 +179,7 @@
   .scroll-top-fade {
     position: fixed; top: 0; left: 0; right: 0;
     height: 100px;
-    background: linear-gradient(to bottom, var(--editor-bg) 0%, var(--editor-bg) 60px, transparent 100px);
+    background: linear-gradient(to bottom, var(--editor-bg) 0%, var(--editor-bg) 64px, transparent 104px);
     pointer-events: none; z-index: 50;
     transition: background 0.4s;
   }
@@ -191,7 +191,7 @@
   }
 
   .editor-wrap {
-    flex: 1; overflow-y: auto; padding: 112px 0 120px;
+    flex: 1; overflow-y: auto; padding: 116px 0 120px;
     background: var(--editor-bg);
     transition: background 0.4s;
     /* Standard Firefox scrollbar styling */
@@ -244,7 +244,7 @@
 
   /* ── Celebration pill ── */
   .celebration {
-    position: fixed; top: 74px; left: 50%;
+    position: fixed; top: 78px; left: 50%;
     transform: translateX(-50%) translateY(-12px);
     background: var(--glass-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
@@ -274,7 +274,7 @@
      Fixed overlay anchored below the chrome bar; the editor content
      stays put and the toggle button never moves. */
   .posts-panel {
-    position: fixed; top: 60px; left: 0; bottom: 0;
+    position: fixed; top: 64px; left: 0; bottom: 0;
     width: 220px;
     border-right: 1px solid var(--panel-border);
     background: var(--panel-bg);
@@ -291,7 +291,7 @@
     display: flex; align-items: center; justify-content: space-between;
   }
   .posts-panel-label {
-    font-size: 10px; font-weight: 600;
+    font-size: 11px; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.14em;
     color: var(--ink-dim);
   }
@@ -315,12 +315,12 @@
   .post-row.active { background: var(--accent-dim); box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset; }
   .post-row-info { flex: 1; min-width: 0; }
   .post-row-title {
-    font-size: 12.5px; font-weight: 500; color: var(--ink);
+    font-size: 14px; font-weight: 500; color: var(--ink);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     letter-spacing: -0.01em; line-height: 1.3;
   }
   .post-row.active .post-row-title { color: var(--accent); }
-  .post-row-meta { font-size: 10.5px; color: var(--ink-dim); margin-top: 2px; }
+  .post-row-meta { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
   .post-row-delete {
     width: 20px; height: 20px; border-radius: 5px;
     border: none; background: none; cursor: pointer;
@@ -903,7 +903,7 @@ function renderPostsList() {
   const ids      = getAllPostIds();
   const activeId = getActiveId();
   if (!ids.length) {
-    elPostsList.innerHTML = '<div style="font-size:12px;color:var(--ink-dim);padding:8px 2px;">No posts yet.</div>';
+    elPostsList.innerHTML = '<div style="font-size:14px;color:var(--ink-dim);padding:8px 2px;">No posts yet.</div>';
     return;
   }
   elPostsList.innerHTML = [...ids].reverse().map(id => {
@@ -974,14 +974,14 @@ function confirmDeletePost(id) {
   const name = getPost(id)?.title || 'Untitled post';
   row.innerHTML = `
     <div class="post-row-info" style="min-width:0">
-      <div class="post-row-title" style="color:#b84a4a;font-size:11px">Delete "${escHtml(name)}"?</div>
+      <div class="post-row-title" style="color:#b84a4a;font-size:12px">Delete "${escHtml(name)}"?</div>
       <div class="post-row-meta">This can't be undone</div>
     </div>
     <button onclick="event.stopPropagation();doDeletePost('${id}')"
-      style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;border:none;
+      style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px;border:none;
              background:rgba(184,74,74,0.15);color:#b84a4a;cursor:pointer;flex-shrink:0;">Yes</button>
     <button onclick="event.stopPropagation();renderPostsList()"
-      style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;border:none;
+      style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px;border:none;
              background:var(--ink-faint);color:var(--ink-mid);cursor:pointer;flex-shrink:0;">No</button>
   `;
 }
