@@ -74,7 +74,7 @@
     z-index: 200;
   }
   .chrome-left  { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  .chrome-right { display: flex; align-items: center; gap: 10px;  flex-shrink: 0; }
+  .chrome-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
 
   .brand { display: flex; align-items: center; flex-shrink: 0; }
   .brand img { height: 42px; width: auto; display: block; }
@@ -89,30 +89,76 @@
   .post-title-inline::placeholder { color: var(--ink-dim); }
   .post-title-inline:focus { color: var(--ink-mid); }
 
+  /* ── Word count + target widget ── */
+  .word-count-wrap {
+    display: flex; align-items: center; gap: 5px;
+  }
   .word-count {
     font-size: 15px; font-weight: 500; color: var(--ink-dim);
-    font-variant-numeric: tabular-nums; min-width: 54px; text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
-  #wordCount {
-    cursor: pointer; border-radius: 6px;
-    padding: 2px 6px; margin: -2px -6px;
-    transition: background 0.15s, color 0.15s;
-    text-decoration: underline;
-    text-decoration-style: dotted;
-    text-decoration-color: var(--ink-dim);
-    text-underline-offset: 3px;
+  /* Small icon button for adding/clearing target */
+  .target-toggle-btn {
+    width: 22px; height: 22px;
+    border: 1px solid var(--glass-border); border-radius: 6px;
+    background: var(--glass-bg); box-shadow: var(--glass-shadow-sm);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-dim);
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s;
+    flex-shrink: 0;
   }
-  #wordCount:hover { background: var(--ink-faint); color: var(--ink-mid); text-decoration-color: var(--ink-mid); }
+  .target-toggle-btn:hover {
+    background: rgba(255,255,255,0.82);
+    box-shadow: 0 1px 0 #fff inset, 0 4px 14px rgba(0,0,0,0.1);
+    color: var(--ink);
+    transform: translateY(-1px);
+  }
+  .dark .target-toggle-btn:hover { background: rgba(255,255,255,0.1); }
+  .target-toggle-btn.has-target { color: var(--ink-mid); }
+  .target-toggle-btn svg { width: 10px; height: 10px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 
-  .target-input {
-    font-size: 15px; font-weight: 500; color: var(--ink-mid);
-    font-variant-numeric: tabular-nums; width: 72px; text-align: right;
-    background: var(--ink-faint); border: none; outline: none;
-    border-radius: 6px; padding: 2px 5px;
-    display: none;
+  /* ── Word target popover ── */
+  .target-popover {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 8px;
+    opacity: 0; pointer-events: none;
+    transform: translateY(-4px);
+    transition: opacity 0.15s, transform 0.15s cubic-bezier(0.4,0,0.2,1);
+    white-space: nowrap;
+    z-index: 500;
   }
-  /* inline-block keeps it in-flow with the surrounding chrome spans */
-  .target-input.show { display: inline-block; }
+  .target-popover.show {
+    opacity: 1; pointer-events: auto; transform: translateY(0);
+  }
+  .target-popover-label {
+    font-size: 13px; font-weight: 500; color: var(--ink-mid);
+    letter-spacing: -0.01em;
+  }
+  .target-input {
+    font-size: 14px; font-weight: 500; color: var(--ink);
+    font-variant-numeric: tabular-nums; width: 80px;
+    background: var(--ink-faint); border: 1px solid var(--panel-border);
+    outline: none; border-radius: 7px; padding: 4px 8px;
+    text-align: center;
+  }
+  .target-input:focus { border-color: var(--accent); }
+  .target-set-btn {
+    font-size: 13px; font-weight: 600; color: #fff;
+    background: var(--accent); border: none; border-radius: 7px;
+    padding: 4px 11px; cursor: pointer; letter-spacing: -0.01em;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .target-set-btn:hover { background: var(--accent-light); transform: translateY(-1px); }
 
   .word-target-progress {
     position: absolute; bottom: 0; left: 0;
@@ -332,10 +378,82 @@
   .post-row:hover .post-row-delete { opacity: 1; }
   .post-row-delete:hover { background: rgba(184,74,74,0.12); color: #b84a4a; }
 
+  /* ── Mobile bottom sheet backdrop ── */
+  .posts-panel-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.28);
+    z-index: 149;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .posts-panel-backdrop.show { opacity: 1; }
+
   @media (max-width: 700px) {
-    .posts-panel { display: none; }
+    /* Chrome: compact single row */
+    .chrome { padding: 0 14px; gap: 8px; }
+    .chrome-left { gap: 8px; flex: 1; min-width: 0; }
+    .chrome-right { gap: 8px; flex-shrink: 0; }
+
+    /* Hide title input and copy button on mobile — focus on the editor */
+    .post-title-inline { display: none; }
+    .copy-btn { display: none; }
+
+    /* Logo slightly smaller */
+    .brand img { height: 34px; }
+
+    /* Editor padding */
     .editor-inner { padding: 0 20px; }
-    .post-title-inline { max-width: 120px; }
+
+    /* Posts panel: bottom sheet instead of left sidebar */
+    .posts-panel {
+      top: auto;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 62vh;
+      max-height: 520px;
+      border-right: none;
+      border-top: 1px solid var(--panel-border);
+      border-radius: 20px 20px 0 0;
+      /* Hidden state: slide down off-screen */
+      transform: translateY(100%);
+      opacity: 1;
+      /* Override the hidden class transform so our sheet animation works */
+    }
+    .posts-panel.hidden {
+      transform: translateY(100%);
+      opacity: 1; /* keep it rendered but slid away */
+      pointer-events: none;
+      border-top-width: 0;
+    }
+    /* When open on mobile, slide up */
+    .posts-panel.mobile-open {
+      transform: translateY(0) !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      border-top-width: 1px !important;
+    }
+
+    /* Backdrop visible on mobile */
+    .posts-panel-backdrop { display: block; }
+
+    /* Panel header drag handle */
+    .posts-panel-header::before {
+      content: '';
+      position: absolute;
+      top: 8px; left: 50%;
+      transform: translateX(-50%);
+      width: 36px; height: 4px;
+      background: var(--ink-dim);
+      border-radius: 2px;
+      opacity: 0.35;
+    }
+    .posts-panel-header { position: relative; padding-top: 22px; }
+
+    /* Delete buttons always visible on touch */
+    .post-row-delete { opacity: 1; }
   }
 
   /* ── Slash menu ── */
@@ -419,15 +537,25 @@
   </div>
   <div class="chrome-right">
     <span class="save-status" id="saveStatus" aria-live="polite">Saved</span>
-    <span class="word-count" id="wordCount"
-      title="Click to set a word target"
-      role="button" tabindex="0"
-      aria-label="Word count — click to set target"
-      onclick="openTargetInput()"
-      onkeydown="if(event.key==='Enter'||event.key===' ')openTargetInput()">0 words</span>
-    <input class="target-input" id="targetInput" type="number" min="1" max="99999"
-      placeholder="Target…"
-      aria-label="Word target — press Enter to set, Escape to clear">
+    <div class="word-count-wrap" style="position:relative;">
+      <span class="word-count" id="wordCount" aria-live="polite">0 words</span>
+      <button class="target-toggle-btn" id="targetToggleBtn"
+        title="Set word count target"
+        aria-label="Set word count target"
+        onclick="onTargetToggle()">
+        <svg id="targetToggleIcon" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+          <line x1="5" y1="1" x2="5" y2="9"/>
+          <line x1="1" y1="5" x2="9" y2="5"/>
+        </svg>
+      </button>
+      <div class="target-popover" id="targetPopover">
+        <span class="target-popover-label">Target</span>
+        <input class="target-input" id="targetInput" type="number" min="1" max="99999"
+          placeholder="e.g. 500"
+          aria-label="Word target — press Enter to set, Escape to cancel">
+        <button class="target-set-btn" onclick="commitTarget()">Set</button>
+      </div>
+    </div>
     <button class="copy-btn" title="Copy all text to clipboard" aria-label="Copy to clipboard" onclick="copyText()">
       <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="5" y="4" width="9" height="11" rx="1.5"/>
@@ -445,6 +573,7 @@
 <div class="scroll-top-fade" id="scrollTopFade" aria-hidden="true"></div>
 
 <div class="writing-area">
+<div class="posts-panel-backdrop" id="postsPanelBackdrop" onclick="togglePostsPanel()"></div>
   <div class="posts-panel hidden" id="postsPanel">
     <div class="posts-panel-header">
       <span class="posts-panel-label">Posts</span>
@@ -568,14 +697,17 @@ window.addEventListener('DOMContentLoaded', () => {
     document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
   });
 
-  // Word target input handlers
+  // Word target popover: keyboard and outside-click handling
   elTargetInput.addEventListener('keydown', e => {
     if (e.key === 'Enter')  { e.preventDefault(); commitTarget(); }
-    if (e.key === 'Escape') { e.preventDefault(); clearTarget(); }
+    if (e.key === 'Escape') { e.preventDefault(); closeTargetInput(); }
   });
-  elTargetInput.addEventListener('blur', () => {
-    if (elTargetInput.classList.contains('show')) commitTarget();
-  });
+  document.addEventListener('mousedown', e => {
+    const popover = document.getElementById('targetPopover');
+    if (popover && popover.classList.contains('show') && !popover.contains(e.target)) {
+      closeTargetInput();
+    }
+  }, true);
 });
 
 
@@ -812,10 +944,20 @@ function updateWordCount() {
   if (wordTarget > 0 && words > wordTarget) targetCelebrated = true;
 }
 
+// Toggle button click: if target already set, clear it immediately;
+// otherwise open the input to set one.
+function onTargetToggle() {
+  if (wordTarget > 0) {
+    clearTarget();
+  } else {
+    openTargetInput();
+  }
+}
+
 function openTargetInput() {
+  const popover = document.getElementById('targetPopover');
   elTargetInput.value = wordTarget || '';
-  elTargetInput.classList.add('show');
-  elWordCount.style.display = 'none';
+  popover.classList.add('show');
   elTargetInput.focus();
   elTargetInput.select();
 }
@@ -831,6 +973,7 @@ function commitTarget() {
   }
   closeTargetInput();
   updateWordCount();
+  updateTargetToggleBtn();
 }
 
 function clearTarget() {
@@ -839,11 +982,30 @@ function clearTarget() {
   localStorage.removeItem('pb_target');
   closeTargetInput();
   updateWordCount();
+  updateTargetToggleBtn();
 }
 
 function closeTargetInput() {
-  elTargetInput.classList.remove('show');
-  elWordCount.style.display = '';
+  document.getElementById('targetPopover').classList.remove('show');
+}
+
+// Swap the toggle button icon between + (no target) and × (target active)
+function updateTargetToggleBtn() {
+  const btn  = document.getElementById('targetToggleBtn');
+  const icon = document.getElementById('targetToggleIcon');
+  if (!btn || !icon) return;
+  if (wordTarget > 0) {
+    btn.classList.add('has-target');
+    btn.title = 'Clear word target';
+    btn.setAttribute('aria-label', 'Clear word target');
+    // Render as × (times/close)
+    icon.innerHTML = '<line x1="2" y1="2" x2="8" y2="8"/><line x1="8" y1="2" x2="2" y2="8"/>';
+  } else {
+    btn.classList.remove('has-target');
+    btn.title = 'Set word count target';
+    btn.setAttribute('aria-label', 'Set word count target');
+    icon.innerHTML = '<line x1="5" y1="1" x2="5" y2="9"/><line x1="1" y1="5" x2="9" y2="5"/>';
+  }
 }
 
 function updateTargetProgress(words) {
@@ -862,7 +1024,8 @@ function celebrate(msg) {
 function onTitleType() {
   const title = elPostTitle.value.trim();
   document.title = title ? title + ' — Pagebreak' : 'Pagebreak';
-  if (!elPostsPanel.classList.contains('hidden')) renderPostsList();
+  const panelVisible = !elPostsPanel.classList.contains('hidden') || elPostsPanel.classList.contains('mobile-open');
+  if (panelVisible) renderPostsList();
   // Schedule save — title changes don't affect word count
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(silentSave, 5000);
@@ -893,9 +1056,31 @@ function escHtml(s) {
 }
 
 function togglePostsPanel() {
-  const isHidden = elPostsPanel.classList.contains('hidden');
+  const isMobile  = window.innerWidth <= 700;
+  const isHidden  = isMobile
+    ? !elPostsPanel.classList.contains('mobile-open')
+    : elPostsPanel.classList.contains('hidden');
+
   if (isHidden) { silentSave(); renderPostsList(); }
-  elPostsPanel.classList.toggle('hidden', !isHidden);
+
+  if (isMobile) {
+    const backdrop = document.getElementById('postsPanelBackdrop');
+    if (isHidden) {
+      elPostsPanel.classList.remove('hidden');
+      // rAF so the browser paints the unhidden state before we add the class
+      requestAnimationFrame(() => {
+        elPostsPanel.classList.add('mobile-open');
+        backdrop.classList.add('show');
+      });
+    } else {
+      elPostsPanel.classList.remove('mobile-open');
+      backdrop.classList.remove('show');
+      // Re-add hidden after transition so it doesn't intercept touches
+      setTimeout(() => elPostsPanel.classList.add('hidden'), 350);
+    }
+  } else {
+    elPostsPanel.classList.toggle('hidden', !isHidden);
+  }
   elBtnPosts.classList.toggle('on', isHidden);
 }
 
@@ -949,6 +1134,10 @@ function openPost(id) {
   const post = getPost(id);
   if (post) setEditorContent(post.body, post.title);
   renderPostsList();
+  // Close the panel on mobile after selection
+  if (window.innerWidth <= 700 && elPostsPanel.classList.contains('mobile-open')) {
+    togglePostsPanel();
+  }
   elEditor.focus();
 }
 
@@ -964,6 +1153,10 @@ function newPost() {
   setActiveId(id);
   setEditorContent('', '');
   renderPostsList();
+  // Close the panel on mobile after creating a post
+  if (window.innerWidth <= 700 && elPostsPanel.classList.contains('mobile-open')) {
+    togglePostsPanel();
+  }
   elEditor.focus();
 }
 
@@ -1087,6 +1280,7 @@ function loadDoc() {
     const savedTarget = parseInt(localStorage.getItem('pb_target'), 10);
     if (savedTarget > 0) wordTarget = savedTarget;
     updateWordCount();
+    updateTargetToggleBtn();
 
     // 'pb_dark' is stored as the string "true" or "false"
     if (localStorage.getItem('pb_dark') === 'true') setDark(true);
