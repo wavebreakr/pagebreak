@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pagebreak — Write Without Distractions</title>
+<meta name="description" content="A distraction-free writing tool for bloggers and creators. No subscriptions. No clutter. Just writing.">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:           #edeae2;
+    --editor-bg:    #faf9f7;
+    --ink:          #1c1b18;
+    --ink-mid:      #6b6860;
+    --ink-dim:      #a8a49c;
+    --ink-faint:    rgba(0,0,0,0.06);
+    --accent:       #c2692a;
+    --accent-light: #e08040;
+    --glass-bg:     rgba(255,255,255,0.58);
+    --glass-border: rgba(255,255,255,0.78);
+    --glass-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 8px 40px rgba(0,0,0,0.09), 0 1px 2px rgba(0,0,0,0.06);
+    --blur:         blur(22px) saturate(1.7);
+    --radius-pill:  100px;
+    --radius-card:  20px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    pointer-events: none;
+    position: fixed; inset: 0; z-index: 0; opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px;
+  }
+
+  /* Soft ambient blobs */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.28;
+  }
+  .blob-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, #d4895a 0%, transparent 70%);
+    top: -200px; right: -100px;
+  }
+  .blob-2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #c8b89a 0%, transparent 70%);
+    bottom: -150px; left: -100px;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .nav-glass {
+    position: absolute; inset: 0;
+    background: rgba(237,234,226,0.7);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border-bottom: 1px solid rgba(255,255,255,0.5);
+    z-index: -1;
+  }
+
+  .nav-logo img {
+    height: 26px; width: auto; display: block;
+  }
+
+  .nav-cta {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .btn-ghost {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    color: var(--ink-mid);
+    background: none; border: none;
+    cursor: pointer; padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    transition: color 0.2s, background 0.2s;
+  }
+  .btn-ghost:hover { color: var(--ink); background: var(--ink-faint); }
+
+  .btn-primary {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    color: #fff;
+    background: var(--accent);
+    border: none; cursor: pointer;
+    padding: 9px 20px;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    box-shadow: 0 2px 10px rgba(194,105,42,0.3), 0 1px 0 rgba(255,255,255,0.15) inset;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover {
+    background: var(--accent-light);
+    box-shadow: 0 4px 18px rgba(194,105,42,0.38), 0 1px 0 rgba(255,255,255,0.15) inset;
+    transform: translateY(-1px);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 1;
+    min-height: 100svh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.1s forwards cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .hero-headline {
+    font-family: 'Lora', serif;
+    font-size: clamp(42px, 7vw, 82px);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    max-width: 760px;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.2s forwards cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .hero-headline em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 18px; font-weight: 400;
+    color: var(--ink-mid);
+    max-width: 480px; line-height: 1.6;
+    margin-bottom: 44px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.32s forwards cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .hero-actions {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 64px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.44s forwards cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .btn-hero {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600;
+    color: #fff;
+    background: var(--accent);
+    border: none; cursor: pointer;
+    padding: 14px 32px;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 20px rgba(194,105,42,0.32), 0 1px 0 rgba(255,255,255,0.2) inset;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+  }
+  .btn-hero:hover {
+    background: var(--accent-light);
+    box-shadow: 0 6px 28px rgba(194,105,42,0.42), 0 1px 0 rgba(255,255,255,0.2) inset;
+    transform: translateY(-2px);
+  }
+
+  .hero-note {
+    font-size: 12px; color: var(--ink-dim);
+    letter-spacing: 0.01em;
+  }
+
+  /* ── EDITOR PREVIEW ── */
+  .editor-preview-wrap {
+    width: min(760px, 90vw);
+    opacity: 0;
+    animation: fadeUp 1s 0.56s forwards cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .editor-preview {
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+
+  .editor-chrome {
+    height: 44px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .chrome-dots { display: flex; gap: 6px; }
+  .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(0,0,0,0.12);
+  }
+
+  .chrome-title {
+    font-size: 11px; font-weight: 500; color: var(--ink-dim);
+    letter-spacing: 0.02em;
+  }
+
+  .chrome-actions { display: flex; gap: 6px; }
+  .chrome-pill {
+    height: 20px; padding: 0 10px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.06);
+    font-size: 10px; font-weight: 500; color: var(--ink-dim);
+    display: flex; align-items: center;
+  }
+
+  .editor-body {
+    padding: 36px 48px 44px;
+    font-family: 'Lora', serif;
+    font-size: 17px; line-height: 1.85;
+    color: var(--ink);
+    text-align: left;
+  }
+
+  .editor-body h2 {
+    font-size: 1.5em; font-weight: 600;
+    letter-spacing: -0.025em; margin-bottom: 14px;
+    color: var(--ink);
+  }
+
+  .editor-body p { margin-bottom: 1em; color: var(--ink-mid); }
+  .editor-body p.lead { color: var(--ink); }
+
+  .cursor {
+    display: inline-block; width: 2px; height: 1.1em;
+    background: var(--accent); vertical-align: text-bottom;
+    margin-left: 1px;
+    animation: blink 1.1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ── FEATURES ── */
+  .features {
+    position: relative; z-index: 1;
+    padding: 80px 24px 100px;
+    max-width: 960px; margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent); text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Lora', serif;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 600; letter-spacing: -0.025em;
+    text-align: center; line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 64px;
+    max-width: 560px; margin-left: auto; margin-right: auto;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .feature-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--radius-card);
+    padding: 28px 28px 30px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 14px 48px rgba(0,0,0,0.11), 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  .feature-icon {
+    width: 40px; height: 40px;
+    border-radius: 11px;
+    background: rgba(194,105,42,0.1);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+    color: var(--accent);
+  }
+
+  .feature-icon svg {
+    width: 18px; height: 18px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .feature-name {
+    font-size: 15px; font-weight: 600;
+    color: var(--ink); margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .feature-desc {
+    font-size: 13.5px; color: var(--ink-mid);
+    line-height: 1.65;
+  }
+
+  /* ── CLOSING CTA ── */
+  .cta-close {
+    position: relative; z-index: 1;
+    padding: 0 24px 100px;
+  }
+
+  .cta-close-inner {
+    max-width: 960px; margin: 0 auto;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--radius-card);
+    padding: 72px 40px 76px;
+    display: flex; flex-direction: column;
+    align-items: center; text-align: center;
+  }
+
+  .cta-close-headline {
+    font-family: 'Lora', serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 600; letter-spacing: -0.03em;
+    line-height: 1.15; color: var(--ink);
+    margin-bottom: 14px;
+    max-width: 560px;
+  }
+
+  .cta-close-sub {
+    font-size: 17px; color: var(--ink-mid);
+    margin-bottom: 36px; line-height: 1.5;
+  }
+
+  .cta-close-note {
+    font-size: 12px; color: var(--ink-dim);
+    margin-top: 16px; letter-spacing: 0.01em;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    padding: 32px 24px;
+    text-align: center;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .footer-logo img { height: 22px; width: auto; opacity: 0.45; }
+  .footer-copy {
+    font-size: 12px; color: var(--ink-dim);
+    margin-top: 12px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* scroll-reveal */
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1);
+  }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    .editor-body { padding: 24px 24px 32px; }
+    .features-grid { grid-template-columns: 1fr; }
+    nav { padding: 12px 16px; }
+    .btn-ghost { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1" aria-hidden="true"></div>
+<div class="blob blob-2" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav aria-label="Site navigation">
+  <div class="nav-glass" aria-hidden="true"></div>
+  <a href="#" class="nav-logo" aria-label="Pagebreak home">
+    <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/Pagebreak-Logo-3.png" alt="Pagebreak">
+  </a>
+  <div class="nav-cta">
+    <a href="pagebreak-slash-menu-2.html" class="btn-primary">Start writing free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" aria-label="Hero">
+  <p class="hero-eyebrow">Writing, simplified</p>
+  <h1 class="hero-headline">The editor that gets <em>out of your way.</em></h1>
+  <p class="hero-sub">A distraction-free space for bloggers and creators. No menus. No clutter. Just the words.</p>
+  <div class="hero-actions">
+    <a href="pagebreak-slash-menu-2.html" class="btn-hero">Start writing — it's free</a>
+  </div>
+
+  <!-- Editor preview -->
+  <div class="editor-preview-wrap">
+    <div class="editor-preview" role="img" aria-label="Screenshot of Pagebreak editor">
+      <div class="editor-chrome">
+        <div class="chrome-dots" aria-hidden="true">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <span class="chrome-title">Why I Write Every Morning</span>
+        <div class="chrome-actions" aria-hidden="true">
+          <span class="chrome-pill">312 words</span>
+          <span class="chrome-pill">Saved</span>
+        </div>
+      </div>
+      <div class="editor-body" aria-hidden="true">
+        <h2>The habit that changed everything</h2>
+        <p class="lead">There's something about the quiet hour before the world wakes up.</p>
+        <p>I started writing every morning three years ago. While the first few weeks felt forced, it became the part of the day I looked forward to the most.<span class="cursor"></span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features reveal" aria-labelledby="features-heading">
+  <p class="section-label">Built for flow</p>
+  <h2 class="section-title" id="features-heading">Everything a writer needs. Nothing they don't.</h2>
+  <div class="features-grid">
+
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 20 20"><path d="M3 5h14M3 10h10M3 15h7"/></svg>
+      </div>
+      <p class="feature-name">Distraction-free editor</p>
+      <p class="feature-desc">A clean, full-screen writing canvas. Lora serif, generous line height, nothing competing for your attention.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="3"/><path d="M7 10h6M10 7v6"/></svg>
+      </div>
+      <p class="feature-name">Multiple posts</p>
+      <p class="feature-desc">Keep all your drafts in one place. Switch between posts instantly from the slide-out panel, no files to manage.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2"/></svg>
+      </div>
+      <p class="feature-name">Hit your writing goals</p>
+      <p class="feature-desc">Set a daily word target and watch the progress bar fill. A small celebration when you hit it.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 20 20"><path d="M4 6l3 3 3-3M4 14l3-3 3 3M13 4l3 8-3 4"/></svg>
+      </div>
+      <p class="feature-name">Structure your writing instantly</p>
+      <p class="feature-desc">Type <code style="font-size:12px;background:rgba(0,0,0,0.06);padding:1px 5px;border-radius:4px;">/</code> on an empty line to drop in a heading or paragraph block. Your thinking, organised.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 20 20"><path d="M17 3l-7 7-7-7M17 10l-7 7-7-7"/></svg>
+      </div>
+      <p class="feature-name">Dark mode</p>
+      <p class="feature-desc">A light and dark mode, one click to toggle. Your preference is remembered every time you return.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 20 20"><path d="M5 4h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M3 8h14"/></svg>
+      </div>
+      <p class="feature-name">Autosave — always</p>
+      <p class="feature-desc">Saves automatically to your browser as you type. No account, no server, no data leaving your machine.</p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- CLOSING CTA -->
+<section class="cta-close reveal" aria-label="Get started">
+  <div class="cta-close-inner">
+    <p class="cta-close-headline">Your best writing is still ahead of you.</p>
+    <p class="cta-close-sub">Open the editor. Start with one sentence.</p>
+    <a href="pagebreak-slash-menu-2.html" class="btn-hero">Start writing free →</a>
+    <p class="cta-close-note">No account. No install. Just open and write.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/Pagebreak-Logo-3.png" alt="Pagebreak">
+  </div>
+  <p class="footer-copy">© 2025 Pagebreak. Built for writers who just want to write.</p>
+</footer>
+
+<script>
+'use strict';
+// Scroll reveal
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+  });
+}, { threshold: 0.12 });
+revealEls.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
