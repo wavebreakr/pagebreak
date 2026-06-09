@@ -515,6 +515,89 @@
     color: var(--ink-dim);
     margin-top: 1px;
   }
+
+  /* ── Compare mode ──
+     Default state: #paneA is an unstyled wrapper (display:contents makes
+     it invisible to layout — children behave as direct children of
+     writing-area, exactly matching pagebreak-7). #paneB and the divider
+     are display:none so they have zero layout impact. */
+
+  #paneA          { display: contents; }
+  #paneB          { display: none; }
+  #compareDivider { display: none; }
+
+  /* Compare active */
+  .writing-area.compare-mode { flex-direction: row; }
+
+  .writing-area.compare-mode #paneA {
+    display: flex; flex: 1; flex-direction: column;
+    overflow: hidden; position: relative; min-width: 0;
+  }
+  .writing-area.compare-mode #paneA .editor-wrap { flex: 1; }
+
+  .writing-area.compare-mode #compareDivider {
+    display: block; width: 1px; flex-shrink: 0;
+    background: var(--panel-border);
+    align-self: stretch; margin-top: 64px;
+  }
+
+  .writing-area.compare-mode #paneB {
+    display: flex; flex: 1; flex-direction: column;
+    overflow: hidden; position: relative; min-width: 0;
+    opacity: 0; transform: translateX(18px);
+    transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+  .writing-area.compare-mode #paneB.visible {
+    opacity: 1; transform: translateX(0);
+  }
+  .writing-area.compare-mode #paneB .editor-wrap { flex: 1; }
+
+  /* Hide compare overlays that live inside paneA when not in compare mode */
+  #paneALabel, #paneAFooter { display: none; }
+
+  /* Pane label pill */
+  .compare-label {
+    position: absolute; top: 72px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--ink-dim);
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    padding: 3px 10px; border-radius: 20px;
+    pointer-events: none; z-index: 10; white-space: nowrap;
+  }
+
+  /* Per-pane word count footer */
+  .pane-footer {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none; z-index: 10;
+  }
+  .pane-word-count {
+    font-size: 13px; font-weight: 400; color: var(--ink-dim);
+    font-variant-numeric: tabular-nums;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px; padding: 3px 12px;
+  }
+
+  /* In compare mode hide the chrome word count */
+  .word-count-wrap.compare-mode-active { display: none; }
+
+  /* Per-pane scroll fade */
+  .compare-pane-fade {
+    position: absolute; top: 0; left: 0; right: 0; height: 100px;
+    background: linear-gradient(to bottom, var(--editor-bg) 0%, var(--editor-bg) 64px, transparent 104px);
+    pointer-events: none; z-index: 5; transition: background 0.4s;
+  }
+
+  @media (max-width: 700px) {
+    .writing-area.compare-mode { flex-direction: column; }
+    .writing-area.compare-mode #compareDivider {
+      width: auto; height: 1px; margin-top: 0;
+    }
+  }
 </style>
 </head>
 <body>
@@ -563,6 +646,13 @@
       </svg>
       Copy
     </button>
+    <button class="icon-btn" id="btnCompare" title="Compare mode" aria-label="Toggle compare mode" onclick="toggleCompare()">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
+        <line x1="8" y1="2" x2="8" y2="14"/>
+        <rect x="1" y="4" width="5" height="8" rx="1"/>
+        <rect x="10" y="4" width="5" height="8" rx="1"/>
+      </svg>
+    </button>
     <button class="icon-btn" id="btnDark" title="Toggle dark mode" aria-label="Toggle dark mode" onclick="toggleDark()">
       <span aria-hidden="true">🌙</span>
     </button>
@@ -570,9 +660,8 @@
   <div class="word-target-progress" id="wordTargetProgress" role="progressbar" aria-hidden="true"></div>
 </div>
 
-<div class="scroll-top-fade" id="scrollTopFade" aria-hidden="true"></div>
 
-<div class="writing-area">
+<div class="writing-area" id="writingArea">
 <div class="posts-panel-backdrop" id="postsPanelBackdrop" onclick="togglePostsPanel()"></div>
   <div class="posts-panel hidden" id="postsPanel">
     <div class="posts-panel-header">
@@ -581,15 +670,46 @@
     </div>
     <div class="posts-list" id="postsList" role="list"></div>
   </div>
-  <div class="editor-wrap" id="editorWrap">
-    <div class="editor-inner">
-      <div class="editor" id="editor"
-        contenteditable="true"
-        data-placeholder="Start writing…"
-        spellcheck="true"
-        role="textbox"
-        aria-multiline="true"
-        aria-label="Editor"></div>
+
+  <!-- Pane A wrapper — invisible in default mode (no styles applied to #paneA outside compare) -->
+  <div id="paneA">
+    <!-- Compare-only overlays, hidden by default -->
+    <div class="compare-label" id="paneALabel">Original</div>
+    <div class="pane-footer" id="paneAFooter">
+      <span class="pane-word-count" id="paneACount">0 words</span>
+    </div>
+    <div class="editor-wrap" id="editorWrap">
+      <div class="editor-inner">
+        <div class="editor" id="editor"
+          contenteditable="true"
+          data-placeholder="Start writing…"
+          spellcheck="true"
+          role="textbox"
+          aria-multiline="true"
+          aria-label="Editor"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Divider — hidden until compare mode -->
+  <div id="compareDivider" aria-hidden="true"></div>
+
+  <!-- Compare pane — hidden until compare mode -->
+  <div id="paneB">
+    <div class="compare-label">Compare</div>
+    <div class="editor-wrap" id="editorWrapB">
+      <div class="editor-inner">
+        <div class="editor" id="editorB"
+          contenteditable="true"
+          data-placeholder="Paste or type copy to compare…"
+          spellcheck="true"
+          role="textbox"
+          aria-multiline="true"
+          aria-label="Compare editor"></div>
+      </div>
+    </div>
+    <div class="pane-footer">
+      <span class="pane-word-count" id="paneBCount">0 words</span>
     </div>
   </div>
 </div>
@@ -624,6 +744,7 @@ let targetCelebrated = false;
 let isComposing      = false; // IME composition guard
 let isTyping         = false; // typewriter scroll guard — only scroll on keystrokes, not clicks
 let _typingTimer     = null;
+let compareMode      = false; // compare pane active
 
 // Autosave timer — module-level so both onType and onTitleType share it
 let _saveTimer = null;
@@ -637,7 +758,8 @@ let slashBareLine    = null; // bare text node when "/" is on the first unwrappe
 // Cached element references — populated once in DOMContentLoaded
 let elEditor, elEditorWrap, elPostsPanel, elWordCount,
     elTargetInput, elSaveStatus, elProgressBar, elCelebration, elToast,
-    elPostTitle, elPostsList, elBtnDark, elBtnPosts, elSlashMenu;
+    elPostTitle, elPostsList, elBtnDark, elBtnPosts, elSlashMenu,
+    elBtnCompare, elWritingArea, elPaneB, elEditorB;
 
 // Block tag sets used in DOM-walking hot paths
 const BLOCK_TAGS = new Set(['P', 'DIV', 'LI', 'BR', 'H1', 'H2', 'H3', 'UL', 'OL']);
@@ -660,6 +782,10 @@ window.addEventListener('DOMContentLoaded', () => {
   elBtnDark       = document.getElementById('btnDark');
   elBtnPosts      = document.getElementById('btnPosts');
   elSlashMenu     = document.getElementById('slashMenu');
+  elBtnCompare    = document.getElementById('btnCompare');
+  elWritingArea   = document.getElementById('writingArea');
+  elPaneB         = document.getElementById('paneB');
+  elEditorB       = document.getElementById('editorB');
 
   // defaultParagraphSeparator must be set before any content is loaded
   // NOTE: execCommand is deprecated but remains the only viable API for
@@ -696,6 +822,13 @@ window.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
   });
+
+  // Compare pane: same paste behaviour, live word count
+  elEditorB.addEventListener('paste', e => {
+    e.preventDefault();
+    document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
+  });
+  elEditorB.addEventListener('input', updateComparePaneCount);
 
   // Word target popover: keyboard and outside-click handling
   elTargetInput.addEventListener('keydown', e => {
@@ -903,6 +1036,7 @@ function slashSelect(index) {
 // ── Word count + target ────────────────────────────────
 function onType() {
   updateWordCount();
+  if (compareMode) updatePaneACount();
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(silentSave, 5000);
 }
@@ -1305,6 +1439,56 @@ function showToast(msg) {
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => elToast.classList.remove('show'), 2000);
 }
+
+// ── Compare mode ───────────────────────────────────────
+function toggleCompare() {
+  compareMode = !compareMode;
+  elWritingArea.classList.toggle('compare-mode', compareMode);
+  elBtnCompare.classList.toggle('on', compareMode);
+
+  if (compareMode) {
+    requestAnimationFrame(() => elPaneB.classList.add('visible'));
+    // Override the CSS default-hidden rule with an inline style
+    document.getElementById('paneALabel').style.display = 'block';
+    document.getElementById('paneAFooter').style.display = 'flex';
+    document.querySelector('.word-count-wrap').classList.add('compare-mode-active');
+    updatePaneACount();
+    updateComparePaneCount();
+  } else {
+    elPaneB.classList.remove('visible');
+    // Remove inline style so CSS default (display:none) takes back over
+    document.getElementById('paneALabel').style.removeProperty('display');
+    document.getElementById('paneAFooter').style.removeProperty('display');
+    document.querySelector('.word-count-wrap').classList.remove('compare-mode-active');
+  }
+}
+
+function countWords(el) {
+  const parts = [];
+  function walk(node) {
+    if (node.nodeType === Node.TEXT_NODE) { parts.push(node.textContent); }
+    else if (node.nodeType === Node.ELEMENT_NODE) {
+      if (BLOCK_TAGS.has(node.tagName)) parts.push(' ');
+      for (const c of node.childNodes) walk(c);
+      if (BLOCK_TAGS.has(node.tagName)) parts.push(' ');
+    }
+  }
+  walk(el);
+  const t = parts.join('').trim();
+  return t ? t.split(/\s+/).length : 0;
+}
+
+function fmtCount(n) { return n + ' word' + (n !== 1 ? 's' : ''); }
+
+function updatePaneACount() {
+  if (!compareMode) return;
+  document.getElementById('paneACount').textContent = fmtCount(countWords(elEditor));
+}
+
+function updateComparePaneCount() {
+  document.getElementById('paneBCount').textContent = fmtCount(countWords(elEditorB));
+}
+
 
 </script>
 </body>
