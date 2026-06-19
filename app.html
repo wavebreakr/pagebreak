@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pagebreak</title>
+<meta name="description" content="Pagebreak is the browser-based writing tool that saves to your device, needs no login, and gets out of your way.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23c2692a'/%3E%3Ctext x='16' y='22' font-family='Georgia%2C serif' font-size='20' font-weight='600' text-anchor='middle' fill='white'%3EP%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -26,6 +28,8 @@
     --glass-shadow:    0 1px 0 rgba(255,255,255,0.9) inset, 0 8px 32px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
     --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.8) inset, 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
     --blur:           blur(18px) saturate(1.6);
+    --delete-bg:      rgba(184,74,74,0.15);
+    --delete-color:   #b84a4a;
   }
 
   .dark {
@@ -56,7 +60,8 @@
     transition: background 0.4s;
   }
 
-  /* Noise grain overlay */
+  input, button { font-family: inherit; }
+
   body::before {
     content: '';
     pointer-events: none;
@@ -98,7 +103,6 @@
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
-  /* Small icon button for adding/clearing target */
   .target-toggle-btn {
     width: 22px; height: 22px;
     border: 1px solid var(--glass-border); border-radius: 6px;
@@ -191,7 +195,6 @@
     border-color: transparent;
     box-shadow: 0 2px 8px rgba(0,0,0,0.22);
   }
-  /* Small variant used for the new-post button in the sidebar header */
   .icon-btn--sm { width: 24px; height: 24px; font-size: 16px; border-radius: 5px; }
 
   /* Glass text button */
@@ -214,21 +217,80 @@
   .dark .copy-btn:hover { background: rgba(255,255,255,0.1); }
   .copy-btn svg { width: 12px; height: 12px; stroke: currentColor; flex-shrink: 0; }
 
+  /* ── Desktop action row vs hamburger menu ──
+     Desktop (>=860px): show individual buttons, hide hamburger.
+     Tablet/mobile (<860px): hide individual buttons, show hamburger. */
+  .desktop-actions {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .menu-wrap { display: none; }
+
+  @media (max-width: 860px) {
+    .desktop-actions { display: none; }
+    .menu-wrap { display: block; }
+  }
+
+  /* ── Hamburger dropdown menu ── */
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 200px;
+    background: var(--panel-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 14px;
+    padding: 6px;
+    display: flex; flex-direction: column; gap: 1px;
+    opacity: 0; pointer-events: none;
+    transform: translateY(-6px);
+    transition: opacity 0.15s, transform 0.15s cubic-bezier(0.4,0,0.2,1);
+    z-index: 500;
+  }
+  .dropdown-menu.show {
+    opacity: 1; pointer-events: auto; transform: translateY(0);
+  }
+  .dropdown-item {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; text-align: left;
+    font-size: 14px; font-weight: 500; color: var(--ink);
+    background: none; border: none; cursor: pointer;
+    padding: 9px 10px; border-radius: 9px;
+    transition: background 0.12s, box-shadow 0.12s, transform 0.12s;
+    letter-spacing: -0.01em;
+  }
+  .dropdown-item:hover {
+    background: rgba(255,255,255,0.7);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.8) inset, 0 3px 10px rgba(0,0,0,0.09);
+  }
+  .dark .dropdown-item:hover {
+    background: rgba(255,255,255,0.07);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 3px 10px rgba(0,0,0,0.28);
+  }
+  .dropdown-item.on { color: var(--accent); }
+  .dropdown-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .dropdown-item-icon-emoji { font-size: 14px; width: 15px; text-align: center; flex-shrink: 0; }
+  .dropdown-divider {
+    height: 1px; margin: 5px 4px;
+    background: var(--panel-border);
+  }
+
+  /* Mobile-only backdrop so a tap outside the menu closes it without
+     fighting other click handlers (e.g. posts panel backdrop) */
+  .menu-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    z-index: 450;
+  }
+  .menu-backdrop.show { display: block; }
+
   .save-status {
     font-size: 14px; color: var(--accent);
     opacity: 0; transition: opacity 0.4s;
     white-space: nowrap; letter-spacing: 0.01em;
   }
   .save-status.show { opacity: 1; }
-
-  /* ── Scroll top fade ── */
-  .scroll-top-fade {
-    position: fixed; top: 0; left: 0; right: 0;
-    height: 100px;
-    background: linear-gradient(to bottom, var(--editor-bg) 0%, var(--editor-bg) 64px, transparent 104px);
-    pointer-events: none; z-index: 50;
-    transition: background 0.4s;
-  }
 
   /* ── Layout ── */
   .writing-area {
@@ -240,7 +302,6 @@
     flex: 1; overflow-y: auto; padding: 116px 0 120px;
     background: var(--editor-bg);
     transition: background 0.4s;
-    /* Standard Firefox scrollbar styling */
     scrollbar-width: thin;
     scrollbar-color: rgba(0,0,0,0.12) transparent;
   }
@@ -249,8 +310,6 @@
 
   .editor-inner { max-width: 640px; margin: 0 auto; padding: 0 36px; }
 
-  /* ── Editor ──
-     min-height accounts for: 48px chrome + 52px top padding + ~100px breathing room */
   .editor {
     font-family: 'Lora', serif;
     font-size: 18px; line-height: 1.9;
@@ -258,7 +317,6 @@
     outline: none; min-height: calc(100vh - 200px);
     transition: color 0.3s;
     letter-spacing: 0.005em;
-    /* break-word is a legacy alias; overflow-wrap is the standard equivalent */
     overflow-wrap: break-word;
     word-break: normal;
   }
@@ -267,7 +325,6 @@
     color: var(--ink-dim); font-style: italic; pointer-events: none;
   }
 
-  /* Uniform paragraph spacing — editor-wrap top padding provides the top breathing room */
   .editor p,
   .editor div { margin-top: 1.15em; }
 
@@ -316,9 +373,7 @@
   }
   .toast.show { opacity: 1; transform: translateY(0); }
 
-  /* ── Posts sidebar ──
-     Fixed overlay anchored below the chrome bar; the editor content
-     stays put and the toggle button never moves. */
+  /* ── Posts sidebar ── */
   .posts-panel {
     position: fixed; top: 64px; left: 0; bottom: 0;
     width: 220px;
@@ -376,7 +431,25 @@
     flex-shrink: 0;
   }
   .post-row:hover .post-row-delete { opacity: 1; }
-  .post-row-delete:hover { background: rgba(184,74,74,0.12); color: #b84a4a; }
+  .post-row-delete:hover { background: var(--delete-bg); color: var(--delete-color); }
+
+  /* ── Delete confirm inline UI ── */
+  .post-row-confirm-title {
+    font-size: 12px; font-weight: 500; color: var(--delete-color); line-height: 1.3;
+  }
+  .post-row-confirm-meta {
+    font-size: 12px; color: var(--ink-dim); margin-top: 2px;
+  }
+  .post-row-confirm-yes {
+    font-size: 11px; font-weight: 600; padding: 2px 7px;
+    border-radius: 4px; border: none; cursor: pointer; flex-shrink: 0;
+    background: var(--delete-bg); color: var(--delete-color);
+  }
+  .post-row-confirm-no {
+    font-size: 11px; font-weight: 600; padding: 2px 7px;
+    border-radius: 4px; border: none; cursor: pointer; flex-shrink: 0;
+    background: var(--ink-faint); color: var(--ink-mid);
+  }
 
   /* ── Mobile bottom sheet backdrop ── */
   .posts-panel-backdrop {
@@ -390,45 +463,31 @@
   .posts-panel-backdrop.show { opacity: 1; }
 
   @media (max-width: 700px) {
-    /* Chrome: compact single row */
     .chrome { padding: 0 14px; gap: 8px; }
     .chrome-left { gap: 8px; flex: 1; min-width: 0; }
     .chrome-right { gap: 8px; flex-shrink: 0; }
 
-    /* Hide title input and copy button on mobile — focus on the editor */
     .post-title-inline { display: none; }
-    .copy-btn { display: none; }
 
-    /* Logo slightly smaller */
     .brand img { height: 34px; }
 
-    /* Editor padding */
     .editor-inner { padding: 0 20px; }
 
-    /* Posts panel: bottom sheet instead of left sidebar */
     .posts-panel {
-      top: auto;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      width: 100%;
-      height: 62vh;
-      max-height: 520px;
+      top: auto; bottom: 0; left: 0; right: 0;
+      width: 100%; height: 62vh; max-height: 520px;
       border-right: none;
       border-top: 1px solid var(--panel-border);
       border-radius: 20px 20px 0 0;
-      /* Hidden state: slide down off-screen */
       transform: translateY(100%);
       opacity: 1;
-      /* Override the hidden class transform so our sheet animation works */
     }
     .posts-panel.hidden {
       transform: translateY(100%);
-      opacity: 1; /* keep it rendered but slid away */
+      opacity: 1;
       pointer-events: none;
       border-top-width: 0;
     }
-    /* When open on mobile, slide up */
     .posts-panel.mobile-open {
       transform: translateY(0) !important;
       opacity: 1 !important;
@@ -436,23 +495,18 @@
       border-top-width: 1px !important;
     }
 
-    /* Backdrop visible on mobile */
     .posts-panel-backdrop { display: block; }
 
-    /* Panel header drag handle */
     .posts-panel-header::before {
       content: '';
-      position: absolute;
-      top: 8px; left: 50%;
+      position: absolute; top: 8px; left: 50%;
       transform: translateX(-50%);
       width: 36px; height: 4px;
       background: var(--ink-dim);
-      border-radius: 2px;
-      opacity: 0.35;
+      border-radius: 2px; opacity: 0.35;
     }
     .posts-panel-header { position: relative; padding-top: 22px; }
 
-    /* Delete buttons always visible on touch */
     .post-row-delete { opacity: 1; }
   }
 
@@ -478,55 +532,30 @@
     pointer-events: auto;
   }
   .slash-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 7px 10px;
-    border-radius: 7px;
-    cursor: pointer;
-    transition: background 0.1s;
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 7px;
+    cursor: pointer; transition: background 0.1s;
     user-select: none;
   }
   .slash-menu-item:hover,
-  .slash-menu-item.active {
-    background: var(--ink-faint);
-  }
+  .slash-menu-item.active { background: var(--ink-faint); }
   .slash-menu-item-icon {
-    width: 28px; height: 28px;
-    border-radius: 6px;
-    background: var(--glass-bg);
-    border: 1px solid var(--panel-border);
+    width: 28px; height: 28px; border-radius: 6px;
+    background: var(--glass-bg); border: 1px solid var(--panel-border);
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
-    font-family: 'Lora', serif;
-    color: var(--ink-mid);
-    font-weight: 600;
+    font-family: 'Lora', serif; color: var(--ink-mid); font-weight: 600;
   }
   .slash-menu-item-icon.icon-h { font-size: 14px; }
   .slash-menu-item-icon.icon-p { font-size: 10px; }
-  .slash-menu-item-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink);
-    letter-spacing: -0.01em;
-  }
-  .slash-menu-item-desc {
-    font-size: 11px;
-    color: var(--ink-dim);
-    margin-top: 1px;
-  }
+  .slash-menu-item-label { font-size: 13px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+  .slash-menu-item-desc  { font-size: 11px; color: var(--ink-dim); margin-top: 1px; }
 
-  /* ── Compare mode ──
-     Default state: #paneA is an unstyled wrapper (display:contents makes
-     it invisible to layout — children behave as direct children of
-     writing-area, exactly matching pagebreak-7). #paneB and the divider
-     are display:none so they have zero layout impact. */
-
+  /* ── Compare mode ── */
   #paneA          { display: contents; }
   #paneB          { display: none; }
   #compareDivider { display: none; }
 
-  /* Compare active */
   .writing-area.compare-mode { flex-direction: row; }
 
   .writing-area.compare-mode #paneA {
@@ -552,10 +581,8 @@
   }
   .writing-area.compare-mode #paneB .editor-wrap { flex: 1; }
 
-  /* Hide compare overlays that live inside paneA when not in compare mode */
   #paneALabel, #paneAFooter { display: none; }
 
-  /* Pane label pill */
   .compare-label {
     position: absolute; top: 72px; left: 50%; transform: translateX(-50%);
     font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
@@ -567,7 +594,6 @@
     pointer-events: none; z-index: 10; white-space: nowrap;
   }
 
-  /* Per-pane word count footer */
   .pane-footer {
     position: absolute; bottom: 0; left: 0; right: 0; height: 44px;
     display: flex; align-items: center; justify-content: center;
@@ -582,21 +608,73 @@
     border-radius: 20px; padding: 3px 12px;
   }
 
-  /* In compare mode hide the chrome word count */
   .word-count-wrap.compare-mode-active { display: none; }
-
-  /* Per-pane scroll fade */
-  .compare-pane-fade {
-    position: absolute; top: 0; left: 0; right: 0; height: 100px;
-    background: linear-gradient(to bottom, var(--editor-bg) 0%, var(--editor-bg) 64px, transparent 104px);
-    pointer-events: none; z-index: 5; transition: background 0.4s;
-  }
 
   @media (max-width: 700px) {
     .writing-area.compare-mode { flex-direction: column; }
-    .writing-area.compare-mode #compareDivider {
-      width: auto; height: 1px; margin-top: 0;
-    }
+    .writing-area.compare-mode #compareDivider { width: auto; height: 1px; margin-top: 0; }
+  }
+
+  /* ── Shortcuts modal ── */
+  .shortcuts-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.32);
+    z-index: 600;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .shortcuts-overlay.show { opacity: 1; pointer-events: auto; }
+
+  .shortcuts-modal {
+    background: var(--panel-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 18px;
+    width: min(420px, 100%);
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 26px 26px 22px;
+    transform: translateY(10px) scale(0.98);
+    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+  }
+  .shortcuts-overlay.show .shortcuts-modal { transform: translateY(0) scale(1); }
+
+  .shortcuts-modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .shortcuts-modal-title {
+    font-family: 'Lora', serif; font-size: 19px; font-weight: 600;
+    letter-spacing: -0.01em; color: var(--ink);
+  }
+  .shortcuts-close-btn {
+    width: 28px; height: 28px; border-radius: 8px;
+    border: none; background: var(--ink-faint); cursor: pointer;
+    color: var(--ink-mid); font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, color 0.15s;
+  }
+  .shortcuts-close-btn:hover { background: var(--delete-bg); color: var(--delete-color); }
+
+  .shortcuts-list { display: flex; flex-direction: column; gap: 4px; }
+  .shortcut-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 4px;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  .shortcut-row:last-child { border-bottom: none; }
+  .shortcut-desc { font-size: 14px; color: var(--ink); }
+  .shortcut-keys { display: flex; gap: 4px; flex-shrink: 0; margin-left: 16px; }
+  .key-cap {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 600; color: var(--ink-mid);
+    background: var(--ink-faint);
+    border-radius: 6px; padding: 3px 7px;
+    min-width: 20px; text-align: center;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.04);
   }
 </style>
 </head>
@@ -604,28 +682,27 @@
 
 <div class="chrome">
   <div class="chrome-left">
-    <button class="icon-btn" id="btnPosts" title="All posts" aria-label="Toggle posts panel" onclick="togglePostsPanel()">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
-        <line x1="2" y1="4" x2="14" y2="4"/>
-        <line x1="2" y1="8" x2="14" y2="8"/>
-        <line x1="2" y1="12" x2="9" y2="12"/>
+    <button class="icon-btn" id="btnPosts" title="All posts" aria-label="Toggle posts panel">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" aria-hidden="true">
+        <path d="M8 1.5 14.5 5 8 8.5 1.5 5z"/>
+        <path d="M2.3 7.5 8 10.3l5.7-2.8"/>
+        <path d="M2.3 10 8 12.8l5.7-2.8"/>
       </svg>
     </button>
     <div class="brand">
       <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/PagebreakLogo2.png" alt="Pagebreak">
     </div>
     <input class="post-title-inline" id="postTitleInline" type="text"
-      placeholder="Untitled post…" maxlength="80" oninput="onTitleType()"
+      placeholder="Untitled post…" maxlength="80"
       aria-label="Post title">
   </div>
   <div class="chrome-right">
     <span class="save-status" id="saveStatus" aria-live="polite">Saved</span>
-    <div class="word-count-wrap" style="position:relative;">
+    <div class="word-count-wrap" id="wordCountWrap" style="position:relative;">
       <span class="word-count" id="wordCount" aria-live="polite">0 words</span>
       <button class="target-toggle-btn" id="targetToggleBtn"
         title="Set word count target"
-        aria-label="Set word count target"
-        onclick="onTargetToggle()">
+        aria-label="Set word count target">
         <svg id="targetToggleIcon" viewBox="0 0 10 10" fill="none" aria-hidden="true">
           <line x1="5" y1="1" x2="5" y2="9"/>
           <line x1="1" y1="5" x2="9" y2="5"/>
@@ -636,44 +713,108 @@
         <input class="target-input" id="targetInput" type="number" min="1" max="99999"
           placeholder="e.g. 500"
           aria-label="Word target — press Enter to set, Escape to cancel">
-        <button class="target-set-btn" onclick="commitTarget()">Set</button>
+        <button class="target-set-btn" id="targetSetBtn">Set</button>
       </div>
     </div>
-    <button class="copy-btn" title="Copy all text to clipboard" aria-label="Copy to clipboard" onclick="copyText()">
-      <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="5" y="4" width="9" height="11" rx="1.5"/>
-        <path d="M11 4V3a1 1 0 0 0-1-1H3a1.5 1.5 0 0 0-1.5 1.5v8A1 1 0 0 0 3 12.5h2"/>
-      </svg>
-      Copy
-    </button>
-    <button class="icon-btn" id="btnCompare" title="Compare mode" aria-label="Toggle compare mode" onclick="toggleCompare()">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
-        <line x1="8" y1="2" x2="8" y2="14"/>
-        <rect x="1" y="4" width="5" height="8" rx="1"/>
-        <rect x="10" y="4" width="5" height="8" rx="1"/>
-      </svg>
-    </button>
-    <button class="icon-btn" id="btnDark" title="Toggle dark mode" aria-label="Toggle dark mode" onclick="toggleDark()">
-      <span aria-hidden="true">🌙</span>
-    </button>
+
+    <!-- Desktop: individual buttons, shown >=860px -->
+    <div class="desktop-actions" id="desktopActions">
+      <button class="icon-btn" id="btnShortcutsDesktop" title="Keyboard shortcuts" aria-label="Show keyboard shortcuts">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
+          <circle cx="8" cy="8" r="6.5"/>
+          <path d="M6.1 6.2a1.9 1.9 0 1 1 2.7 1.7c-.6.3-.9.6-.9 1.3"/>
+          <circle cx="8" cy="11.1" r="0.4" fill="currentColor"/>
+        </svg>
+      </button>
+      <button class="copy-btn" id="btnCopyDesktop" title="Copy all text to clipboard" aria-label="Copy to clipboard">
+        <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="5" y="4" width="9" height="11" rx="1.5"/>
+          <path d="M11 4V3a1 1 0 0 0-1-1H3a1.5 1.5 0 0 0-1.5 1.5v8A1 1 0 0 0 3 12.5h2"/>
+        </svg>
+        Copy
+      </button>
+      <button class="copy-btn" id="btnExportDesktop" title="Download as .txt" aria-label="Download as text file">
+        <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M8 2v8M8 10l-3-3M8 10l3-3"/>
+          <path d="M3 12.5v.5A1.5 1.5 0 0 0 4.5 14.5h7A1.5 1.5 0 0 0 13 13v-.5"/>
+        </svg>
+        Export
+      </button>
+      <button class="icon-btn" id="btnCompareDesktop" title="Compare mode" aria-label="Toggle compare mode">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
+          <line x1="8" y1="2" x2="8" y2="14"/>
+          <rect x="1" y="4" width="5" height="8" rx="1"/>
+          <rect x="10" y="4" width="5" height="8" rx="1"/>
+        </svg>
+      </button>
+      <button class="icon-btn" id="btnDarkDesktop" title="Toggle dark mode" aria-label="Toggle dark mode">
+        <span id="darkIconDesktop" aria-hidden="true">🌙</span>
+      </button>
+    </div>
+
+    <!-- Tablet/mobile: hamburger + dropdown, shown <860px -->
+    <div class="menu-wrap" id="menuWrap" style="position:relative;">
+      <button class="icon-btn" id="btnMenu" title="More actions" aria-label="Open menu" aria-haspopup="true" aria-expanded="false">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
+          <line x1="2" y1="4.5" x2="14" y2="4.5"/>
+          <line x1="2" y1="8" x2="14" y2="8"/>
+          <line x1="2" y1="11.5" x2="14" y2="11.5"/>
+        </svg>
+      </button>
+      <div class="dropdown-menu" id="dropdownMenu" role="menu">
+        <button class="dropdown-item" id="btnShortcuts" role="menuitem">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="8" cy="8" r="6.5"/>
+            <path d="M6.1 6.2a1.9 1.9 0 1 1 2.7 1.7c-.6.3-.9.6-.9 1.3"/>
+            <circle cx="8" cy="11.1" r="0.4" fill="currentColor"/>
+          </svg>
+          Keyboard shortcuts
+        </button>
+        <button class="dropdown-item" id="btnCopy" role="menuitem">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="5" y="4" width="9" height="11" rx="1.5"/>
+            <path d="M11 4V3a1 1 0 0 0-1-1H3a1.5 1.5 0 0 0-1.5 1.5v8A1 1 0 0 0 3 12.5h2"/>
+          </svg>
+          Copy to clipboard
+        </button>
+        <button class="dropdown-item" id="btnExport" role="menuitem">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M8 2v8M8 10l-3-3M8 10l3-3"/>
+            <path d="M3 12.5v.5A1.5 1.5 0 0 0 4.5 14.5h7A1.5 1.5 0 0 0 13 13v-.5"/>
+          </svg>
+          Download as .txt
+        </button>
+        <button class="dropdown-item" id="btnCompare" role="menuitem">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="8" y1="2" x2="8" y2="14"/>
+            <rect x="1" y="4" width="5" height="8" rx="1"/>
+            <rect x="10" y="4" width="5" height="8" rx="1"/>
+          </svg>
+          <span id="compareLabel">Compare mode</span>
+        </button>
+        <div class="dropdown-divider" aria-hidden="true"></div>
+        <button class="dropdown-item" id="btnDark" role="menuitem">
+          <span class="dropdown-item-icon-emoji" id="darkIcon" aria-hidden="true">🌙</span>
+          <span id="darkLabel">Dark mode</span>
+        </button>
+      </div>
+    </div>
   </div>
   <div class="word-target-progress" id="wordTargetProgress" role="progressbar" aria-hidden="true"></div>
 </div>
-
+<div class="menu-backdrop" id="menuBackdrop" aria-hidden="true"></div>
 
 <div class="writing-area" id="writingArea">
-<div class="posts-panel-backdrop" id="postsPanelBackdrop" onclick="togglePostsPanel()"></div>
+  <div class="posts-panel-backdrop" id="postsPanelBackdrop"></div>
   <div class="posts-panel hidden" id="postsPanel">
     <div class="posts-panel-header">
       <span class="posts-panel-label">Posts</span>
-      <button class="icon-btn icon-btn--sm" onclick="newPost()" title="New post" aria-label="New post">＋</button>
+      <button class="icon-btn icon-btn--sm" id="btnNewPost" title="New post" aria-label="New post">＋</button>
     </div>
     <div class="posts-list" id="postsList" role="list"></div>
   </div>
 
-  <!-- Pane A wrapper — invisible in default mode (no styles applied to #paneA outside compare) -->
   <div id="paneA">
-    <!-- Compare-only overlays, hidden by default -->
     <div class="compare-label" id="paneALabel">Original</div>
     <div class="pane-footer" id="paneAFooter">
       <span class="pane-word-count" id="paneACount">0 words</span>
@@ -691,13 +832,11 @@
     </div>
   </div>
 
-  <!-- Divider — hidden until compare mode -->
   <div id="compareDivider" aria-hidden="true"></div>
 
-  <!-- Compare pane — hidden until compare mode -->
   <div id="paneB">
     <div class="compare-label">Compare</div>
-    <div class="editor-wrap" id="editorWrapB">
+    <div class="editor-wrap">
       <div class="editor-inner">
         <div class="editor" id="editorB"
           contenteditable="true"
@@ -717,20 +856,53 @@
 <div class="celebration" id="celebration" aria-live="polite" aria-atomic="true"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="slash-menu" id="slashMenu" role="listbox" aria-label="Insert block type">
-  <div class="slash-menu-item" data-index="0" role="option"
-    onmousedown="event.preventDefault(); slashSelect(0)">
+  <div class="slash-menu-item" data-index="0" role="option">
     <div class="slash-menu-item-icon icon-h">H</div>
     <div>
       <div class="slash-menu-item-label">Header</div>
       <div class="slash-menu-item-desc">Section heading</div>
     </div>
   </div>
-  <div class="slash-menu-item" data-index="1" role="option"
-    onmousedown="event.preventDefault(); slashSelect(1)">
+  <div class="slash-menu-item" data-index="1" role="option">
     <div class="slash-menu-item-icon icon-p">¶</div>
     <div>
       <div class="slash-menu-item-label">Paragraph</div>
       <div class="slash-menu-item-desc">Plain body text</div>
+    </div>
+  </div>
+</div>
+
+<div class="shortcuts-overlay" id="shortcutsOverlay" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+  <div class="shortcuts-modal">
+    <div class="shortcuts-modal-header">
+      <span class="shortcuts-modal-title">Keyboard shortcuts</span>
+      <button class="shortcuts-close-btn" id="btnCloseShortcuts" aria-label="Close">×</button>
+    </div>
+    <div class="shortcuts-list">
+      <div class="shortcut-row">
+        <span class="shortcut-desc">Bold selected text</span>
+        <span class="shortcut-keys"><span class="key-cap">⌘/Ctrl</span><span class="key-cap">B</span></span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-desc">Italicize selected text</span>
+        <span class="shortcut-keys"><span class="key-cap">⌘/Ctrl</span><span class="key-cap">I</span></span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-desc">Save now</span>
+        <span class="shortcut-keys"><span class="key-cap">⌘/Ctrl</span><span class="key-cap">S</span></span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-desc">Insert heading or paragraph block</span>
+        <span class="shortcut-keys"><span class="key-cap">/</span></span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-desc">Start a bullet list</span>
+        <span class="shortcut-keys"><span class="key-cap">-</span><span class="key-cap">Space</span></span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-desc">Indent / outdent a list item</span>
+        <span class="shortcut-keys"><span class="key-cap">Tab</span></span>
+      </div>
     </div>
   </div>
 </div>
@@ -741,109 +913,168 @@
 // ── State ──────────────────────────────────────────────
 let wordTarget       = 0;
 let targetCelebrated = false;
-let isComposing      = false; // IME composition guard
-let isTyping         = false; // typewriter scroll guard — only scroll on keystrokes, not clicks
+let isComposing      = false;
+let isTyping         = false;
 let _typingTimer     = null;
-let compareMode      = false; // compare pane active
-
-// Autosave timer — module-level so both onType and onTitleType share it
-let _saveTimer = null;
+let compareMode      = false;
+let _saveTimer       = null;
 
 // Slash menu state
-let slashMenuOpen    = false;
-let slashMenuIndex   = 0;  // 0 = Header, 1 = Paragraph
-let slashBlock       = null; // the block element that holds the "/" trigger
-let slashBareLine    = null; // bare text node when "/" is on the first unwrapped line
-
-// Cached element references — populated once in DOMContentLoaded
-let elEditor, elEditorWrap, elPostsPanel, elWordCount,
-    elTargetInput, elSaveStatus, elProgressBar, elCelebration, elToast,
-    elPostTitle, elPostsList, elBtnDark, elBtnPosts, elSlashMenu,
-    elBtnCompare, elWritingArea, elPaneB, elEditorB;
+let slashMenuOpen  = false;
+let slashMenuIndex = 0;
+let slashBlock     = null;
+let slashBareLine  = null;
 
 // Block tag sets used in DOM-walking hot paths
 const BLOCK_TAGS = new Set(['P', 'DIV', 'LI', 'BR', 'H1', 'H2', 'H3', 'UL', 'OL']);
-// PARA_RE: paragraph-like blocks only (list detection, slash-menu trigger)
 const PARA_RE    = /^(P|DIV|LI)$/;
+
+// Cached element references
+let elEditor, elEditorWrap, elPostsPanel, elWordCount, elWordCountWrap,
+    elTargetInput, elTargetPopover, elTargetToggleBtn, elTargetToggleIcon,
+    elSaveStatus, elProgressBar, elCelebration, elToast,
+    elPostTitle, elPostsList, elBtnDark, elDarkIcon, elBtnPosts, elSlashMenu,
+    elBtnCompare, elWritingArea, elPaneB, elEditorB,
+    elPaneALabel, elPaneAFooter, elPostsPanelBackdrop,
+    elShortcutsOverlay, elBtnShortcuts, elBtnCloseShortcuts, elBtnExport,
+    elBtnMenu, elDropdownMenu, elMenuBackdrop, elCompareLabel, elDarkLabel,
+    elBtnShortcutsDesktop, elBtnCopyDesktop, elBtnExportDesktop,
+    elBtnCompareDesktop, elBtnDarkDesktop, elDarkIconDesktop;
 
 // ── Init ───────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  elEditor        = document.getElementById('editor');
-  elEditorWrap    = document.getElementById('editorWrap');
-  elPostsPanel    = document.getElementById('postsPanel');
-  elWordCount     = document.getElementById('wordCount');
-  elTargetInput   = document.getElementById('targetInput');
-  elSaveStatus    = document.getElementById('saveStatus');
-  elProgressBar   = document.getElementById('wordTargetProgress');
-  elCelebration   = document.getElementById('celebration');
-  elToast         = document.getElementById('toast');
-  elPostTitle     = document.getElementById('postTitleInline');
-  elPostsList     = document.getElementById('postsList');
-  elBtnDark       = document.getElementById('btnDark');
-  elBtnPosts      = document.getElementById('btnPosts');
-  elSlashMenu     = document.getElementById('slashMenu');
-  elBtnCompare    = document.getElementById('btnCompare');
-  elWritingArea   = document.getElementById('writingArea');
-  elPaneB         = document.getElementById('paneB');
-  elEditorB       = document.getElementById('editorB');
+  elEditor              = document.getElementById('editor');
+  elEditorWrap          = document.getElementById('editorWrap');
+  elPostsPanel          = document.getElementById('postsPanel');
+  elWordCount           = document.getElementById('wordCount');
+  elWordCountWrap       = document.getElementById('wordCountWrap');
+  elTargetInput         = document.getElementById('targetInput');
+  elTargetPopover       = document.getElementById('targetPopover');
+  elTargetToggleBtn     = document.getElementById('targetToggleBtn');
+  elTargetToggleIcon    = document.getElementById('targetToggleIcon');
+  elSaveStatus          = document.getElementById('saveStatus');
+  elProgressBar         = document.getElementById('wordTargetProgress');
+  elCelebration         = document.getElementById('celebration');
+  elToast               = document.getElementById('toast');
+  elPostTitle           = document.getElementById('postTitleInline');
+  elPostsList           = document.getElementById('postsList');
+  elBtnDark             = document.getElementById('btnDark');
+  elDarkIcon            = document.getElementById('darkIcon');
+  elBtnPosts            = document.getElementById('btnPosts');
+  elSlashMenu           = document.getElementById('slashMenu');
+  elBtnCompare          = document.getElementById('btnCompare');
+  elWritingArea         = document.getElementById('writingArea');
+  elPaneB               = document.getElementById('paneB');
+  elEditorB             = document.getElementById('editorB');
+  elPaneALabel          = document.getElementById('paneALabel');
+  elPaneAFooter         = document.getElementById('paneAFooter');
+  elPostsPanelBackdrop  = document.getElementById('postsPanelBackdrop');
+  elShortcutsOverlay    = document.getElementById('shortcutsOverlay');
+  elBtnShortcuts        = document.getElementById('btnShortcuts');
+  elBtnCloseShortcuts   = document.getElementById('btnCloseShortcuts');
+  elBtnExport           = document.getElementById('btnExport');
+  elBtnMenu             = document.getElementById('btnMenu');
+  elDropdownMenu        = document.getElementById('dropdownMenu');
+  elMenuBackdrop        = document.getElementById('menuBackdrop');
+  elCompareLabel        = document.getElementById('compareLabel');
+  elDarkLabel           = document.getElementById('darkLabel');
+  elBtnShortcutsDesktop = document.getElementById('btnShortcutsDesktop');
+  elBtnCopyDesktop      = document.getElementById('btnCopyDesktop');
+  elBtnExportDesktop    = document.getElementById('btnExportDesktop');
+  elBtnCompareDesktop   = document.getElementById('btnCompareDesktop');
+  elBtnDarkDesktop      = document.getElementById('btnDarkDesktop');
+  elDarkIconDesktop     = document.getElementById('darkIconDesktop');
 
-  // defaultParagraphSeparator must be set before any content is loaded
   // NOTE: execCommand is deprecated but remains the only viable API for
   // contenteditable editing at this level without a full editor framework.
   document.execCommand('defaultParagraphSeparator', false, 'p');
 
-  loadDoc();
-
-  // Autosave every 20s as a backstop for the 5s debounce
-  setInterval(silentSave, 20000);
-
-  // Save on tab close/refresh — localStorage.setItem is synchronous so this works
-  window.addEventListener('beforeunload', silentSave);
-
-  // Cmd/Ctrl+S
-  document.addEventListener('keydown', e => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); silentSave(); }
+  // Wire up all event listeners (no inline onclick handlers in HTML)
+  elBtnPosts.addEventListener('click', togglePostsPanel);
+  elBtnDark.addEventListener('click', () => { toggleDark(); closeMenu(); });
+  elBtnCompare.addEventListener('click', () => { toggleCompare(); closeMenu(); });
+  document.getElementById('btnCopy').addEventListener('click', () => { copyText(); closeMenu(); });
+  elBtnExport.addEventListener('click', () => { exportText(); closeMenu(); });
+  document.getElementById('btnNewPost').addEventListener('click', newPost);
+  elTargetToggleBtn.addEventListener('click', onTargetToggle);
+  document.getElementById('targetSetBtn').addEventListener('click', commitTarget);
+  elPostsPanelBackdrop.addEventListener('click', togglePostsPanel);
+  elBtnShortcuts.addEventListener('click', () => { closeMenu(); openShortcuts(); });
+  elBtnCloseShortcuts.addEventListener('click', closeShortcuts);
+  elShortcutsOverlay.addEventListener('click', e => {
+    if (e.target === elShortcutsOverlay) closeShortcuts();
   });
+  elBtnMenu.addEventListener('click', toggleMenu);
+  elMenuBackdrop.addEventListener('click', closeMenu);
 
-  // Close slash menu on outside click
-  document.addEventListener('mousedown', e => {
-    if (slashMenuOpen && !elSlashMenu.contains(e.target)) closeSlashMenu();
-  });
+  // Desktop action row — same handlers, no menu to close
+  elBtnShortcutsDesktop.addEventListener('click', openShortcuts);
+  elBtnCopyDesktop.addEventListener('click', copyText);
+  elBtnExportDesktop.addEventListener('click', exportText);
+  elBtnCompareDesktop.addEventListener('click', toggleCompare);
+  elBtnDarkDesktop.addEventListener('click', toggleDark);
+
+  elPostTitle.addEventListener('input', onTitleType);
 
   elEditor.addEventListener('keydown', onEditorKeydown);
   elEditor.addEventListener('input', onEditorInput);
-
-  // Track IME composition to avoid false triggers on CJK input
   elEditor.addEventListener('compositionstart', () => { isComposing = true; });
   elEditor.addEventListener('compositionend',   () => { isComposing = false; });
-
-  // Plain-text paste only
   elEditor.addEventListener('paste', e => {
     e.preventDefault();
     document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
   });
 
-  // Compare pane: same paste behaviour, live word count
   elEditorB.addEventListener('paste', e => {
     e.preventDefault();
     document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
   });
   elEditorB.addEventListener('input', updateComparePaneCount);
 
-  // Word target popover: keyboard and outside-click handling
   elTargetInput.addEventListener('keydown', e => {
     if (e.key === 'Enter')  { e.preventDefault(); commitTarget(); }
     if (e.key === 'Escape') { e.preventDefault(); closeTargetInput(); }
   });
+
+  // Slash menu: wire items via JS
+  elSlashMenu.querySelectorAll('.slash-menu-item').forEach((item, i) => {
+    item.addEventListener('mousedown', e => { e.preventDefault(); slashSelect(i); });
+  });
+
+  // Global: close slash menu on outside click
   document.addEventListener('mousedown', e => {
-    const popover = document.getElementById('targetPopover');
-    if (popover && popover.classList.contains('show') && !popover.contains(e.target)) {
+    if (slashMenuOpen && !elSlashMenu.contains(e.target)) closeSlashMenu();
+  });
+  // Global: close target popover on outside click
+  document.addEventListener('mousedown', e => {
+    if (elTargetPopover.classList.contains('show') && !elTargetPopover.contains(e.target)) {
       closeTargetInput();
     }
   }, true);
+  // Global: close hamburger dropdown on outside click
+  document.addEventListener('mousedown', e => {
+    if (elDropdownMenu.classList.contains('show') &&
+        !elDropdownMenu.contains(e.target) && e.target !== elBtnMenu && !elBtnMenu.contains(e.target)) {
+      closeMenu();
+    }
+  }, true);
+  // Global: Cmd/Ctrl+S, and Escape to close shortcuts modal or dropdown menu
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); silentSave(); }
+    if (e.key === 'Escape' && elShortcutsOverlay.classList.contains('show')) closeShortcuts();
+    if (e.key === 'Escape' && elDropdownMenu.classList.contains('show')) closeMenu();
+  });
+
+  // Autosave backstop every 20s
+  setInterval(silentSave, 20000);
+  // Flush on tab close
+  window.addEventListener('beforeunload', silentSave);
+
+  loadDoc();
+  requestAnimationFrame(() => elEditor.focus());
 });
 
-
+// ── Typewriter scroll ──────────────────────────────────
 // Keeps the cursor at ~50% of the visible editor height while typing.
 // Only fires during keyboard input (isTyping guard) to avoid disrupting
 // click-to-reposition behaviour.
@@ -852,40 +1083,34 @@ function scrollToCursor() {
   const sel = window.getSelection();
   if (!sel || !sel.rangeCount) return;
   const rect = sel.getRangeAt(0).getBoundingClientRect();
-  if (!rect.height) return; // no valid cursor position
+  if (!rect.height) return;
   const wrapRect = elEditorWrap.getBoundingClientRect();
   const target   = wrapRect.top + wrapRect.height * 0.5;
   const delta    = rect.top - target;
-  // Dead zone of 4px prevents micro-jitter when cursor is already near centre
   if (Math.abs(delta) > 4) elEditorWrap.scrollTop += delta;
 }
 
-// ── Editor keydown handler ─────────────────────────────
+// ── Editor keydown ─────────────────────────────────────
 function onEditorKeydown(e) {
-  // Mark as keyboard-driven for typewriter scroll; clear after 1s of inactivity
   isTyping = true;
   clearTimeout(_typingTimer);
   _typingTimer = setTimeout(() => { isTyping = false; }, 1000);
 
   const mod = e.metaKey || e.ctrlKey;
 
-  // Slash menu navigation
   if (slashMenuOpen) {
-    if (e.key === 'ArrowDown')  { e.preventDefault(); setSlashIndex((slashMenuIndex + 1) % 2); return; }
-    if (e.key === 'ArrowUp')    { e.preventDefault(); setSlashIndex((slashMenuIndex + 1) % 2); return; }
-    if (e.key === 'Enter')      { e.preventDefault(); slashSelect(slashMenuIndex); return; }
-    if (e.key === 'Escape')     { e.preventDefault(); closeSlashMenu(true); return; }
-    // Any other non-navigation key dismisses the menu and types normally
+    if (e.key === 'ArrowDown') { e.preventDefault(); setSlashIndex((slashMenuIndex + 1) % 2); return; }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); setSlashIndex((slashMenuIndex - 1 + 2) % 2); return; }
+    if (e.key === 'Enter')     { e.preventDefault(); slashSelect(slashMenuIndex); return; }
+    if (e.key === 'Escape')    { e.preventDefault(); closeSlashMenu(true); return; }
     if (e.key !== 'Shift' && e.key !== 'Meta' && e.key !== 'Control' && e.key !== 'Alt') {
       closeSlashMenu();
     }
   }
 
-  // Bold / Italic
   if (mod && e.key === 'b') { e.preventDefault(); document.execCommand('bold');   return; }
   if (mod && e.key === 'i') { e.preventDefault(); document.execCommand('italic'); return; }
 
-  // Tab — indent/outdent in lists, otherwise insert spaces
   if (e.key === 'Tab') {
     e.preventDefault();
     const sel = window.getSelection();
@@ -903,10 +1128,9 @@ function onEditorKeydown(e) {
     return;
   }
 
-  const sel = window.getSelection();
-
-  // Space — "- " → unordered list
+  // Space: "- " → unordered list
   if (e.key === ' ') {
+    const sel = window.getSelection();
     if (!sel || !sel.rangeCount) return;
     const range = sel.getRangeAt(0);
     if (!range.collapsed) return;
@@ -926,22 +1150,19 @@ function onEditorKeydown(e) {
       sel.removeAllRanges(); sel.addRange(del);
       document.execCommand('delete');
       document.execCommand('insertUnorderedList');
-      onType(); return;
+      onType();
     }
-    return;
   }
 }
 
-// ── Editor input handler ───────────────────────────────
+// ── Editor input ───────────────────────────────────────
 function onEditorInput() {
-  // Check if we should open the slash menu
   if (!slashMenuOpen) maybeOpenSlashMenu();
   onType();
   requestAnimationFrame(scrollToCursor);
 }
 
 // ── Slash menu ─────────────────────────────────────────
-// Opens the slash menu if the current block contains only "/"
 function maybeOpenSlashMenu() {
   if (isComposing) return;
   const sel = window.getSelection();
@@ -949,25 +1170,17 @@ function maybeOpenSlashMenu() {
   const range = sel.getRangeAt(0);
   if (!range.collapsed) return;
 
-  // Walk up to find the enclosing block (P/DIV/LI), or detect a bare text
-  // node sitting directly inside the editor (first-line edge case)
   let block = range.startContainer;
   while (block && block !== elEditor && !PARA_RE.test(block.nodeName)) {
     block = block.parentNode;
   }
   if (!block) return;
 
-  // If we landed on the editor itself, the cursor is in a bare text node —
-  // use the text node's parent (elEditor) as the block anchor
-  const isBareLine = (block === elEditor);
-
-  // Only trigger when the visible text is exactly "/"
-  const textContent = isBareLine
-    ? range.startContainer.textContent
-    : block.textContent;
+  const isBareLine  = (block === elEditor);
+  const textContent = isBareLine ? range.startContainer.textContent : block.textContent;
   if (textContent !== '/') return;
 
-  slashBlock   = block;
+  slashBlock    = block;
   slashBareLine = isBareLine ? range.startContainer : null;
   openSlashMenu(range);
 }
@@ -975,7 +1188,6 @@ function maybeOpenSlashMenu() {
 function openSlashMenu(range) {
   slashMenuIndex = 0;
   updateSlashMenuItems();
-  // Position below the cursor
   const rect = range.getBoundingClientRect();
   elSlashMenu.style.left = Math.min(rect.left, window.innerWidth - 200) + 'px';
   elSlashMenu.style.top  = (rect.bottom + 6) + 'px';
@@ -983,12 +1195,14 @@ function openSlashMenu(range) {
   slashMenuOpen = true;
 }
 
-function closeSlashMenu(restoreFocus) {
+// closeWithFocus=true restores editor focus (used on Escape); omit when user
+// is still actively typing and focus should stay where it is naturally.
+function closeSlashMenu(closeWithFocus) {
   slashMenuOpen = false;
   slashBlock    = null;
   slashBareLine = null;
   elSlashMenu.classList.remove('visible');
-  if (restoreFocus) elEditor.focus();
+  if (closeWithFocus) elEditor.focus();
 }
 
 function setSlashIndex(i) {
@@ -1002,7 +1216,6 @@ function updateSlashMenuItems() {
   });
 }
 
-// Called when user confirms a selection (mousedown on item or Enter key)
 // index 0 = Header (h2), index 1 = Paragraph (p)
 function slashSelect(index) {
   const block    = slashBlock;
@@ -1014,14 +1227,12 @@ function slashSelect(index) {
   newEl.appendChild(document.createElement('br'));
 
   if (bareLine) {
-    // First-line bare text node: replace it (and only it) with the new element
     elEditor.replaceChild(newEl, bareLine);
   } else {
     if (!block || !block.isConnected) return;
     block.parentNode.replaceChild(newEl, block);
   }
 
-  // Place cursor at the start of the new element
   const sel = window.getSelection();
   const r   = document.createRange();
   r.setStart(newEl, 0);
@@ -1032,7 +1243,6 @@ function slashSelect(index) {
   onType();
 }
 
-
 // ── Word count + target ────────────────────────────────
 function onType() {
   updateWordCount();
@@ -1041,9 +1251,12 @@ function onType() {
   _saveTimer = setTimeout(silentSave, 5000);
 }
 
-// Walk the editor tree and collect text. sep=' ' for word-counting (blocks
-// get whitespace boundaries), sep='\n' for copy (blocks become line breaks).
-function walkEditorText(sep) {
+// Walk an element's tree and collect text.
+// sep=' ' for word-counting (block boundaries become whitespace).
+// sep='\n' for copy (block boundaries become line breaks).
+// Defaults to elEditor when no element is provided.
+function walkText(sep, el) {
+  const root  = el || elEditor;
   const parts = [];
   function walk(node) {
     if (node.nodeType === Node.TEXT_NODE) {
@@ -1055,15 +1268,17 @@ function walkEditorText(sep) {
       if (isBlock) parts.push(sep);
     }
   }
-  walk(elEditor);
+  walk(root);
   return parts.join('');
 }
 
+function countWords(el) {
+  const t = walkText(' ', el).trim();
+  return t ? t.split(/\s+/).length : 0;
+}
 
 function updateWordCount() {
-  const rawText = walkEditorText(' ');
-  const trimmed = rawText.trim();
-  const words   = trimmed ? trimmed.split(/\s+/).length : 0;
+  const words = countWords(elEditor);
   elWordCount.textContent = wordTarget
     ? `${words} / ${wordTarget} word${wordTarget !== 1 ? 's' : ''}`
     : `${words} word${words !== 1 ? 's' : ''}`;
@@ -1072,26 +1287,17 @@ function updateWordCount() {
     targetCelebrated = true;
     celebrate(`${words} words — target reached! ✦`);
   }
-  // Reset flag when below target; also lock it when above (so overshooting
-  // doesn't re-fire the celebration on the way back down through the target)
   if (wordTarget > 0 && words < wordTarget) targetCelebrated = false;
   if (wordTarget > 0 && words > wordTarget) targetCelebrated = true;
 }
 
-// Toggle button click: if target already set, clear it immediately;
-// otherwise open the input to set one.
 function onTargetToggle() {
-  if (wordTarget > 0) {
-    clearTarget();
-  } else {
-    openTargetInput();
-  }
+  wordTarget > 0 ? clearTarget() : openTargetInput();
 }
 
 function openTargetInput() {
-  const popover = document.getElementById('targetPopover');
   elTargetInput.value = wordTarget || '';
-  popover.classList.add('show');
+  elTargetPopover.classList.add('show');
   elTargetInput.focus();
   elTargetInput.select();
 }
@@ -1100,11 +1306,7 @@ function commitTarget() {
   const val = parseInt(elTargetInput.value, 10);
   wordTarget = val > 0 ? val : 0;
   targetCelebrated = false;
-  if (wordTarget) {
-    localStorage.setItem('pb_target', wordTarget);
-  } else {
-    localStorage.removeItem('pb_target');
-  }
+  wordTarget ? localStorage.setItem('pb_target', wordTarget) : localStorage.removeItem('pb_target');
   closeTargetInput();
   updateWordCount();
   updateTargetToggleBtn();
@@ -1120,25 +1322,20 @@ function clearTarget() {
 }
 
 function closeTargetInput() {
-  document.getElementById('targetPopover').classList.remove('show');
+  elTargetPopover.classList.remove('show');
 }
 
-// Swap the toggle button icon between + (no target) and × (target active)
 function updateTargetToggleBtn() {
-  const btn  = document.getElementById('targetToggleBtn');
-  const icon = document.getElementById('targetToggleIcon');
-  if (!btn || !icon) return;
   if (wordTarget > 0) {
-    btn.classList.add('has-target');
-    btn.title = 'Clear word target';
-    btn.setAttribute('aria-label', 'Clear word target');
-    // Render as × (times/close)
-    icon.innerHTML = '<line x1="2" y1="2" x2="8" y2="8"/><line x1="8" y1="2" x2="2" y2="8"/>';
+    elTargetToggleBtn.classList.add('has-target');
+    elTargetToggleBtn.title = 'Clear word target';
+    elTargetToggleBtn.setAttribute('aria-label', 'Clear word target');
+    elTargetToggleIcon.innerHTML = '<line x1="2" y1="2" x2="8" y2="8"/><line x1="8" y1="2" x2="2" y2="8"/>';
   } else {
-    btn.classList.remove('has-target');
-    btn.title = 'Set word count target';
-    btn.setAttribute('aria-label', 'Set word count target');
-    icon.innerHTML = '<line x1="5" y1="1" x2="5" y2="9"/><line x1="1" y1="5" x2="9" y2="5"/>';
+    elTargetToggleBtn.classList.remove('has-target');
+    elTargetToggleBtn.title = 'Set word count target';
+    elTargetToggleBtn.setAttribute('aria-label', 'Set word count target');
+    elTargetToggleIcon.innerHTML = '<line x1="5" y1="1" x2="5" y2="9"/><line x1="1" y1="5" x2="9" y2="5"/>';
   }
 }
 
@@ -1158,9 +1355,7 @@ function celebrate(msg) {
 function onTitleType() {
   const title = elPostTitle.value.trim();
   document.title = title ? title + ' — Pagebreak' : 'Pagebreak';
-  const panelVisible = !elPostsPanel.classList.contains('hidden') || elPostsPanel.classList.contains('mobile-open');
-  if (panelVisible) renderPostsList();
-  // Schedule save — title changes don't affect word count
+  if (!elPostsPanel.classList.contains('hidden')) renderPostsList();
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(silentSave, 5000);
 }
@@ -1176,7 +1371,7 @@ function saveAllPostIds(ids) { localStorage.setItem('pb_posts', JSON.stringify(i
 function getActiveId()       { return localStorage.getItem('pb_active') || null; }
 function setActiveId(id)     { localStorage.setItem('pb_active', id); }
 function getPost(id) {
-  // localStorage.getItem returns null for missing keys; JSON.parse(null) === null (no error).
+  // JSON.parse(null) === null, so missing keys return null without throwing.
   // The try/catch only fires on malformed JSON.
   try { return JSON.parse(localStorage.getItem(id)); } catch { return null; }
 }
@@ -1190,26 +1385,23 @@ function escHtml(s) {
 }
 
 function togglePostsPanel() {
-  const isMobile  = window.innerWidth <= 700;
-  const isHidden  = isMobile
+  const isMobile = window.innerWidth <= 700;
+  const isHidden = isMobile
     ? !elPostsPanel.classList.contains('mobile-open')
     : elPostsPanel.classList.contains('hidden');
 
   if (isHidden) { silentSave(); renderPostsList(); }
 
   if (isMobile) {
-    const backdrop = document.getElementById('postsPanelBackdrop');
     if (isHidden) {
       elPostsPanel.classList.remove('hidden');
-      // rAF so the browser paints the unhidden state before we add the class
       requestAnimationFrame(() => {
         elPostsPanel.classList.add('mobile-open');
-        backdrop.classList.add('show');
+        elPostsPanelBackdrop.classList.add('show');
       });
     } else {
       elPostsPanel.classList.remove('mobile-open');
-      backdrop.classList.remove('show');
-      // Re-add hidden after transition so it doesn't intercept touches
+      elPostsPanelBackdrop.classList.remove('show');
       setTimeout(() => elPostsPanel.classList.add('hidden'), 350);
     }
   } else {
@@ -1229,30 +1421,34 @@ function renderPostsList() {
     const post = getPost(id);
     if (!post) return '';
     const title = post.title || 'Untitled post';
-    // Strip HTML tags to count words; regex is safe here because content
-    // has already passed through sanitizeBody
+    // Strip HTML tags to count words; safe because content passed through sanitizeBody
     const words = post.body
       ? post.body.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length
       : 0;
-    // Use navigator.language for locale-appropriate date formatting
     const date = post.saved
       ? new Date(post.saved).toLocaleDateString(navigator.language, { day: 'numeric', month: 'short' })
       : '';
     return `
-      <div class="post-row${id === activeId ? ' active' : ''}" data-post-id="${id}"
-        role="listitem" onclick="openPost('${id}')">
+      <div class="post-row${id === activeId ? ' active' : ''}" data-post-id="${id}" role="listitem">
         <div class="post-row-info">
           <div class="post-row-title">${escHtml(title)}</div>
           <div class="post-row-meta">${words} word${words !== 1 ? 's' : ''} · ${date}</div>
         </div>
-        <button class="post-row-delete"
-          aria-label="Delete ${escHtml(title)}"
-          onclick="event.stopPropagation();confirmDeletePost('${id}')">×</button>
+        <button class="post-row-delete" aria-label="Delete ${escHtml(title)}">×</button>
       </div>`;
   }).join('');
+
+  // Attach event listeners after rendering
+  elPostsList.querySelectorAll('.post-row').forEach(row => {
+    const id = row.dataset.postId;
+    row.addEventListener('click', () => openPost(id));
+    row.querySelector('.post-row-delete').addEventListener('click', e => {
+      e.stopPropagation();
+      confirmDeletePost(id);
+    });
+  });
 }
 
-// Shared helper — populates editor and chrome title from saved post data
 function setEditorContent(body, title) {
   const t = (title || '').trim();
   elPostTitle.value  = title || '';
@@ -1268,7 +1464,6 @@ function openPost(id) {
   const post = getPost(id);
   if (post) setEditorContent(post.body, post.title);
   renderPostsList();
-  // Close the panel on mobile after selection
   if (window.innerWidth <= 700 && elPostsPanel.classList.contains('mobile-open')) {
     togglePostsPanel();
   }
@@ -1287,7 +1482,6 @@ function newPost() {
   setActiveId(id);
   setEditorContent('', '');
   renderPostsList();
-  // Close the panel on mobile after creating a post
   if (window.innerWidth <= 700 && elPostsPanel.classList.contains('mobile-open')) {
     togglePostsPanel();
   }
@@ -1295,26 +1489,26 @@ function newPost() {
 }
 
 function confirmDeletePost(id) {
-  // Scope the query to the posts list, not the whole document
   const row = elPostsList.querySelector(`.post-row[data-post-id="${id}"]`);
   if (!row) return;
   const name = getPost(id)?.title || 'Untitled post';
   row.innerHTML = `
     <div class="post-row-info" style="min-width:0">
-      <div class="post-row-title" style="color:#b84a4a;font-size:12px">Delete "${escHtml(name)}"?</div>
-      <div class="post-row-meta">This can't be undone</div>
+      <div class="post-row-confirm-title">Delete "${escHtml(name)}"?</div>
+      <div class="post-row-confirm-meta">This can't be undone</div>
     </div>
-    <button onclick="event.stopPropagation();doDeletePost('${id}')"
-      style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px;border:none;
-             background:rgba(184,74,74,0.15);color:#b84a4a;cursor:pointer;flex-shrink:0;">Yes</button>
-    <button onclick="event.stopPropagation();renderPostsList()"
-      style="font-size:11px;font-weight:600;padding:2px 7px;border-radius:4px;border:none;
-             background:var(--ink-faint);color:var(--ink-mid);cursor:pointer;flex-shrink:0;">No</button>
+    <button class="post-row-confirm-yes">Yes</button>
+    <button class="post-row-confirm-no">No</button>
   `;
+  row.querySelector('.post-row-confirm-yes').addEventListener('click', e => {
+    e.stopPropagation(); doDeletePost(id);
+  });
+  row.querySelector('.post-row-confirm-no').addEventListener('click', e => {
+    e.stopPropagation(); renderPostsList();
+  });
 }
 
 function doDeletePost(id) {
-  // Save current work before any deletion, including when deleting a different post
   silentSave();
   const activeId = getActiveId();
   deletePost(id);
@@ -1329,21 +1523,23 @@ function doDeletePost(id) {
 // ── Dark mode ──────────────────────────────────────────
 function setDark(on) {
   document.body.classList.toggle('dark', on);
-  // The emoji is aria-hidden; the button's aria-label is the accessible name
-  elBtnDark.querySelector('span').textContent = on ? '☀️' : '🌙';
+  elDarkIcon.textContent = on ? '☀️' : '🌙';
   elBtnDark.classList.toggle('on', on);
+  if (elDarkLabel) elDarkLabel.textContent = on ? 'Light mode' : 'Dark mode';
+  if (elDarkIconDesktop) elDarkIconDesktop.textContent = on ? '☀️' : '🌙';
+  if (elBtnDarkDesktop) elBtnDarkDesktop.classList.toggle('on', on);
 }
 
 function toggleDark() {
   const on = !document.body.classList.contains('dark');
   setDark(on);
+  // stored as the string "true"/"false"; read back with === 'true'
   localStorage.setItem('pb_dark', on);
 }
 
 // ── Save / Load ────────────────────────────────────────
-
-// Strip inline color/background injected by Chromium's contenteditable so
-// saved HTML defers to CSS variables correctly in light and dark mode.
+// Strip inline color/background injected by Chromium's contenteditable
+// so saved HTML defers to CSS variables correctly in light and dark mode.
 function sanitizeBody(html) {
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
@@ -1351,7 +1547,6 @@ function sanitizeBody(html) {
     el.style.removeProperty('color');
     el.style.removeProperty('background-color');
     el.style.removeProperty('background');
-    // getAttribute can return null if a prior removeProperty already cleared it
     const remaining = el.getAttribute('style') || '';
     if (!remaining.trim()) el.removeAttribute('style');
   });
@@ -1372,8 +1567,6 @@ function silentSave() {
       saved: Date.now(),
     });
     showSaveStatus('Saved');
-    // Only re-render the list if the panel is open — inside try so we only
-    // update the UI after confirming the save succeeded
     if (!elPostsPanel.classList.contains('hidden')) renderPostsList();
   } catch {
     showSaveStatus('⚠ Save failed', true);
@@ -1382,7 +1575,7 @@ function silentSave() {
 
 function showSaveStatus(msg, isError = false) {
   elSaveStatus.textContent = msg;
-  elSaveStatus.style.color = isError ? '#b84a4a' : '';
+  elSaveStatus.style.color = isError ? 'var(--delete-color)' : '';
   elSaveStatus.classList.add('show');
   clearTimeout(showSaveStatus._t);
   showSaveStatus._t = setTimeout(() => elSaveStatus.classList.remove('show'), isError ? 4000 : 2000);
@@ -1416,21 +1609,41 @@ function loadDoc() {
     updateWordCount();
     updateTargetToggleBtn();
 
-    // 'pb_dark' is stored as the string "true" or "false"
     if (localStorage.getItem('pb_dark') === 'true') setDark(true);
-
-    // Do an initial save to ensure a freshly-opened session has a record
-    silentSave();
-    requestAnimationFrame(() => elEditor.focus());
   } catch { /* corrupt localStorage — start fresh */ }
 }
 
 function copyText() {
   const title = elPostTitle.value.trim();
-  const body  = walkEditorText('\n').replace(/\n{3,}/g, '\n\n').trim();
+  const body  = walkText('\n').replace(/\n{3,}/g, '\n\n').trim();
   navigator.clipboard.writeText((title ? title + '\n\n' : '') + body)
     .then(() => showToast('Copied ✓'))
     .catch(() => showToast('Copy failed — try Cmd+A, Cmd+C'));
+}
+
+function slugify(s) {
+  const slug = s.toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  return slug || 'untitled-post';
+}
+
+function exportText() {
+  const title = elPostTitle.value.trim();
+  const body  = walkText('\n').replace(/\n{3,}/g, '\n\n').trim();
+  const content = (title ? title + '\n\n' : '') + body;
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = slugify(title) + '.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Downloaded ✓');
 }
 
 function showToast(msg) {
@@ -1440,42 +1653,51 @@ function showToast(msg) {
   showToast._t = setTimeout(() => elToast.classList.remove('show'), 2000);
 }
 
+// ── Keyboard shortcuts modal ────────────────────────────
+function openShortcuts() {
+  elShortcutsOverlay.classList.add('show');
+}
+function closeShortcuts() {
+  elShortcutsOverlay.classList.remove('show');
+}
+
+// ── Hamburger dropdown menu ─────────────────────────────
+function toggleMenu() {
+  const isOpen = elDropdownMenu.classList.contains('show');
+  isOpen ? closeMenu() : openMenu();
+}
+function openMenu() {
+  elDropdownMenu.classList.add('show');
+  elMenuBackdrop.classList.add('show');
+  elBtnMenu.setAttribute('aria-expanded', 'true');
+}
+function closeMenu() {
+  elDropdownMenu.classList.remove('show');
+  elMenuBackdrop.classList.remove('show');
+  elBtnMenu.setAttribute('aria-expanded', 'false');
+}
+
 // ── Compare mode ───────────────────────────────────────
 function toggleCompare() {
   compareMode = !compareMode;
   elWritingArea.classList.toggle('compare-mode', compareMode);
   elBtnCompare.classList.toggle('on', compareMode);
+  if (elBtnCompareDesktop) elBtnCompareDesktop.classList.toggle('on', compareMode);
+  if (elCompareLabel) elCompareLabel.textContent = compareMode ? 'Exit compare mode' : 'Compare mode';
 
   if (compareMode) {
     requestAnimationFrame(() => elPaneB.classList.add('visible'));
-    // Override the CSS default-hidden rule with an inline style
-    document.getElementById('paneALabel').style.display = 'block';
-    document.getElementById('paneAFooter').style.display = 'flex';
-    document.querySelector('.word-count-wrap').classList.add('compare-mode-active');
+    elPaneALabel.style.display = 'block';
+    elPaneAFooter.style.display = 'flex';
+    elWordCountWrap.classList.add('compare-mode-active');
     updatePaneACount();
     updateComparePaneCount();
   } else {
     elPaneB.classList.remove('visible');
-    // Remove inline style so CSS default (display:none) takes back over
-    document.getElementById('paneALabel').style.removeProperty('display');
-    document.getElementById('paneAFooter').style.removeProperty('display');
-    document.querySelector('.word-count-wrap').classList.remove('compare-mode-active');
+    elPaneALabel.style.removeProperty('display');
+    elPaneAFooter.style.removeProperty('display');
+    elWordCountWrap.classList.remove('compare-mode-active');
   }
-}
-
-function countWords(el) {
-  const parts = [];
-  function walk(node) {
-    if (node.nodeType === Node.TEXT_NODE) { parts.push(node.textContent); }
-    else if (node.nodeType === Node.ELEMENT_NODE) {
-      if (BLOCK_TAGS.has(node.tagName)) parts.push(' ');
-      for (const c of node.childNodes) walk(c);
-      if (BLOCK_TAGS.has(node.tagName)) parts.push(' ');
-    }
-  }
-  walk(el);
-  const t = parts.join('').trim();
-  return t ? t.split(/\s+/).length : 0;
 }
 
 function fmtCount(n) { return n + ' word' + (n !== 1 ? 's' : ''); }
@@ -1488,8 +1710,6 @@ function updatePaneACount() {
 function updateComparePaneCount() {
   document.getElementById('paneBCount').textContent = fmtCount(countWords(elEditorB));
 }
-
-
 </script>
 </body>
 </html>
