@@ -4,14 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pagebreak</title>
-<meta name="description" content="Pagebreak is the browser-based writing tool that saves to your device, needs no login, and gets out of your way.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23c2692a'/%3E%3Ctext x='16' y='22' font-family='Georgia%2C serif' font-size='20' font-weight='600' text-anchor='middle' fill='white'%3EP%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* ── Theme: Paper (default) ── */
+    /* ── Theme: Editorial (default) — no gradient ── */
     --bg-canvas:      #edeae2;
     --editor-bg:      #faf9f7;
     --ink:            #1c1b18;
@@ -23,13 +21,60 @@
     --accent-dim:     rgba(194,105,42,0.1);
     --panel-bg:       rgba(250,248,244,0.82);
     --panel-border:   rgba(0,0,0,0.08);
-    --glass-bg:       rgba(255,255,255,0.58);
-    --glass-border:   rgba(255,255,255,0.75);
-    --glass-shadow:    0 1px 0 rgba(255,255,255,0.9) inset, 0 8px 32px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
-    --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.8) inset, 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+    --glass-bg:       rgba(255,255,255,0.65);
+    --glass-border:   rgba(255,255,255,0.8);
+    --glass-shadow:    0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 32px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06), inset 0 0 0 1.5px rgba(255,255,255,0.6);
+    --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.9) inset, 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
     --blur:           blur(18px) saturate(1.6);
     --delete-bg:      rgba(184,74,74,0.15);
     --delete-color:   #b84a4a;
+    --gradient-fade:  transparent;
+  }
+
+  :root.theme-mint {
+    /* Very light, airy mint — minimal color saturation */
+    --bg-canvas:      #f2f8f7;
+    --editor-bg:      #f6faf9;
+    --ink:            #1a3c3b;
+    --ink-mid:        #5a7b7a;
+    --ink-dim:        #8aabaa;
+    --ink-faint:      rgba(0,0,0,0.05);
+    --accent:         #2d9c9a;
+    --accent-light:   #4db3b0;
+    --accent-dim:     rgba(45,156,154,0.08);
+    --panel-bg:       rgba(246,251,250,0.82);
+    --panel-border:   rgba(0,0,0,0.07);
+    --glass-bg:       rgba(255,255,255,0.68);
+    --glass-border:   rgba(255,255,255,0.85);
+    --glass-shadow:    0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 32px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06), inset 0 0 0 1.5px rgba(255,255,255,0.65);
+    --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.9) inset, 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+    --blur:           blur(18px) saturate(1.6);
+    --delete-bg:      rgba(184,74,74,0.15);
+    --delete-color:   #b84a4a;
+    --gradient-fade:  rgba(76,178,176,0.02);
+  }
+
+  :root.theme-sky {
+    /* Extremely light blue — barely visible tint */
+    --bg-canvas:      #f1f5f9;
+    --editor-bg:      #f7fafD;
+    --ink:            #1a3f4f;
+    --ink-mid:        #5a7f8f;
+    --ink-dim:        #8aafbf;
+    --ink-faint:      rgba(0,0,0,0.05);
+    --accent:         #2980c0;
+    --accent-light:   #4a9fd9;
+    --accent-dim:     rgba(41,128,192,0.08);
+    --panel-bg:       rgba(247,250,253,0.82);
+    --panel-border:   rgba(0,0,0,0.07);
+    --glass-bg:       rgba(255,255,255,0.70);
+    --glass-border:   rgba(255,255,255,0.88);
+    --glass-shadow:    0 1px 0 rgba(255,255,255,0.96) inset, 0 8px 32px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06), inset 0 0 0 1.5px rgba(255,255,255,0.68);
+    --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.9) inset, 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+    --blur:           blur(18px) saturate(1.6);
+    --delete-bg:      rgba(184,74,74,0.15);
+    --delete-color:   #b84a4a;
+    --gradient-fade:  rgba(110,190,240,0.01);
   }
 
   .dark {
@@ -43,7 +88,7 @@
     --panel-border:   rgba(255,255,255,0.07);
     --glass-bg:       rgba(38,35,28,0.62);
     --glass-border:   rgba(255,255,255,0.1);
-    --glass-shadow:    0 1px 0 rgba(255,255,255,0.06) inset, 0 8px 32px rgba(0,0,0,0.32), 0 1px 2px rgba(0,0,0,0.2);
+    --glass-shadow:    0 1px 0 rgba(255,255,255,0.06) inset, 0 8px 32px rgba(0,0,0,0.32), 0 1px 2px rgba(0,0,0,0.2), inset 0 0 0 1.5px rgba(255,255,255,0.08);
     --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.05) inset, 0 2px 8px rgba(0,0,0,0.28), 0 1px 2px rgba(0,0,0,0.16);
     --blur:           blur(20px) saturate(1.4);
   }
@@ -60,14 +105,28 @@
     transition: background 0.4s;
   }
 
+  /* Ensure inputs/buttons inherit the body font */
   input, button { font-family: inherit; }
 
+  /* Noise grain overlay */
   body::before {
     content: '';
     pointer-events: none;
     position: fixed; inset: 0; z-index: 0; opacity: 0.028;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-size: 180px;
+  }
+
+  /* Minimal fade gradient backdrop */
+  body::after {
+    content: '';
+    pointer-events: none;
+    position: fixed; top: 0; left: 0; right: 0; height: 180px;
+    background: linear-gradient(180deg, var(--gradient-fade) 0%, transparent 100%);
+    filter: blur(50px);
+    z-index: 0;
+    opacity: 1;
+    transition: opacity 0.3s;
   }
 
   /* ── Chrome ── */
@@ -103,6 +162,7 @@
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
+  /* Small icon button for adding/clearing target */
   .target-toggle-btn {
     width: 22px; height: 22px;
     border: 1px solid var(--glass-border); border-radius: 6px;
@@ -114,12 +174,15 @@
     flex-shrink: 0;
   }
   .target-toggle-btn:hover {
-    background: rgba(255,255,255,0.82);
-    box-shadow: 0 1px 0 #fff inset, 0 4px 14px rgba(0,0,0,0.1);
+    background: rgba(255,255,255,0.72);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 4px 14px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(255,255,255,0.5);
     color: var(--ink);
     transform: translateY(-1px);
   }
-  .dark .target-toggle-btn:hover { background: rgba(255,255,255,0.1); }
+  .dark .target-toggle-btn:hover {
+    background: rgba(255,255,255,0.12);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 4px 14px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(255,255,255,0.08);
+  }
   .target-toggle-btn.has-target { color: var(--ink-mid); }
   .target-toggle-btn svg { width: 10px; height: 10px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 
@@ -173,117 +236,57 @@
   }
   .word-target-progress.done { background: linear-gradient(90deg, #4a9e6a, #6ec48a); }
 
-  /* Glass icon button */
+  /* Glass icon button — circular, 50px */
   .icon-btn {
-    width: 34px; height: 34px;
-    border: 1px solid var(--glass-border); border-radius: 9px;
-    background: var(--glass-bg); box-shadow: var(--glass-shadow-sm);
+    width: 50px; height: 50px; border-radius: 50%;
+    border: 1px solid var(--glass-border); 
+    background: var(--glass-bg);
+    box-shadow: var(--glass-shadow);
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    font-size: 13px; color: var(--ink-mid);
+    color: var(--ink-mid);
     transition: background 0.15s, box-shadow 0.15s, color 0.15s, transform 0.15s;
+    flex-shrink: 0;
   }
   .icon-btn:hover {
-    background: rgba(255,255,255,0.82);
-    box-shadow: 0 1px 0 #fff inset, 0 4px 14px rgba(0,0,0,0.1);
+    background: rgba(255,255,255,0.72);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 10px 40px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08), inset 0 0 0 1.5px rgba(255,255,255,0.6);
     color: var(--ink);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
   }
-  .dark .icon-btn:hover { background: rgba(255,255,255,0.1); }
+  .dark .icon-btn:hover {
+    background: rgba(255,255,255,0.12);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 8px 32px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3), inset 0 0 0 1.5px rgba(255,255,255,0.12);
+  }
   .icon-btn.on {
     background: var(--ink); color: var(--bg-canvas);
     border-color: transparent;
     box-shadow: 0 2px 8px rgba(0,0,0,0.22);
   }
-  .icon-btn--sm { width: 24px; height: 24px; font-size: 16px; border-radius: 5px; }
+  .icon-btn--sm { width: 40px; height: 40px; font-size: 18px; }
 
   /* Glass text button */
   .copy-btn {
     font-size: 14px; font-weight: 500;
-    padding: 0 13px; height: 34px;
-    border: 1px solid var(--glass-border); border-radius: 8px;
-    background: var(--glass-bg); box-shadow: var(--glass-shadow-sm);
+    padding: 0 13px; height: 50px;
+    border: 1px solid var(--glass-border); border-radius: 25px;
+    background: var(--glass-bg); box-shadow: var(--glass-shadow);
     cursor: pointer; color: var(--ink-mid);
-    display: flex; align-items: center; gap: 5px;
+    display: flex; align-items: center; gap: 6px;
     transition: background 0.15s, box-shadow 0.15s, color 0.15s, transform 0.15s;
     white-space: nowrap; letter-spacing: 0.01em;
   }
   .copy-btn:hover {
-    background: rgba(255,255,255,0.82);
-    box-shadow: 0 1px 0 #fff inset, 0 4px 14px rgba(0,0,0,0.1);
+    background: rgba(255,255,255,0.72);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 10px 40px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08), inset 0 0 0 1.5px rgba(255,255,255,0.6);
     color: var(--ink);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
   }
-  .dark .copy-btn:hover { background: rgba(255,255,255,0.1); }
-  .copy-btn svg { width: 12px; height: 12px; stroke: currentColor; flex-shrink: 0; }
-
-  /* ── Desktop action row vs hamburger menu ──
-     Desktop (>=860px): show individual buttons, hide hamburger.
-     Tablet/mobile (<860px): hide individual buttons, show hamburger. */
-  .desktop-actions {
-    display: flex; align-items: center; gap: 14px;
+  .dark .copy-btn:hover {
+    background: rgba(255,255,255,0.12);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 8px 32px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3), inset 0 0 0 1.5px rgba(255,255,255,0.12);
   }
-  .menu-wrap { display: none; }
-
-  @media (max-width: 860px) {
-    .desktop-actions { display: none; }
-    .menu-wrap { display: block; }
-  }
-
-  /* ── Hamburger dropdown menu ── */
-  .dropdown-menu {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    min-width: 200px;
-    background: var(--panel-bg);
-    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    border-radius: 14px;
-    padding: 6px;
-    display: flex; flex-direction: column; gap: 1px;
-    opacity: 0; pointer-events: none;
-    transform: translateY(-6px);
-    transition: opacity 0.15s, transform 0.15s cubic-bezier(0.4,0,0.2,1);
-    z-index: 500;
-  }
-  .dropdown-menu.show {
-    opacity: 1; pointer-events: auto; transform: translateY(0);
-  }
-  .dropdown-item {
-    display: flex; align-items: center; gap: 10px;
-    width: 100%; text-align: left;
-    font-size: 14px; font-weight: 500; color: var(--ink);
-    background: none; border: none; cursor: pointer;
-    padding: 9px 10px; border-radius: 9px;
-    transition: background 0.12s, box-shadow 0.12s, transform 0.12s;
-    letter-spacing: -0.01em;
-  }
-  .dropdown-item:hover {
-    background: rgba(255,255,255,0.7);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.8) inset, 0 3px 10px rgba(0,0,0,0.09);
-  }
-  .dark .dropdown-item:hover {
-    background: rgba(255,255,255,0.07);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 3px 10px rgba(0,0,0,0.28);
-  }
-  .dropdown-item.on { color: var(--accent); }
-  .dropdown-item svg { width: 15px; height: 15px; flex-shrink: 0; }
-  .dropdown-item-icon-emoji { font-size: 14px; width: 15px; text-align: center; flex-shrink: 0; }
-  .dropdown-divider {
-    height: 1px; margin: 5px 4px;
-    background: var(--panel-border);
-  }
-
-  /* Mobile-only backdrop so a tap outside the menu closes it without
-     fighting other click handlers (e.g. posts panel backdrop) */
-  .menu-backdrop {
-    display: none;
-    position: fixed; inset: 0;
-    z-index: 450;
-  }
-  .menu-backdrop.show { display: block; }
+  .copy-btn svg { width: 14px; height: 14px; stroke: currentColor; flex-shrink: 0; }
 
   .save-status {
     font-size: 14px; color: var(--accent);
@@ -325,6 +328,7 @@
     color: var(--ink-dim); font-style: italic; pointer-events: none;
   }
 
+  /* Uniform paragraph spacing */
   .editor p,
   .editor div { margin-top: 1.15em; }
 
@@ -468,11 +472,13 @@
     .chrome-right { gap: 8px; flex-shrink: 0; }
 
     .post-title-inline { display: none; }
+    .copy-btn { display: none; }
 
     .brand img { height: 34px; }
 
     .editor-inner { padding: 0 20px; }
 
+    /* Posts panel: bottom sheet */
     .posts-panel {
       top: auto; bottom: 0; left: 0; right: 0;
       width: 100%; height: 62vh; max-height: 520px;
@@ -497,6 +503,7 @@
 
     .posts-panel-backdrop { display: block; }
 
+    /* Drag handle */
     .posts-panel-header::before {
       content: '';
       position: absolute; top: 8px; left: 50%;
@@ -551,7 +558,9 @@
   .slash-menu-item-label { font-size: 13px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
   .slash-menu-item-desc  { font-size: 11px; color: var(--ink-dim); margin-top: 1px; }
 
-  /* ── Compare mode ── */
+  /* ── Compare mode ──
+     Default: #paneA is display:contents (layout-invisible); #paneB and
+     the divider are display:none. */
   #paneA          { display: contents; }
   #paneB          { display: none; }
   #compareDivider { display: none; }
@@ -581,6 +590,7 @@
   }
   .writing-area.compare-mode #paneB .editor-wrap { flex: 1; }
 
+  /* Compare-only overlays hidden by default */
   #paneALabel, #paneAFooter { display: none; }
 
   .compare-label {
@@ -608,85 +618,105 @@
     border-radius: 20px; padding: 3px 12px;
   }
 
+  /* Hide chrome word count in compare mode */
   .word-count-wrap.compare-mode-active { display: none; }
 
-  @media (max-width: 700px) {
-    .writing-area.compare-mode { flex-direction: column; }
-    .writing-area.compare-mode #compareDivider { width: auto; height: 1px; margin-top: 0; }
-  }
-
-  /* ── Shortcuts modal ── */
-  .shortcuts-overlay {
+  /* ── Theme picker modal ── */
+  .theme-picker-backdrop {
+    display: none;
     position: fixed; inset: 0;
-    background: rgba(0,0,0,0.32);
-    z-index: 600;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.25s;
-    display: flex; align-items: center; justify-content: center;
-    padding: 24px;
+    background: rgba(0,0,0,0.3);
+    z-index: 500;
+    opacity: 0;
+    transition: opacity 0.3s;
   }
-  .shortcuts-overlay.show { opacity: 1; pointer-events: auto; }
+  .theme-picker-backdrop.show { display: block; opacity: 1; }
 
-  .shortcuts-modal {
-    background: var(--panel-bg);
+  .theme-picker-modal {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    background: var(--glass-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
-    border-radius: 18px;
-    width: min(420px, 100%);
-    max-height: 80vh;
-    overflow-y: auto;
-    padding: 26px 26px 22px;
-    transform: translateY(10px) scale(0.98);
-    transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+    border-radius: 16px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+    z-index: 501;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s cubic-bezier(0.4,0,0.2,1);
   }
-  .shortcuts-overlay.show .shortcuts-modal { transform: translateY(0) scale(1); }
+  .theme-picker-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
 
-  .shortcuts-modal-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 18px;
+  .theme-picker-title {
+    font-size: 16px; font-weight: 600; color: var(--ink);
+    margin: 0 0 16px; letter-spacing: -0.01em;
   }
-  .shortcuts-modal-title {
-    font-family: 'Lora', serif; font-size: 19px; font-weight: 600;
-    letter-spacing: -0.01em; color: var(--ink);
+
+  .theme-options {
+    display: flex; flex-direction: column; gap: 10px;
   }
-  .shortcuts-close-btn {
-    width: 28px; height: 28px; border-radius: 8px;
-    border: none; background: var(--ink-faint); cursor: pointer;
-    color: var(--ink-mid); font-size: 15px;
+
+  .theme-option {
+    padding: 12px 14px; border-radius: 10px;
+    border: 1.5px solid var(--glass-border);
+    background: rgba(255,255,255,0.4);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .theme-option:hover {
+    background: rgba(255,255,255,0.6);
+    border-color: var(--accent);
+  }
+  .theme-option.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+  }
+  .theme-option-radio {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid var(--ink-mid);
     display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s, color 0.15s;
+    transition: all 0.15s;
+    flex-shrink: 0;
   }
-  .shortcuts-close-btn:hover { background: var(--delete-bg); color: var(--delete-color); }
+  .theme-option.active .theme-option-radio {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .theme-option-radio::after {
+    content: '';
+    width: 5px; height: 5px; border-radius: 50%;
+    background: white;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .theme-option.active .theme-option-radio::after { opacity: 1; }
+  .theme-option-label {
+    font-size: 14px; font-weight: 500; color: var(--ink);
+  }
+  .theme-option-desc {
+    font-size: 12px; color: var(--ink-dim);
+    margin-top: 2px;
+  }
 
-  .shortcuts-list { display: flex; flex-direction: column; gap: 4px; }
-  .shortcut-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 9px 4px;
-    border-bottom: 1px solid var(--panel-border);
-  }
-  .shortcut-row:last-child { border-bottom: none; }
-  .shortcut-desc { font-size: 14px; color: var(--ink); }
-  .shortcut-keys { display: flex; gap: 4px; flex-shrink: 0; margin-left: 16px; }
-  .key-cap {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px; font-weight: 600; color: var(--ink-mid);
-    background: var(--ink-faint);
-    border-radius: 6px; padding: 3px 7px;
-    min-width: 20px; text-align: center;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.04);
-  }
-</style>
 </head>
 <body>
 
 <div class="chrome">
   <div class="chrome-left">
     <button class="icon-btn" id="btnPosts" title="All posts" aria-label="Toggle posts panel">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" aria-hidden="true">
-        <path d="M8 1.5 14.5 5 8 8.5 1.5 5z"/>
-        <path d="M2.3 7.5 8 10.3l5.7-2.8"/>
-        <path d="M2.3 10 8 12.8l5.7-2.8"/>
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
+        <line x1="2" y1="4" x2="14" y2="4"/>
+        <line x1="2" y1="8" x2="14" y2="8"/>
+        <line x1="2" y1="12" x2="9" y2="12"/>
       </svg>
     </button>
     <div class="brand">
@@ -716,93 +746,58 @@
         <button class="target-set-btn" id="targetSetBtn">Set</button>
       </div>
     </div>
-
-    <!-- Desktop: individual buttons, shown >=860px -->
-    <div class="desktop-actions" id="desktopActions">
-      <button class="icon-btn" id="btnShortcutsDesktop" title="Keyboard shortcuts" aria-label="Show keyboard shortcuts">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
-          <circle cx="8" cy="8" r="6.5"/>
-          <path d="M6.1 6.2a1.9 1.9 0 1 1 2.7 1.7c-.6.3-.9.6-.9 1.3"/>
-          <circle cx="8" cy="11.1" r="0.4" fill="currentColor"/>
-        </svg>
-      </button>
-      <button class="copy-btn" id="btnCopyDesktop" title="Copy all text to clipboard" aria-label="Copy to clipboard">
-        <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="5" y="4" width="9" height="11" rx="1.5"/>
-          <path d="M11 4V3a1 1 0 0 0-1-1H3a1.5 1.5 0 0 0-1.5 1.5v8A1 1 0 0 0 3 12.5h2"/>
-        </svg>
-        Copy
-      </button>
-      <button class="copy-btn" id="btnExportDesktop" title="Download as .txt" aria-label="Download as text file">
-        <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M8 2v8M8 10l-3-3M8 10l3-3"/>
-          <path d="M3 12.5v.5A1.5 1.5 0 0 0 4.5 14.5h7A1.5 1.5 0 0 0 13 13v-.5"/>
-        </svg>
-        Export
-      </button>
-      <button class="icon-btn" id="btnCompareDesktop" title="Compare mode" aria-label="Toggle compare mode">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
-          <line x1="8" y1="2" x2="8" y2="14"/>
-          <rect x="1" y="4" width="5" height="8" rx="1"/>
-          <rect x="10" y="4" width="5" height="8" rx="1"/>
-        </svg>
-      </button>
-      <button class="icon-btn" id="btnDarkDesktop" title="Toggle dark mode" aria-label="Toggle dark mode">
-        <span id="darkIconDesktop" aria-hidden="true">🌙</span>
-      </button>
-    </div>
-
-    <!-- Tablet/mobile: hamburger + dropdown, shown <860px -->
-    <div class="menu-wrap" id="menuWrap" style="position:relative;">
-      <button class="icon-btn" id="btnMenu" title="More actions" aria-label="Open menu" aria-haspopup="true" aria-expanded="false">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
-          <line x1="2" y1="4.5" x2="14" y2="4.5"/>
-          <line x1="2" y1="8" x2="14" y2="8"/>
-          <line x1="2" y1="11.5" x2="14" y2="11.5"/>
-        </svg>
-      </button>
-      <div class="dropdown-menu" id="dropdownMenu" role="menu">
-        <button class="dropdown-item" id="btnShortcuts" role="menuitem">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="8" cy="8" r="6.5"/>
-            <path d="M6.1 6.2a1.9 1.9 0 1 1 2.7 1.7c-.6.3-.9.6-.9 1.3"/>
-            <circle cx="8" cy="11.1" r="0.4" fill="currentColor"/>
-          </svg>
-          Keyboard shortcuts
-        </button>
-        <button class="dropdown-item" id="btnCopy" role="menuitem">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="5" y="4" width="9" height="11" rx="1.5"/>
-            <path d="M11 4V3a1 1 0 0 0-1-1H3a1.5 1.5 0 0 0-1.5 1.5v8A1 1 0 0 0 3 12.5h2"/>
-          </svg>
-          Copy to clipboard
-        </button>
-        <button class="dropdown-item" id="btnExport" role="menuitem">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M8 2v8M8 10l-3-3M8 10l3-3"/>
-            <path d="M3 12.5v.5A1.5 1.5 0 0 0 4.5 14.5h7A1.5 1.5 0 0 0 13 13v-.5"/>
-          </svg>
-          Download as .txt
-        </button>
-        <button class="dropdown-item" id="btnCompare" role="menuitem">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="8" y1="2" x2="8" y2="14"/>
-            <rect x="1" y="4" width="5" height="8" rx="1"/>
-            <rect x="10" y="4" width="5" height="8" rx="1"/>
-          </svg>
-          <span id="compareLabel">Compare mode</span>
-        </button>
-        <div class="dropdown-divider" aria-hidden="true"></div>
-        <button class="dropdown-item" id="btnDark" role="menuitem">
-          <span class="dropdown-item-icon-emoji" id="darkIcon" aria-hidden="true">🌙</span>
-          <span id="darkLabel">Dark mode</span>
-        </button>
-      </div>
-    </div>
+    <button class="copy-btn" id="btnCopy" title="Copy all text to clipboard" aria-label="Copy to clipboard">
+      <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="5" y="4" width="9" height="11" rx="1.5"/>
+        <path d="M11 4V3a1 1 0 0 0-1-1H3a1.5 1.5 0 0 0-1.5 1.5v8A1 1 0 0 0 3 12.5h2"/>
+      </svg>
+      Copy
+    </button>
+    <button class="icon-btn" id="btnCompare" title="Compare mode" aria-label="Toggle compare mode">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
+        <line x1="8" y1="2" x2="8" y2="14"/>
+        <rect x="1" y="4" width="5" height="8" rx="1"/>
+        <rect x="10" y="4" width="5" height="8" rx="1"/>
+      </svg>
+    </button>
+    <button class="icon-btn" id="btnDark" title="Toggle dark mode" aria-label="Toggle dark mode">
+      <span id="darkIcon" aria-hidden="true">🌙</span>
+    </button>
+    <button class="icon-btn" id="btnTheme" title="Theme picker" aria-label="Theme picker">
+      🎨
+    </button>
   </div>
   <div class="word-target-progress" id="wordTargetProgress" role="progressbar" aria-hidden="true"></div>
 </div>
-<div class="menu-backdrop" id="menuBackdrop" aria-hidden="true"></div>
+
+<!-- Theme picker modal -->
+<div class="theme-picker-backdrop" id="themePickerBackdrop"></div>
+<div class="theme-picker-modal" id="themePickerModal">
+  <div class="theme-picker-title">Writing theme</div>
+  <div class="theme-options" id="themeOptions">
+    <div class="theme-option" data-theme="editorial">
+      <div class="theme-option-radio"></div>
+      <div>
+        <div class="theme-option-label">Editorial</div>
+        <div class="theme-option-desc">Warm, paper-like classic</div>
+      </div>
+    </div>
+    <div class="theme-option" data-theme="mint">
+      <div class="theme-option-radio"></div>
+      <div>
+        <div class="theme-option-label">Mint</div>
+        <div class="theme-option-desc">Cool, calming seafoam</div>
+      </div>
+    </div>
+    <div class="theme-option" data-theme="sky">
+      <div class="theme-option-radio"></div>
+      <div>
+        <div class="theme-option-label">Sky</div>
+        <div class="theme-option-desc">Ethereal, pale blue</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="writing-area" id="writingArea">
   <div class="posts-panel-backdrop" id="postsPanelBackdrop"></div>
@@ -872,43 +867,17 @@
   </div>
 </div>
 
-<div class="shortcuts-overlay" id="shortcutsOverlay" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
-  <div class="shortcuts-modal">
-    <div class="shortcuts-modal-header">
-      <span class="shortcuts-modal-title">Keyboard shortcuts</span>
-      <button class="shortcuts-close-btn" id="btnCloseShortcuts" aria-label="Close">×</button>
-    </div>
-    <div class="shortcuts-list">
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Bold selected text</span>
-        <span class="shortcut-keys"><span class="key-cap">⌘/Ctrl</span><span class="key-cap">B</span></span>
-      </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Italicize selected text</span>
-        <span class="shortcut-keys"><span class="key-cap">⌘/Ctrl</span><span class="key-cap">I</span></span>
-      </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Save now</span>
-        <span class="shortcut-keys"><span class="key-cap">⌘/Ctrl</span><span class="key-cap">S</span></span>
-      </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Insert heading or paragraph block</span>
-        <span class="shortcut-keys"><span class="key-cap">/</span></span>
-      </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Start a bullet list</span>
-        <span class="shortcut-keys"><span class="key-cap">-</span><span class="key-cap">Space</span></span>
-      </div>
-      <div class="shortcut-row">
-        <span class="shortcut-desc">Indent / outdent a list item</span>
-        <span class="shortcut-keys"><span class="key-cap">Tab</span></span>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
 'use strict';
+
+// Global error handler for debugging
+window.addEventListener('error', e => {
+  console.error('Runtime error:', e.error);
+});
+
+window.addEventListener('unhandledrejection', e => {
+  console.error('Unhandled promise rejection:', e.reason);
+});
 
 // ── State ──────────────────────────────────────────────
 let wordTarget       = 0;
@@ -935,11 +904,7 @@ let elEditor, elEditorWrap, elPostsPanel, elWordCount, elWordCountWrap,
     elSaveStatus, elProgressBar, elCelebration, elToast,
     elPostTitle, elPostsList, elBtnDark, elDarkIcon, elBtnPosts, elSlashMenu,
     elBtnCompare, elWritingArea, elPaneB, elEditorB,
-    elPaneALabel, elPaneAFooter, elPostsPanelBackdrop,
-    elShortcutsOverlay, elBtnShortcuts, elBtnCloseShortcuts, elBtnExport,
-    elBtnMenu, elDropdownMenu, elMenuBackdrop, elCompareLabel, elDarkLabel,
-    elBtnShortcutsDesktop, elBtnCopyDesktop, elBtnExportDesktop,
-    elBtnCompareDesktop, elBtnDarkDesktop, elDarkIconDesktop;
+    elPaneALabel, elPaneAFooter, elPostsPanelBackdrop;
 
 // ── Init ───────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
@@ -969,21 +934,6 @@ window.addEventListener('DOMContentLoaded', () => {
   elPaneALabel          = document.getElementById('paneALabel');
   elPaneAFooter         = document.getElementById('paneAFooter');
   elPostsPanelBackdrop  = document.getElementById('postsPanelBackdrop');
-  elShortcutsOverlay    = document.getElementById('shortcutsOverlay');
-  elBtnShortcuts        = document.getElementById('btnShortcuts');
-  elBtnCloseShortcuts   = document.getElementById('btnCloseShortcuts');
-  elBtnExport           = document.getElementById('btnExport');
-  elBtnMenu             = document.getElementById('btnMenu');
-  elDropdownMenu        = document.getElementById('dropdownMenu');
-  elMenuBackdrop        = document.getElementById('menuBackdrop');
-  elCompareLabel        = document.getElementById('compareLabel');
-  elDarkLabel           = document.getElementById('darkLabel');
-  elBtnShortcutsDesktop = document.getElementById('btnShortcutsDesktop');
-  elBtnCopyDesktop      = document.getElementById('btnCopyDesktop');
-  elBtnExportDesktop    = document.getElementById('btnExportDesktop');
-  elBtnCompareDesktop   = document.getElementById('btnCompareDesktop');
-  elBtnDarkDesktop      = document.getElementById('btnDarkDesktop');
-  elDarkIconDesktop     = document.getElementById('darkIconDesktop');
 
   // NOTE: execCommand is deprecated but remains the only viable API for
   // contenteditable editing at this level without a full editor framework.
@@ -991,28 +941,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Wire up all event listeners (no inline onclick handlers in HTML)
   elBtnPosts.addEventListener('click', togglePostsPanel);
-  elBtnDark.addEventListener('click', () => { toggleDark(); closeMenu(); });
-  elBtnCompare.addEventListener('click', () => { toggleCompare(); closeMenu(); });
-  document.getElementById('btnCopy').addEventListener('click', () => { copyText(); closeMenu(); });
-  elBtnExport.addEventListener('click', () => { exportText(); closeMenu(); });
+  elBtnDark.addEventListener('click', toggleDark);
+  elBtnCompare.addEventListener('click', toggleCompare);
+  document.getElementById('btnCopy').addEventListener('click', copyText);
   document.getElementById('btnNewPost').addEventListener('click', newPost);
   elTargetToggleBtn.addEventListener('click', onTargetToggle);
   document.getElementById('targetSetBtn').addEventListener('click', commitTarget);
   elPostsPanelBackdrop.addEventListener('click', togglePostsPanel);
-  elBtnShortcuts.addEventListener('click', () => { closeMenu(); openShortcuts(); });
-  elBtnCloseShortcuts.addEventListener('click', closeShortcuts);
-  elShortcutsOverlay.addEventListener('click', e => {
-    if (e.target === elShortcutsOverlay) closeShortcuts();
-  });
-  elBtnMenu.addEventListener('click', toggleMenu);
-  elMenuBackdrop.addEventListener('click', closeMenu);
-
-  // Desktop action row — same handlers, no menu to close
-  elBtnShortcutsDesktop.addEventListener('click', openShortcuts);
-  elBtnCopyDesktop.addEventListener('click', copyText);
-  elBtnExportDesktop.addEventListener('click', exportText);
-  elBtnCompareDesktop.addEventListener('click', toggleCompare);
-  elBtnDarkDesktop.addEventListener('click', toggleDark);
 
   elPostTitle.addEventListener('input', onTitleType);
 
@@ -1051,18 +986,9 @@ window.addEventListener('DOMContentLoaded', () => {
       closeTargetInput();
     }
   }, true);
-  // Global: close hamburger dropdown on outside click
-  document.addEventListener('mousedown', e => {
-    if (elDropdownMenu.classList.contains('show') &&
-        !elDropdownMenu.contains(e.target) && e.target !== elBtnMenu && !elBtnMenu.contains(e.target)) {
-      closeMenu();
-    }
-  }, true);
-  // Global: Cmd/Ctrl+S, and Escape to close shortcuts modal or dropdown menu
+  // Global: Cmd/Ctrl+S
   document.addEventListener('keydown', e => {
     if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); silentSave(); }
-    if (e.key === 'Escape' && elShortcutsOverlay.classList.contains('show')) closeShortcuts();
-    if (e.key === 'Escape' && elDropdownMenu.classList.contains('show')) closeMenu();
   });
 
   // Autosave backstop every 20s
@@ -1071,7 +997,8 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('beforeunload', silentSave);
 
   loadDoc();
-  requestAnimationFrame(() => elEditor.focus());
+  initThemePicker();
+  if (elEditor) requestAnimationFrame(() => elEditor.focus());
 });
 
 // ── Typewriter scroll ──────────────────────────────────
@@ -1525,9 +1452,6 @@ function setDark(on) {
   document.body.classList.toggle('dark', on);
   elDarkIcon.textContent = on ? '☀️' : '🌙';
   elBtnDark.classList.toggle('on', on);
-  if (elDarkLabel) elDarkLabel.textContent = on ? 'Light mode' : 'Dark mode';
-  if (elDarkIconDesktop) elDarkIconDesktop.textContent = on ? '☀️' : '🌙';
-  if (elBtnDarkDesktop) elBtnDarkDesktop.classList.toggle('on', on);
 }
 
 function toggleDark() {
@@ -1621,31 +1545,6 @@ function copyText() {
     .catch(() => showToast('Copy failed — try Cmd+A, Cmd+C'));
 }
 
-function slugify(s) {
-  const slug = s.toLowerCase().trim()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
-  return slug || 'untitled-post';
-}
-
-function exportText() {
-  const title = elPostTitle.value.trim();
-  const body  = walkText('\n').replace(/\n{3,}/g, '\n\n').trim();
-  const content = (title ? title + '\n\n' : '') + body;
-  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = slugify(title) + '.txt';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast('Downloaded ✓');
-}
-
 function showToast(msg) {
   elToast.textContent = msg;
   elToast.classList.add('show');
@@ -1653,37 +1552,11 @@ function showToast(msg) {
   showToast._t = setTimeout(() => elToast.classList.remove('show'), 2000);
 }
 
-// ── Keyboard shortcuts modal ────────────────────────────
-function openShortcuts() {
-  elShortcutsOverlay.classList.add('show');
-}
-function closeShortcuts() {
-  elShortcutsOverlay.classList.remove('show');
-}
-
-// ── Hamburger dropdown menu ─────────────────────────────
-function toggleMenu() {
-  const isOpen = elDropdownMenu.classList.contains('show');
-  isOpen ? closeMenu() : openMenu();
-}
-function openMenu() {
-  elDropdownMenu.classList.add('show');
-  elMenuBackdrop.classList.add('show');
-  elBtnMenu.setAttribute('aria-expanded', 'true');
-}
-function closeMenu() {
-  elDropdownMenu.classList.remove('show');
-  elMenuBackdrop.classList.remove('show');
-  elBtnMenu.setAttribute('aria-expanded', 'false');
-}
-
 // ── Compare mode ───────────────────────────────────────
 function toggleCompare() {
   compareMode = !compareMode;
   elWritingArea.classList.toggle('compare-mode', compareMode);
   elBtnCompare.classList.toggle('on', compareMode);
-  if (elBtnCompareDesktop) elBtnCompareDesktop.classList.toggle('on', compareMode);
-  if (elCompareLabel) elCompareLabel.textContent = compareMode ? 'Exit compare mode' : 'Compare mode';
 
   if (compareMode) {
     requestAnimationFrame(() => elPaneB.classList.add('visible'));
@@ -1707,9 +1580,78 @@ function updatePaneACount() {
   document.getElementById('paneACount').textContent = fmtCount(countWords(elEditor));
 }
 
-function updateComparePaneCount() {
-  document.getElementById('paneBCount').textContent = fmtCount(countWords(elEditorB));
+// ── Theme picker ───────────────────────────────────
+let elBtnTheme, elThemePickerBackdrop, elThemePickerModal, elThemeOptions;
+let currentTheme = 'editorial';
+
+function initThemePicker() {
+  elBtnTheme = document.getElementById('btnTheme');
+  elThemePickerBackdrop = document.getElementById('themePickerBackdrop');
+  elThemePickerModal = document.getElementById('themePickerModal');
+  elThemeOptions = document.getElementById('themeOptions');
+
+  if (!elBtnTheme || !elThemePickerBackdrop || !elThemePickerModal || !elThemeOptions) {
+    console.warn('Theme picker elements not found');
+    return;
+  }
+
+  elBtnTheme.addEventListener('click', openThemePicker);
+  elThemePickerBackdrop.addEventListener('click', closeThemePicker);
+
+  elThemeOptions.querySelectorAll('.theme-option').forEach(option => {
+    option.addEventListener('click', () => {
+      const theme = option.dataset.theme;
+      if (theme) {
+        setTheme(theme);
+        closeThemePicker();
+      }
+    });
+  });
+
+  loadTheme();
 }
-</script>
+
+function openThemePicker() {
+  if (elThemePickerBackdrop) elThemePickerBackdrop.classList.add('show');
+  if (elThemePickerModal) elThemePickerModal.classList.add('show');
+}
+
+function closeThemePicker() {
+  if (elThemePickerBackdrop) elThemePickerBackdrop.classList.remove('show');
+  if (elThemePickerModal) elThemePickerModal.classList.remove('show');
+}
+
+function setTheme(theme) {
+  const validThemes = ['editorial', 'mint', 'sky'];
+  if (!validThemes.includes(theme)) return;
+  
+  currentTheme = theme;
+  const classList = document.documentElement.classList;
+  classList.remove('theme-mint', 'theme-sky');
+  if (theme !== 'editorial') {
+    classList.add(`theme-${theme}`);
+  }
+  try {
+    localStorage.setItem('pb_theme', theme);
+  } catch { /* localStorage quota exceeded — silent fail */ }
+  updateThemePickerUI();
+}
+
+function updateThemePickerUI() {
+  if (!elThemeOptions) return;
+  elThemeOptions.querySelectorAll('.theme-option').forEach(option => {
+    option.classList.toggle('active', option.dataset.theme === currentTheme);
+  });
+}
+
+function loadTheme() {
+  try {
+    const savedTheme = localStorage.getItem('pb_theme') || 'editorial';
+    setTheme(savedTheme);
+  } catch { /* corrupt localStorage — default to editorial */ 
+    setTheme('editorial');
+  }
+}
+
 </body>
 </html>
