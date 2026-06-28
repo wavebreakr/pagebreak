@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pagebreak</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
   :root {
-    /* ── Theme: Editorial (default) — no gradient ── */
+    /* ── Editorial palette ── */
     --bg-canvas:      #edeae2;
     --editor-bg:      #faf9f7;
     --ink:            #1c1b18;
@@ -28,55 +28,8 @@
     --blur:           blur(18px) saturate(1.6);
     --delete-bg:      rgba(184,74,74,0.15);
     --delete-color:   #b84a4a;
-    --gradient-fade:  transparent;
   }
-
-  :root.theme-mint {
-    /* Very light, airy mint — minimal color saturation */
-    --bg-canvas:      #f2f8f7;
-    --editor-bg:      #f6faf9;
-    --ink:            #1a3c3b;
-    --ink-mid:        #5a7b7a;
-    --ink-dim:        #8aabaa;
-    --ink-faint:      rgba(0,0,0,0.05);
-    --accent:         #2d9c9a;
-    --accent-light:   #4db3b0;
-    --accent-dim:     rgba(45,156,154,0.08);
-    --panel-bg:       rgba(246,251,250,0.82);
-    --panel-border:   rgba(0,0,0,0.07);
-    --glass-bg:       rgba(255,255,255,0.68);
-    --glass-border:   rgba(255,255,255,0.85);
-    --glass-shadow:    0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 32px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06), inset 0 0 0 1.5px rgba(255,255,255,0.65);
-    --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.9) inset, 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
-    --blur:           blur(18px) saturate(1.6);
-    --delete-bg:      rgba(184,74,74,0.15);
-    --delete-color:   #b84a4a;
-    --gradient-fade:  rgba(76,178,176,0.02);
-  }
-
-  :root.theme-sky {
-    /* Extremely light blue — barely visible tint */
-    --bg-canvas:      #f1f5f9;
-    --editor-bg:      #f7fafD;
-    --ink:            #1a3f4f;
-    --ink-mid:        #5a7f8f;
-    --ink-dim:        #8aafbf;
-    --ink-faint:      rgba(0,0,0,0.05);
-    --accent:         #2980c0;
-    --accent-light:   #4a9fd9;
-    --accent-dim:     rgba(41,128,192,0.08);
-    --panel-bg:       rgba(247,250,253,0.82);
-    --panel-border:   rgba(0,0,0,0.07);
-    --glass-bg:       rgba(255,255,255,0.70);
-    --glass-border:   rgba(255,255,255,0.88);
-    --glass-shadow:    0 1px 0 rgba(255,255,255,0.96) inset, 0 8px 32px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06), inset 0 0 0 1.5px rgba(255,255,255,0.68);
-    --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.9) inset, 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
-    --blur:           blur(18px) saturate(1.6);
-    --delete-bg:      rgba(184,74,74,0.15);
-    --delete-color:   #b84a4a;
-    --gradient-fade:  rgba(110,190,240,0.01);
-  }
-
+ 
   .dark {
     --bg-canvas:      #18160f;
     --editor-bg:      #141412;
@@ -92,10 +45,10 @@
     --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.05) inset, 0 2px 8px rgba(0,0,0,0.28), 0 1px 2px rgba(0,0,0,0.16);
     --blur:           blur(20px) saturate(1.4);
   }
-
+ 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; overflow: hidden; }
-
+ 
   body {
     font-family: 'DM Sans', sans-serif;
     color: var(--ink);
@@ -104,10 +57,10 @@
     background: var(--bg-canvas);
     transition: background 0.4s;
   }
-
+ 
   /* Ensure inputs/buttons inherit the body font */
   input, button { font-family: inherit; }
-
+ 
   /* Noise grain overlay */
   body::before {
     content: '';
@@ -116,19 +69,7 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-size: 180px;
   }
-
-  /* Minimal fade gradient backdrop */
-  body::after {
-    content: '';
-    pointer-events: none;
-    position: fixed; top: 0; left: 0; right: 0; height: 180px;
-    background: linear-gradient(180deg, var(--gradient-fade) 0%, transparent 100%);
-    filter: blur(50px);
-    z-index: 0;
-    opacity: 1;
-    transition: opacity 0.3s;
-  }
-
+ 
   /* ── Chrome ── */
   .chrome {
     position: fixed; top: 0; left: 0; right: 0; height: 64px;
@@ -139,11 +80,11 @@
   }
   .chrome-left  { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
   .chrome-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
-
+ 
   .brand { display: flex; align-items: center; flex-shrink: 0; }
   .brand img { height: 42px; width: auto; display: block; }
   .dark .brand img { filter: invert(1); }
-
+ 
   .post-title-inline {
     font-size: 16px;
     color: var(--ink-dim); background: none; border: none; outline: none;
@@ -152,7 +93,7 @@
   }
   .post-title-inline::placeholder { color: var(--ink-dim); }
   .post-title-inline:focus { color: var(--ink-mid); }
-
+ 
   /* ── Word count + target widget ── */
   .word-count-wrap {
     display: flex; align-items: center; gap: 5px;
@@ -185,7 +126,7 @@
   }
   .target-toggle-btn.has-target { color: var(--ink-mid); }
   .target-toggle-btn svg { width: 10px; height: 10px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-
+ 
   /* ── Word target popover ── */
   .target-popover {
     position: absolute;
@@ -226,7 +167,7 @@
     transition: background 0.15s, transform 0.1s;
   }
   .target-set-btn:hover { background: var(--accent-light); transform: translateY(-1px); }
-
+ 
   .word-target-progress {
     position: absolute; bottom: 0; left: 0;
     height: 2px; width: 0;
@@ -235,7 +176,7 @@
     border-radius: 0 1px 1px 0;
   }
   .word-target-progress.done { background: linear-gradient(90deg, #4a9e6a, #6ec48a); }
-
+ 
   /* Glass icon button — circular, 50px */
   .icon-btn {
     width: 50px; height: 50px; border-radius: 50%;
@@ -247,6 +188,7 @@
     color: var(--ink-mid);
     transition: background 0.15s, box-shadow 0.15s, color 0.15s, transform 0.15s;
     flex-shrink: 0;
+    font-size: 18px;
   }
   .icon-btn:hover {
     background: rgba(255,255,255,0.72);
@@ -264,7 +206,7 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.22);
   }
   .icon-btn--sm { width: 40px; height: 40px; font-size: 18px; }
-
+ 
   /* Glass text button */
   .copy-btn {
     font-size: 14px; font-weight: 500;
@@ -287,20 +229,259 @@
     box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 8px 32px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3), inset 0 0 0 1.5px rgba(255,255,255,0.12);
   }
   .copy-btn svg { width: 14px; height: 14px; stroke: currentColor; flex-shrink: 0; }
-
+ 
+  /* Menu dropdown */
+  .menu-wrapper {
+    position: relative;
+  }
+ 
+  .menu-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 6px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 10px;
+    min-width: 160px;
+    z-index: 500;
+    opacity: 0;
+    transform: translateY(-4px);
+    pointer-events: none;
+    transition: opacity 0.15s, transform 0.15s cubic-bezier(0.4,0,0.2,1);
+    overflow: hidden;
+  }
+ 
+  .menu-dropdown.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+ 
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 14px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--ink-mid);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    transition: background 0.1s, color 0.1s;
+    letter-spacing: -0.01em;
+  }
+ 
+  .menu-item:hover {
+    background: var(--ink-faint);
+    color: var(--ink);
+  }
+ 
+  .menu-item:active {
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+ 
+  .menu-item svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+ 
+  .menu-item span:last-child {
+    flex: 1;
+  }
+ 
+  .menu-divider {
+    height: 1px;
+    background: var(--panel-border);
+    margin: 4px 0;
+  }
+ 
+  /* Help modal */
+  .help-modal-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 600;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+ 
+  .help-modal-backdrop.show {
+    display: block;
+    opacity: 1;
+  }
+ 
+  .help-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 601;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    scrollbar-width: thin;
+    scrollbar-color: var(--ink-faint) transparent;
+  }
+ 
+  .help-modal::-webkit-scrollbar {
+    width: 6px;
+  }
+ 
+  .help-modal::-webkit-scrollbar-thumb {
+    background: var(--ink-faint);
+    border-radius: 3px;
+  }
+ 
+  .help-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
+ 
+  .help-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--panel-border);
+    position: sticky;
+    top: 0;
+    background: var(--glass-bg);
+    z-index: 1;
+  }
+ 
+  .help-modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+ 
+  .help-modal-close {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    background: none;
+    cursor: pointer;
+    color: var(--ink-mid);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+  }
+ 
+  .help-modal-close:hover {
+    background: var(--ink-faint);
+    color: var(--ink);
+  }
+ 
+  .help-modal-content {
+    padding: 24px;
+  }
+ 
+  .help-section {
+    margin-bottom: 28px;
+  }
+ 
+  .help-section:last-child {
+    margin-bottom: 0;
+  }
+ 
+  .help-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    letter-spacing: 0.1em;
+    margin: 0 0 14px 0;
+  }
+ 
+  .help-shortcut {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+ 
+  kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 8px;
+    background: var(--ink-faint);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-mid);
+    white-space: nowrap;
+  }
+ 
+  .help-desc {
+    color: var(--ink-mid);
+    flex: 1;
+  }
+ 
+  .help-feature {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--panel-border);
+  }
+ 
+  .help-feature:last-child {
+    border-bottom: none;
+  }
+ 
+  .help-feature-name {
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 14px;
+  }
+ 
+  .help-feature .help-desc {
+    font-size: 13px;
+  }
+ 
   .save-status {
     font-size: 14px; color: var(--accent);
     opacity: 0; transition: opacity 0.4s;
     white-space: nowrap; letter-spacing: 0.01em;
   }
   .save-status.show { opacity: 1; }
-
+ 
   /* ── Layout ── */
   .writing-area {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     display: flex; overflow: hidden;
   }
-
+ 
   .editor-wrap {
     flex: 1; overflow-y: auto; padding: 116px 0 120px;
     background: var(--editor-bg);
@@ -310,9 +491,9 @@
   }
   .editor-wrap::-webkit-scrollbar { width: 3px; }
   .editor-wrap::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
-
+ 
   .editor-inner { max-width: 640px; margin: 0 auto; padding: 0 36px; }
-
+ 
   .editor {
     font-family: 'Lora', serif;
     font-size: 18px; line-height: 1.9;
@@ -327,19 +508,19 @@
     content: attr(data-placeholder);
     color: var(--ink-dim); font-style: italic; pointer-events: none;
   }
-
+ 
   /* Uniform paragraph spacing */
   .editor p,
   .editor div { margin-top: 1.15em; }
-
+ 
   .editor ul { padding-left: 1.4em; margin-top: 1.15em; list-style: disc; }
   .editor ul li { margin-bottom: 0.2em; line-height: 1.9; }
   .editor ul ul { margin-top: 0; list-style: circle; }
   .editor ul ul ul { list-style: square; }
-
+ 
   .editor strong { font-weight: 700; }
   .editor em { font-style: italic; }
-
+ 
   .editor h1, .editor h2, .editor h3 {
     font-family: 'Lora', serif; font-weight: 600; color: var(--ink);
     line-height: 1.3; margin-top: 1.15em; margin-bottom: 0.5em;
@@ -348,7 +529,7 @@
   .editor h1 { font-size: 2em; }
   .editor h2 { font-size: 1.5em; }
   .editor h3 { font-size: 1.2em; }
-
+ 
   /* ── Celebration pill ── */
   .celebration {
     position: fixed; top: 78px; left: 50%;
@@ -363,7 +544,7 @@
     white-space: nowrap; letter-spacing: -0.01em;
   }
   .celebration.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
+ 
   /* ── Toast ── */
   .toast {
     position: fixed; bottom: 24px; right: 24px;
@@ -376,7 +557,7 @@
     transform: translateY(6px); pointer-events: none; z-index: 300;
   }
   .toast.show { opacity: 1; transform: translateY(0); }
-
+ 
   /* ── Posts sidebar ── */
   .posts-panel {
     position: fixed; top: 64px; left: 0; bottom: 0;
@@ -389,7 +570,7 @@
     transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s, border-color 0.4s;
   }
   .posts-panel.hidden { transform: translateX(-100%); opacity: 0; pointer-events: none; border-right-width: 0; }
-
+ 
   .posts-panel-header {
     padding: 16px 14px 12px; flex-shrink: 0;
     border-bottom: 1px solid var(--panel-border);
@@ -408,7 +589,7 @@
   }
   .posts-list::-webkit-scrollbar { width: 2px; }
   .posts-list::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
-
+ 
   .post-row {
     display: flex; align-items: center; gap: 8px;
     padding: 8px 10px; border-radius: 9px;
@@ -436,7 +617,7 @@
   }
   .post-row:hover .post-row-delete { opacity: 1; }
   .post-row-delete:hover { background: var(--delete-bg); color: var(--delete-color); }
-
+ 
   /* ── Delete confirm inline UI ── */
   .post-row-confirm-title {
     font-size: 12px; font-weight: 500; color: var(--delete-color); line-height: 1.3;
@@ -454,7 +635,7 @@
     border-radius: 4px; border: none; cursor: pointer; flex-shrink: 0;
     background: var(--ink-faint); color: var(--ink-mid);
   }
-
+ 
   /* ── Mobile bottom sheet backdrop ── */
   .posts-panel-backdrop {
     display: none;
@@ -465,19 +646,19 @@
     transition: opacity 0.3s;
   }
   .posts-panel-backdrop.show { opacity: 1; }
-
+ 
   @media (max-width: 700px) {
     .chrome { padding: 0 14px; gap: 8px; }
     .chrome-left { gap: 8px; flex: 1; min-width: 0; }
     .chrome-right { gap: 8px; flex-shrink: 0; }
-
+ 
     .post-title-inline { display: none; }
     .copy-btn { display: none; }
-
+ 
     .brand img { height: 34px; }
-
+ 
     .editor-inner { padding: 0 20px; }
-
+ 
     /* Posts panel: bottom sheet */
     .posts-panel {
       top: auto; bottom: 0; left: 0; right: 0;
@@ -500,9 +681,9 @@
       pointer-events: auto !important;
       border-top-width: 1px !important;
     }
-
+ 
     .posts-panel-backdrop { display: block; }
-
+ 
     /* Drag handle */
     .posts-panel-header::before {
       content: '';
@@ -513,10 +694,10 @@
       border-radius: 2px; opacity: 0.35;
     }
     .posts-panel-header { position: relative; padding-top: 22px; }
-
+ 
     .post-row-delete { opacity: 1; }
   }
-
+ 
   /* ── Slash menu ── */
   .slash-menu {
     position: fixed;
@@ -557,28 +738,28 @@
   .slash-menu-item-icon.icon-p { font-size: 10px; }
   .slash-menu-item-label { font-size: 13px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
   .slash-menu-item-desc  { font-size: 11px; color: var(--ink-dim); margin-top: 1px; }
-
+ 
   /* ── Compare mode ──
      Default: #paneA is display:contents (layout-invisible); #paneB and
      the divider are display:none. */
   #paneA          { display: contents; }
   #paneB          { display: none; }
   #compareDivider { display: none; }
-
+ 
   .writing-area.compare-mode { flex-direction: row; }
-
+ 
   .writing-area.compare-mode #paneA {
     display: flex; flex: 1; flex-direction: column;
     overflow: hidden; position: relative; min-width: 0;
   }
   .writing-area.compare-mode #paneA .editor-wrap { flex: 1; }
-
+ 
   .writing-area.compare-mode #compareDivider {
     display: block; width: 1px; flex-shrink: 0;
     background: var(--panel-border);
     align-self: stretch; margin-top: 64px;
   }
-
+ 
   .writing-area.compare-mode #paneB {
     display: flex; flex: 1; flex-direction: column;
     overflow: hidden; position: relative; min-width: 0;
@@ -589,10 +770,10 @@
     opacity: 1; transform: translateX(0);
   }
   .writing-area.compare-mode #paneB .editor-wrap { flex: 1; }
-
+ 
   /* Compare-only overlays hidden by default */
   #paneALabel, #paneAFooter { display: none; }
-
+ 
   .compare-label {
     position: absolute; top: 72px; left: 50%; transform: translateX(-50%);
     font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
@@ -603,7 +784,7 @@
     padding: 3px 10px; border-radius: 20px;
     pointer-events: none; z-index: 10; white-space: nowrap;
   }
-
+ 
   .pane-footer {
     position: absolute; bottom: 0; left: 0; right: 0; height: 44px;
     display: flex; align-items: center; justify-content: center;
@@ -617,106 +798,20 @@
     border: 1px solid var(--glass-border);
     border-radius: 20px; padding: 3px 12px;
   }
-
+ 
   /* Hide chrome word count in compare mode */
   .word-count-wrap.compare-mode-active { display: none; }
-
-  /* ── Theme picker modal ── */
-  .theme-picker-backdrop {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.3);
-    z-index: 500;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .theme-picker-backdrop.show { display: block; opacity: 1; }
-
-  .theme-picker-modal {
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(0.95);
-    background: var(--glass-bg);
-    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    border-radius: 16px;
-    padding: 24px;
-    width: 90%;
-    max-width: 400px;
-    z-index: 501;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s, transform 0.3s cubic-bezier(0.4,0,0.2,1);
-  }
-  .theme-picker-modal.show {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translate(-50%, -50%) scale(1);
-  }
-
-  .theme-picker-title {
-    font-size: 16px; font-weight: 600; color: var(--ink);
-    margin: 0 0 16px; letter-spacing: -0.01em;
-  }
-
-  .theme-options {
-    display: flex; flex-direction: column; gap: 10px;
-  }
-
-  .theme-option {
-    padding: 12px 14px; border-radius: 10px;
-    border: 1.5px solid var(--glass-border);
-    background: rgba(255,255,255,0.4);
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .theme-option:hover {
-    background: rgba(255,255,255,0.6);
-    border-color: var(--accent);
-  }
-  .theme-option.active {
-    background: var(--accent-dim);
-    border-color: var(--accent);
-  }
-  .theme-option-radio {
-    width: 16px; height: 16px; border-radius: 50%;
-    border: 2px solid var(--ink-mid);
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s;
-    flex-shrink: 0;
-  }
-  .theme-option.active .theme-option-radio {
-    background: var(--accent);
-    border-color: var(--accent);
-  }
-  .theme-option-radio::after {
-    content: '';
-    width: 5px; height: 5px; border-radius: 50%;
-    background: white;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-  .theme-option.active .theme-option-radio::after { opacity: 1; }
-  .theme-option-label {
-    font-size: 14px; font-weight: 500; color: var(--ink);
-  }
-  .theme-option-desc {
-    font-size: 12px; color: var(--ink-dim);
-    margin-top: 2px;
-  }
-
+ 
+</style>
 </head>
 <body>
-
+ 
 <div class="chrome">
   <div class="chrome-left">
     <button class="icon-btn" id="btnPosts" title="All posts" aria-label="Toggle posts panel">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
-        <line x1="2" y1="4" x2="14" y2="4"/>
-        <line x1="2" y1="8" x2="14" y2="8"/>
-        <line x1="2" y1="12" x2="9" y2="12"/>
+        <path d="M2 3h10a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>
+        <path d="M4 6h6M4 9h6M4 12h4" opacity="0.6"/>
       </svg>
     </button>
     <div class="brand">
@@ -733,7 +828,7 @@
       <button class="target-toggle-btn" id="targetToggleBtn"
         title="Set word count target"
         aria-label="Set word count target">
-        <svg id="targetToggleIcon" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+        <svg id="targetToggleIcon" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
           <line x1="5" y1="1" x2="5" y2="9"/>
           <line x1="1" y1="5" x2="9" y2="5"/>
         </svg>
@@ -746,59 +841,49 @@
         <button class="target-set-btn" id="targetSetBtn">Set</button>
       </div>
     </div>
-    <button class="copy-btn" id="btnCopy" title="Copy all text to clipboard" aria-label="Copy to clipboard">
-      <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="5" y="4" width="9" height="11" rx="1.5"/>
-        <path d="M11 4V3a1 1 0 0 0-1-1H3a1.5 1.5 0 0 0-1.5 1.5v8A1 1 0 0 0 3 12.5h2"/>
-      </svg>
-      Copy
-    </button>
-    <button class="icon-btn" id="btnCompare" title="Compare mode" aria-label="Toggle compare mode">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
-        <line x1="8" y1="2" x2="8" y2="14"/>
-        <rect x="1" y="4" width="5" height="8" rx="1"/>
-        <rect x="10" y="4" width="5" height="8" rx="1"/>
-      </svg>
-    </button>
-    <button class="icon-btn" id="btnDark" title="Toggle dark mode" aria-label="Toggle dark mode">
-      <span id="darkIcon" aria-hidden="true">🌙</span>
-    </button>
-    <button class="icon-btn" id="btnTheme" title="Theme picker" aria-label="Theme picker">
-      🎨
-    </button>
+    <!-- Menu button with dropdown -->
+    <div class="menu-wrapper">
+      <button class="icon-btn" id="btnMenu" title="More options" aria-label="More options">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="14" height="14" aria-hidden="true">
+          <line x1="2" y1="3" x2="14" y2="3"/>
+          <line x1="2" y1="8" x2="14" y2="8"/>
+          <line x1="2" y1="13" x2="14" y2="13"/>
+        </svg>
+      </button>
+      <div class="menu-dropdown" id="menuDropdown" role="menu">
+        <button class="menu-item" id="btnCopy" role="menuitem" title="Copy all text to clipboard">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
+            <rect x="5" y="4" width="9" height="11" rx="1.5"/>
+            <path d="M11 4V3a1 1 0 0 0-1-1H3a1.5 1.5 0 0 0-1.5 1.5v8A1 1 0 0 0 3 12.5h2"/>
+          </svg>
+          <span>Copy</span>
+        </button>
+        <button class="menu-item" id="btnCompare" role="menuitem" title="Toggle compare mode">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
+            <line x1="8" y1="2" x2="8" y2="14"/>
+            <rect x="1" y="4" width="5" height="8" rx="1"/>
+            <rect x="10" y="4" width="5" height="8" rx="1"/>
+          </svg>
+          <span>Compare</span>
+        </button>
+        <button class="menu-item" id="btnDark" role="menuitem" title="Toggle dark mode">
+          <span id="darkIcon" aria-hidden="true">🌙</span>
+          <span>Dark mode</span>
+        </button>
+        <div class="menu-divider"></div>
+        <button class="menu-item" id="btnHelp" role="menuitem" title="Keyboard shortcuts and tips">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
+            <circle cx="8" cy="8" r="7"/>
+            <path d="M8 5.5a1.5 1.5 0 0 0-1.5 1.5c0 1 1.5 1.5 1.5 3"/>
+            <circle cx="8" cy="12.5" r="0.5" fill="currentColor"/>
+          </svg>
+          <span>Keyboard shortcuts</span>
+        </button>
+    </div>
   </div>
   <div class="word-target-progress" id="wordTargetProgress" role="progressbar" aria-hidden="true"></div>
 </div>
-
-<!-- Theme picker modal -->
-<div class="theme-picker-backdrop" id="themePickerBackdrop"></div>
-<div class="theme-picker-modal" id="themePickerModal">
-  <div class="theme-picker-title">Writing theme</div>
-  <div class="theme-options" id="themeOptions">
-    <div class="theme-option" data-theme="editorial">
-      <div class="theme-option-radio"></div>
-      <div>
-        <div class="theme-option-label">Editorial</div>
-        <div class="theme-option-desc">Warm, paper-like classic</div>
-      </div>
-    </div>
-    <div class="theme-option" data-theme="mint">
-      <div class="theme-option-radio"></div>
-      <div>
-        <div class="theme-option-label">Mint</div>
-        <div class="theme-option-desc">Cool, calming seafoam</div>
-      </div>
-    </div>
-    <div class="theme-option" data-theme="sky">
-      <div class="theme-option-radio"></div>
-      <div>
-        <div class="theme-option-label">Sky</div>
-        <div class="theme-option-desc">Ethereal, pale blue</div>
-      </div>
-    </div>
-  </div>
-</div>
-
+ 
 <div class="writing-area" id="writingArea">
   <div class="posts-panel-backdrop" id="postsPanelBackdrop"></div>
   <div class="posts-panel hidden" id="postsPanel">
@@ -808,7 +893,7 @@
     </div>
     <div class="posts-list" id="postsList" role="list"></div>
   </div>
-
+ 
   <div id="paneA">
     <div class="compare-label" id="paneALabel">Original</div>
     <div class="pane-footer" id="paneAFooter">
@@ -826,9 +911,9 @@
       </div>
     </div>
   </div>
-
+ 
   <div id="compareDivider" aria-hidden="true"></div>
-
+ 
   <div id="paneB">
     <div class="compare-label">Compare</div>
     <div class="editor-wrap">
@@ -847,7 +932,7 @@
     </div>
   </div>
 </div>
-
+ 
 <div class="celebration" id="celebration" aria-live="polite" aria-atomic="true"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="slash-menu" id="slashMenu" role="listbox" aria-label="Insert block type">
@@ -866,19 +951,89 @@
     </div>
   </div>
 </div>
-
+ 
+<!-- Help modal with keyboard shortcuts -->
+<div class="help-modal-backdrop" id="helpModalBackdrop"></div>
+<div class="help-modal" id="helpModal">
+  <div class="help-modal-header">
+    <h2 class="help-modal-title">Keyboard Shortcuts & Tips</h2>
+    <button class="help-modal-close" id="btnCloseHelp" aria-label="Close">✕</button>
+  </div>
+  <div class="help-modal-content">
+    <div class="help-section">
+      <h3 class="help-section-title">Formatting</h3>
+      <div class="help-shortcut">
+        <kbd>⌘</kbd><kbd>B</kbd> or <kbd>Ctrl</kbd><kbd>B</kbd>
+        <span class="help-desc">Bold text</span>
+      </div>
+      <div class="help-shortcut">
+        <kbd>⌘</kbd><kbd>I</kbd> or <kbd>Ctrl</kbd><kbd>I</kbd>
+        <span class="help-desc">Italic text</span>
+      </div>
+      <div class="help-shortcut">
+        <kbd>/</kbd>
+        <span class="help-desc">Insert block (type / at start of line)</span>
+      </div>
+      <div class="help-shortcut">
+        <kbd>-</kbd> <kbd>Space</kbd>
+        <span class="help-desc">Create bullet list (type at line start)</span>
+      </div>
+      <div class="help-shortcut">
+        <kbd>Tab</kbd>
+        <span class="help-desc">Indent list items</span>
+      </div>
+      <div class="help-shortcut">
+        <kbd>Shift</kbd><kbd>Tab</kbd>
+        <span class="help-desc">Outdent list items</span>
+      </div>
+    </div>
+ 
+    <div class="help-section">
+      <h3 class="help-section-title">Navigation & Editing</h3>
+      <div class="help-shortcut">
+        <kbd>⌘</kbd><kbd>S</kbd> or <kbd>Ctrl</kbd><kbd>S</kbd>
+        <span class="help-desc">Save (auto-saves in background)</span>
+      </div>
+      <div class="help-shortcut">
+        <kbd>⌘</kbd><kbd>A</kbd> or <kbd>Ctrl</kbd><kbd>A</kbd>
+        <span class="help-desc">Select all text</span>
+      </div>
+      <div class="help-shortcut">
+        <kbd>⌘</kbd><kbd>C</kbd> or <kbd>Ctrl</kbd><kbd>C</kbd>
+        <span class="help-desc">Copy selected text</span>
+      </div>
+    </div>
+ 
+    <div class="help-section">
+      <h3 class="help-section-title">Features</h3>
+      <div class="help-feature">
+        <span class="help-feature-name">Word Count</span>
+        <span class="help-desc">Set a target to track your progress. Click the + button next to word count.</span>
+      </div>
+      <div class="help-feature">
+        <span class="help-feature-name">Compare Mode</span>
+        <span class="help-desc">Paste text on the right to compare two versions side-by-side.</span>
+      </div>
+      <div class="help-feature">
+        <span class="help-feature-name">Posts</span>
+        <span class="help-desc">Create multiple posts and switch between them. Click the document icon on the left.</span>
+      </div>
+      <div class="help-feature">
+        <span class="help-feature-name">Auto-save</span>
+        <span class="help-desc">Your work is saved automatically every 5 seconds and when you switch posts.</span>
+      </div>
+      <div class="help-feature">
+        <span class="help-feature-name">Dark Mode</span>
+        <span class="help-desc">Toggle dark mode from the menu for comfortable writing in low light.</span>
+      </div>
+    </div>
+  </div>
+</div>
+ 
 <script>
 'use strict';
-
-// Global error handler for debugging
-window.addEventListener('error', e => {
-  console.error('Runtime error:', e.error);
-});
-
-window.addEventListener('unhandledrejection', e => {
-  console.error('Unhandled promise rejection:', e.reason);
-});
-
+ 
+ 
 // ── State ──────────────────────────────────────────────
 let wordTarget       = 0;
 let targetCelebrated = false;
@@ -887,25 +1042,26 @@ let isTyping         = false;
 let _typingTimer     = null;
 let compareMode      = false;
 let _saveTimer       = null;
-
+ 
 // Slash menu state
 let slashMenuOpen  = false;
 let slashMenuIndex = 0;
 let slashBlock     = null;
 let slashBareLine  = null;
-
+ 
 // Block tag sets used in DOM-walking hot paths
 const BLOCK_TAGS = new Set(['P', 'DIV', 'LI', 'BR', 'H1', 'H2', 'H3', 'UL', 'OL']);
 const PARA_RE    = /^(P|DIV|LI)$/;
-
+ 
 // Cached element references
 let elEditor, elEditorWrap, elPostsPanel, elWordCount, elWordCountWrap,
     elTargetInput, elTargetPopover, elTargetToggleBtn, elTargetToggleIcon,
     elSaveStatus, elProgressBar, elCelebration, elToast,
     elPostTitle, elPostsList, elBtnDark, elDarkIcon, elBtnPosts, elSlashMenu,
     elBtnCompare, elWritingArea, elPaneB, elEditorB,
-    elPaneALabel, elPaneAFooter, elPostsPanelBackdrop;
-
+    elPaneALabel, elPaneAFooter, elPostsPanelBackdrop,
+    elBtnMenu, elMenuDropdown, elHelpModal, elHelpModalBackdrop;
+ 
 // ── Init ───────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   elEditor              = document.getElementById('editor');
@@ -934,23 +1090,31 @@ window.addEventListener('DOMContentLoaded', () => {
   elPaneALabel          = document.getElementById('paneALabel');
   elPaneAFooter         = document.getElementById('paneAFooter');
   elPostsPanelBackdrop  = document.getElementById('postsPanelBackdrop');
-
+  elBtnMenu             = document.getElementById('btnMenu');
+  elMenuDropdown        = document.getElementById('menuDropdown');
+  elHelpModal           = document.getElementById('helpModal');
+  elHelpModalBackdrop   = document.getElementById('helpModalBackdrop');
+ 
   // NOTE: execCommand is deprecated but remains the only viable API for
   // contenteditable editing at this level without a full editor framework.
   document.execCommand('defaultParagraphSeparator', false, 'p');
-
+ 
   // Wire up all event listeners (no inline onclick handlers in HTML)
   elBtnPosts.addEventListener('click', togglePostsPanel);
-  elBtnDark.addEventListener('click', toggleDark);
-  elBtnCompare.addEventListener('click', toggleCompare);
-  document.getElementById('btnCopy').addEventListener('click', copyText);
+  elBtnMenu.addEventListener('click', toggleMenu);
+  elBtnDark.addEventListener('click', () => { toggleDark(); closeMenu(); });
+  elBtnCompare.addEventListener('click', () => { toggleCompare(); closeMenu(); });
+  document.getElementById('btnCopy').addEventListener('click', () => { copyText(); closeMenu(); });
+  document.getElementById('btnHelp').addEventListener('click', () => { openHelp(); closeMenu(); });
+  document.getElementById('btnCloseHelp').addEventListener('click', closeHelp);
+  elHelpModalBackdrop.addEventListener('click', closeHelp);
   document.getElementById('btnNewPost').addEventListener('click', newPost);
   elTargetToggleBtn.addEventListener('click', onTargetToggle);
   document.getElementById('targetSetBtn').addEventListener('click', commitTarget);
   elPostsPanelBackdrop.addEventListener('click', togglePostsPanel);
-
+ 
   elPostTitle.addEventListener('input', onTitleType);
-
+ 
   elEditor.addEventListener('keydown', onEditorKeydown);
   elEditor.addEventListener('input', onEditorInput);
   elEditor.addEventListener('compositionstart', () => { isComposing = true; });
@@ -959,26 +1123,32 @@ window.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
   });
-
+ 
   elEditorB.addEventListener('paste', e => {
     e.preventDefault();
     document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
   });
-  elEditorB.addEventListener('input', updateComparePaneCount);
-
+  elEditorB.addEventListener('input', updatePaneACount);
+ 
   elTargetInput.addEventListener('keydown', e => {
     if (e.key === 'Enter')  { e.preventDefault(); commitTarget(); }
     if (e.key === 'Escape') { e.preventDefault(); closeTargetInput(); }
   });
-
+ 
   // Slash menu: wire items via JS
   elSlashMenu.querySelectorAll('.slash-menu-item').forEach((item, i) => {
     item.addEventListener('mousedown', e => { e.preventDefault(); slashSelect(i); });
   });
-
+ 
   // Global: close slash menu on outside click
   document.addEventListener('mousedown', e => {
     if (slashMenuOpen && !elSlashMenu.contains(e.target)) closeSlashMenu();
+  });
+  // Global: close menu on outside click
+  document.addEventListener('mousedown', e => {
+    if (elMenuDropdown.classList.contains('show') && !elMenuDropdown.contains(e.target) && e.target !== elBtnMenu) {
+      closeMenu();
+    }
   });
   // Global: close target popover on outside click
   document.addEventListener('mousedown', e => {
@@ -990,17 +1160,16 @@ window.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', e => {
     if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); silentSave(); }
   });
-
+ 
   // Autosave backstop every 20s
   setInterval(silentSave, 20000);
   // Flush on tab close
   window.addEventListener('beforeunload', silentSave);
-
+ 
   loadDoc();
-  initThemePicker();
   if (elEditor) requestAnimationFrame(() => elEditor.focus());
 });
-
+ 
 // ── Typewriter scroll ──────────────────────────────────
 // Keeps the cursor at ~50% of the visible editor height while typing.
 // Only fires during keyboard input (isTyping guard) to avoid disrupting
@@ -1016,15 +1185,15 @@ function scrollToCursor() {
   const delta    = rect.top - target;
   if (Math.abs(delta) > 4) elEditorWrap.scrollTop += delta;
 }
-
+ 
 // ── Editor keydown ─────────────────────────────────────
 function onEditorKeydown(e) {
   isTyping = true;
   clearTimeout(_typingTimer);
   _typingTimer = setTimeout(() => { isTyping = false; }, 1000);
-
+ 
   const mod = e.metaKey || e.ctrlKey;
-
+ 
   if (slashMenuOpen) {
     if (e.key === 'ArrowDown') { e.preventDefault(); setSlashIndex((slashMenuIndex + 1) % 2); return; }
     if (e.key === 'ArrowUp')   { e.preventDefault(); setSlashIndex((slashMenuIndex - 1 + 2) % 2); return; }
@@ -1034,10 +1203,10 @@ function onEditorKeydown(e) {
       closeSlashMenu();
     }
   }
-
+ 
   if (mod && e.key === 'b') { e.preventDefault(); document.execCommand('bold');   return; }
   if (mod && e.key === 'i') { e.preventDefault(); document.execCommand('italic'); return; }
-
+ 
   if (e.key === 'Tab') {
     e.preventDefault();
     const sel = window.getSelection();
@@ -1054,7 +1223,7 @@ function onEditorKeydown(e) {
     document.execCommand('insertText', false, '    ');
     return;
   }
-
+ 
   // Space: "- " → unordered list
   if (e.key === ' ') {
     const sel = window.getSelection();
@@ -1081,14 +1250,14 @@ function onEditorKeydown(e) {
     }
   }
 }
-
+ 
 // ── Editor input ───────────────────────────────────────
 function onEditorInput() {
   if (!slashMenuOpen) maybeOpenSlashMenu();
   onType();
   requestAnimationFrame(scrollToCursor);
 }
-
+ 
 // ── Slash menu ─────────────────────────────────────────
 function maybeOpenSlashMenu() {
   if (isComposing) return;
@@ -1096,22 +1265,22 @@ function maybeOpenSlashMenu() {
   if (!sel || !sel.rangeCount) return;
   const range = sel.getRangeAt(0);
   if (!range.collapsed) return;
-
+ 
   let block = range.startContainer;
   while (block && block !== elEditor && !PARA_RE.test(block.nodeName)) {
     block = block.parentNode;
   }
   if (!block) return;
-
+ 
   const isBareLine  = (block === elEditor);
   const textContent = isBareLine ? range.startContainer.textContent : block.textContent;
   if (textContent !== '/') return;
-
+ 
   slashBlock    = block;
   slashBareLine = isBareLine ? range.startContainer : null;
   openSlashMenu(range);
 }
-
+ 
 function openSlashMenu(range) {
   slashMenuIndex = 0;
   updateSlashMenuItems();
@@ -1121,7 +1290,7 @@ function openSlashMenu(range) {
   elSlashMenu.classList.add('visible');
   slashMenuOpen = true;
 }
-
+ 
 // closeWithFocus=true restores editor focus (used on Escape); omit when user
 // is still actively typing and focus should stay where it is naturally.
 function closeSlashMenu(closeWithFocus) {
@@ -1131,45 +1300,45 @@ function closeSlashMenu(closeWithFocus) {
   elSlashMenu.classList.remove('visible');
   if (closeWithFocus) elEditor.focus();
 }
-
+ 
 function setSlashIndex(i) {
   slashMenuIndex = i;
   updateSlashMenuItems();
 }
-
+ 
 function updateSlashMenuItems() {
   elSlashMenu.querySelectorAll('.slash-menu-item').forEach((el, i) => {
     el.classList.toggle('active', i === slashMenuIndex);
   });
 }
-
+ 
 // index 0 = Header (h2), index 1 = Paragraph (p)
 function slashSelect(index) {
   const block    = slashBlock;
   const bareLine = slashBareLine;
   closeSlashMenu();
-
+ 
   const tag   = index === 0 ? 'h2' : 'p';
   const newEl = document.createElement(tag);
   newEl.appendChild(document.createElement('br'));
-
+ 
   if (bareLine) {
     elEditor.replaceChild(newEl, bareLine);
   } else {
     if (!block || !block.isConnected) return;
     block.parentNode.replaceChild(newEl, block);
   }
-
+ 
   const sel = window.getSelection();
   const r   = document.createRange();
   r.setStart(newEl, 0);
   r.collapse(true);
   sel.removeAllRanges();
   sel.addRange(r);
-
+ 
   onType();
 }
-
+ 
 // ── Word count + target ────────────────────────────────
 function onType() {
   updateWordCount();
@@ -1177,7 +1346,7 @@ function onType() {
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(silentSave, 5000);
 }
-
+ 
 // Walk an element's tree and collect text.
 // sep=' ' for word-counting (block boundaries become whitespace).
 // sep='\n' for copy (block boundaries become line breaks).
@@ -1198,12 +1367,12 @@ function walkText(sep, el) {
   walk(root);
   return parts.join('');
 }
-
+ 
 function countWords(el) {
   const t = walkText(' ', el).trim();
   return t ? t.split(/\s+/).length : 0;
 }
-
+ 
 function updateWordCount() {
   const words = countWords(elEditor);
   elWordCount.textContent = wordTarget
@@ -1217,18 +1386,18 @@ function updateWordCount() {
   if (wordTarget > 0 && words < wordTarget) targetCelebrated = false;
   if (wordTarget > 0 && words > wordTarget) targetCelebrated = true;
 }
-
+ 
 function onTargetToggle() {
   wordTarget > 0 ? clearTarget() : openTargetInput();
 }
-
+ 
 function openTargetInput() {
   elTargetInput.value = wordTarget || '';
   elTargetPopover.classList.add('show');
   elTargetInput.focus();
   elTargetInput.select();
 }
-
+ 
 function commitTarget() {
   const val = parseInt(elTargetInput.value, 10);
   wordTarget = val > 0 ? val : 0;
@@ -1238,7 +1407,7 @@ function commitTarget() {
   updateWordCount();
   updateTargetToggleBtn();
 }
-
+ 
 function clearTarget() {
   wordTarget = 0;
   targetCelebrated = false;
@@ -1247,11 +1416,11 @@ function clearTarget() {
   updateWordCount();
   updateTargetToggleBtn();
 }
-
+ 
 function closeTargetInput() {
   elTargetPopover.classList.remove('show');
 }
-
+ 
 function updateTargetToggleBtn() {
   if (wordTarget > 0) {
     elTargetToggleBtn.classList.add('has-target');
@@ -1265,20 +1434,20 @@ function updateTargetToggleBtn() {
     elTargetToggleIcon.innerHTML = '<line x1="5" y1="1" x2="5" y2="9"/><line x1="1" y1="5" x2="9" y2="5"/>';
   }
 }
-
+ 
 function updateTargetProgress(words) {
   if (!wordTarget) { elProgressBar.style.width = '0'; return; }
   elProgressBar.style.width = Math.min(words / wordTarget * 100, 100) + '%';
   elProgressBar.classList.toggle('done', words >= wordTarget);
 }
-
+ 
 function celebrate(msg) {
   elCelebration.textContent = msg;
   elCelebration.classList.add('show');
   clearTimeout(celebrate._t);
   celebrate._t = setTimeout(() => elCelebration.classList.remove('show'), 2600);
 }
-
+ 
 function onTitleType() {
   const title = elPostTitle.value.trim();
   document.title = title ? title + ' — Pagebreak' : 'Pagebreak';
@@ -1286,7 +1455,7 @@ function onTitleType() {
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(silentSave, 5000);
 }
-
+ 
 // ── Posts management ───────────────────────────────────
 function genId() {
   return 'pb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
@@ -1310,15 +1479,15 @@ function deletePost(id) {
 function escHtml(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
-
+ 
 function togglePostsPanel() {
   const isMobile = window.innerWidth <= 700;
   const isHidden = isMobile
     ? !elPostsPanel.classList.contains('mobile-open')
     : elPostsPanel.classList.contains('hidden');
-
+ 
   if (isHidden) { silentSave(); renderPostsList(); }
-
+ 
   if (isMobile) {
     if (isHidden) {
       elPostsPanel.classList.remove('hidden');
@@ -1336,7 +1505,7 @@ function togglePostsPanel() {
   }
   elBtnPosts.classList.toggle('on', isHidden);
 }
-
+ 
 function renderPostsList() {
   const ids      = getAllPostIds();
   const activeId = getActiveId();
@@ -1364,7 +1533,7 @@ function renderPostsList() {
         <button class="post-row-delete" aria-label="Delete ${escHtml(title)}">×</button>
       </div>`;
   }).join('');
-
+ 
   // Attach event listeners after rendering
   elPostsList.querySelectorAll('.post-row').forEach(row => {
     const id = row.dataset.postId;
@@ -1375,7 +1544,7 @@ function renderPostsList() {
     });
   });
 }
-
+ 
 function setEditorContent(body, title) {
   const t = (title || '').trim();
   elPostTitle.value  = title || '';
@@ -1384,7 +1553,7 @@ function setEditorContent(body, title) {
   targetCelebrated   = false;
   updateWordCount();
 }
-
+ 
 function openPost(id) {
   silentSave();
   setActiveId(id);
@@ -1396,7 +1565,7 @@ function openPost(id) {
   }
   elEditor.focus();
 }
-
+ 
 function newPost() {
   silentSave();
   const id = genId();
@@ -1414,7 +1583,7 @@ function newPost() {
   }
   elEditor.focus();
 }
-
+ 
 function confirmDeletePost(id) {
   const row = elPostsList.querySelector(`.post-row[data-post-id="${id}"]`);
   if (!row) return;
@@ -1434,7 +1603,7 @@ function confirmDeletePost(id) {
     e.stopPropagation(); renderPostsList();
   });
 }
-
+ 
 function doDeletePost(id) {
   silentSave();
   const activeId = getActiveId();
@@ -1446,21 +1615,40 @@ function doDeletePost(id) {
   }
   renderPostsList();
 }
-
+ 
+// ── Menu ───────────────────────────────────────────────
+function toggleMenu() {
+  elMenuDropdown.classList.toggle('show');
+}
+ 
+function closeMenu() {
+  elMenuDropdown.classList.remove('show');
+}
+ 
+// ── Help Modal ─────────────────────────────────────────
+function openHelp() {
+  elHelpModalBackdrop.classList.add('show');
+  elHelpModal.classList.add('show');
+}
+ 
+function closeHelp() {
+  elHelpModalBackdrop.classList.remove('show');
+  elHelpModal.classList.remove('show');
+}
+ 
 // ── Dark mode ──────────────────────────────────────────
 function setDark(on) {
   document.body.classList.toggle('dark', on);
   elDarkIcon.textContent = on ? '☀️' : '🌙';
   elBtnDark.classList.toggle('on', on);
 }
-
+ 
 function toggleDark() {
   const on = !document.body.classList.contains('dark');
   setDark(on);
-  // stored as the string "true"/"false"; read back with === 'true'
-  localStorage.setItem('pb_dark', on);
+  localStorage.setItem('pb_dark', on ? 'true' : 'false');
 }
-
+ 
 // ── Save / Load ────────────────────────────────────────
 // Strip inline color/background injected by Chromium's contenteditable
 // so saved HTML defers to CSS variables correctly in light and dark mode.
@@ -1476,7 +1664,7 @@ function sanitizeBody(html) {
   });
   return tmp.innerHTML;
 }
-
+ 
 function silentSave() {
   let id = getActiveId();
   try {
@@ -1496,7 +1684,7 @@ function silentSave() {
     showSaveStatus('⚠ Save failed', true);
   }
 }
-
+ 
 function showSaveStatus(msg, isError = false) {
   elSaveStatus.textContent = msg;
   elSaveStatus.style.color = isError ? 'var(--delete-color)' : '';
@@ -1504,11 +1692,11 @@ function showSaveStatus(msg, isError = false) {
   clearTimeout(showSaveStatus._t);
   showSaveStatus._t = setTimeout(() => elSaveStatus.classList.remove('show'), isError ? 4000 : 2000);
 }
-
+ 
 function loadDoc() {
   try {
     const ids = getAllPostIds();
-
+ 
     // Migrate legacy single-doc save (pb_v4) into the multi-post system
     const legacy = localStorage.getItem('pb_v4');
     if (legacy && !ids.length) {
@@ -1527,16 +1715,16 @@ function loadDoc() {
         if (post) setEditorContent(post.body, post.title);
       }
     }
-
+ 
     const savedTarget = parseInt(localStorage.getItem('pb_target'), 10);
     if (savedTarget > 0) wordTarget = savedTarget;
     updateWordCount();
     updateTargetToggleBtn();
-
+ 
     if (localStorage.getItem('pb_dark') === 'true') setDark(true);
   } catch { /* corrupt localStorage — start fresh */ }
 }
-
+ 
 function copyText() {
   const title = elPostTitle.value.trim();
   const body  = walkText('\n').replace(/\n{3,}/g, '\n\n').trim();
@@ -1544,27 +1732,27 @@ function copyText() {
     .then(() => showToast('Copied ✓'))
     .catch(() => showToast('Copy failed — try Cmd+A, Cmd+C'));
 }
-
+ 
 function showToast(msg) {
   elToast.textContent = msg;
   elToast.classList.add('show');
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => elToast.classList.remove('show'), 2000);
 }
-
+ 
 // ── Compare mode ───────────────────────────────────────
 function toggleCompare() {
   compareMode = !compareMode;
   elWritingArea.classList.toggle('compare-mode', compareMode);
   elBtnCompare.classList.toggle('on', compareMode);
-
+ 
   if (compareMode) {
     requestAnimationFrame(() => elPaneB.classList.add('visible'));
     elPaneALabel.style.display = 'block';
     elPaneAFooter.style.display = 'flex';
     elWordCountWrap.classList.add('compare-mode-active');
     updatePaneACount();
-    updateComparePaneCount();
+    updateWordCount();
   } else {
     elPaneB.classList.remove('visible');
     elPaneALabel.style.removeProperty('display');
@@ -1572,86 +1760,14 @@ function toggleCompare() {
     elWordCountWrap.classList.remove('compare-mode-active');
   }
 }
-
+ 
 function fmtCount(n) { return n + ' word' + (n !== 1 ? 's' : ''); }
-
+ 
 function updatePaneACount() {
   if (!compareMode) return;
   document.getElementById('paneACount').textContent = fmtCount(countWords(elEditor));
 }
-
-// ── Theme picker ───────────────────────────────────
-let elBtnTheme, elThemePickerBackdrop, elThemePickerModal, elThemeOptions;
-let currentTheme = 'editorial';
-
-function initThemePicker() {
-  elBtnTheme = document.getElementById('btnTheme');
-  elThemePickerBackdrop = document.getElementById('themePickerBackdrop');
-  elThemePickerModal = document.getElementById('themePickerModal');
-  elThemeOptions = document.getElementById('themeOptions');
-
-  if (!elBtnTheme || !elThemePickerBackdrop || !elThemePickerModal || !elThemeOptions) {
-    console.warn('Theme picker elements not found');
-    return;
-  }
-
-  elBtnTheme.addEventListener('click', openThemePicker);
-  elThemePickerBackdrop.addEventListener('click', closeThemePicker);
-
-  elThemeOptions.querySelectorAll('.theme-option').forEach(option => {
-    option.addEventListener('click', () => {
-      const theme = option.dataset.theme;
-      if (theme) {
-        setTheme(theme);
-        closeThemePicker();
-      }
-    });
-  });
-
-  loadTheme();
-}
-
-function openThemePicker() {
-  if (elThemePickerBackdrop) elThemePickerBackdrop.classList.add('show');
-  if (elThemePickerModal) elThemePickerModal.classList.add('show');
-}
-
-function closeThemePicker() {
-  if (elThemePickerBackdrop) elThemePickerBackdrop.classList.remove('show');
-  if (elThemePickerModal) elThemePickerModal.classList.remove('show');
-}
-
-function setTheme(theme) {
-  const validThemes = ['editorial', 'mint', 'sky'];
-  if (!validThemes.includes(theme)) return;
-  
-  currentTheme = theme;
-  const classList = document.documentElement.classList;
-  classList.remove('theme-mint', 'theme-sky');
-  if (theme !== 'editorial') {
-    classList.add(`theme-${theme}`);
-  }
-  try {
-    localStorage.setItem('pb_theme', theme);
-  } catch { /* localStorage quota exceeded — silent fail */ }
-  updateThemePickerUI();
-}
-
-function updateThemePickerUI() {
-  if (!elThemeOptions) return;
-  elThemeOptions.querySelectorAll('.theme-option').forEach(option => {
-    option.classList.toggle('active', option.dataset.theme === currentTheme);
-  });
-}
-
-function loadTheme() {
-  try {
-    const savedTheme = localStorage.getItem('pb_theme') || 'editorial';
-    setTheme(savedTheme);
-  } catch { /* corrupt localStorage — default to editorial */ 
-    setTheme('editorial');
-  }
-}
-
+ 
+</script>
 </body>
 </html>
