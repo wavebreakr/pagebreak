@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pagebreak</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-canvas:      #edeae2;
+    --editor-bg:      #faf9f7;
+    --ink:            #1c1b18;
+    --ink-mid:        #6b6860;
+    --ink-dim:        #a8a49c;
+    --ink-faint:      rgba(0,0,0,0.07);
+    --accent:         #c2692a;
+    --accent-light:   #e8874a;
+    --accent-dim:     rgba(194,105,42,0.1);
+    --panel-bg:       rgba(250,248,244,0.82);
+    --panel-border:   rgba(0,0,0,0.08);
+    --glass-bg:       rgba(255,255,255,0.65);
+    --glass-border:   rgba(255,255,255,0.8);
+    --glass-shadow:    0 1px 0 rgba(255,255,255,0.95) inset, 0 8px 32px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06), inset 0 0 0 1.5px rgba(255,255,255,0.6);
+    --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.9) inset, 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+    --blur:           blur(18px) saturate(1.6);
+    --delete-bg:      rgba(184,74,74,0.15);
+    --delete-color:   #b84a4a;
+  }
+
+  .dark {
+    --bg-canvas:      #18160f;
+    --editor-bg:      #141412;
+    --ink:            #e8e4db;
+    --ink-mid:        #968f84;
+    --ink-dim:        #4a4740;
+    --ink-faint:      rgba(255,255,255,0.06);
+    --panel-bg:       rgba(24,22,16,0.85);
+    --panel-border:   rgba(255,255,255,0.07);
+    --glass-bg:       rgba(38,35,28,0.62);
+    --glass-border:   rgba(255,255,255,0.1);
+    --glass-shadow:    0 1px 0 rgba(255,255,255,0.06) inset, 0 8px 32px rgba(0,0,0,0.32), 0 1px 2px rgba(0,0,0,0.2), inset 0 0 0 1.5px rgba(255,255,255,0.08);
+    --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.05) inset, 0 2px 8px rgba(0,0,0,0.28), 0 1px 2px rgba(0,0,0,0.16);
+    --blur:           blur(20px) saturate(1.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--bg-canvas);
+    transition: background 0.4s;
+  }
+
+  input, button { font-family: inherit; }
+
+  body::before {
+    content: '';
+    pointer-events: none;
+    position: fixed; inset: 0; z-index: 0; opacity: 0.028;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px;
+  }
+
+  /* ── Chrome ── */
+  .chrome {
+    position: fixed; top: 0; left: 0; right: 0; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; gap: 12px;
+    background: transparent;
+    z-index: 200;
+  }
+  .chrome-left  { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .chrome-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+
+  .brand { display: flex; align-items: center; flex-shrink: 0; }
+  .brand img { height: 42px; width: auto; display: block; }
+  .dark .brand img { filter: invert(1); }
+
+  .post-title-inline {
+    font-size: 16px;
+    color: var(--ink-dim); background: none; border: none; outline: none;
+    width: 220px; max-width: 30vw;
+    transition: color 0.2s;
+  }
+  .post-title-inline::placeholder { color: var(--ink-dim); }
+  .post-title-inline:focus { color: var(--ink-mid); }
+
+  /* ── Word count + target widget ── */
+  .word-count-wrap { display: flex; align-items: center; gap: 5px; }
+  .word-count {
+    font-size: 16px; font-weight: 400; color: var(--ink-dim);
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .target-toggle-btn {
+    width: 22px; height: 22px;
+    border: 1px solid var(--glass-border); border-radius: 6px;
+    background: var(--glass-bg); box-shadow: var(--glass-shadow-sm);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--ink-dim);
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s;
+    flex-shrink: 0;
+  }
+  .target-toggle-btn:hover {
+    background: rgba(255,255,255,0.72);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 4px 14px rgba(0,0,0,0.1);
+    color: var(--ink); transform: translateY(-1px);
+  }
+  .dark .target-toggle-btn:hover { background: rgba(255,255,255,0.12); }
+  .target-toggle-btn.has-target { color: var(--ink-mid); }
+  .target-toggle-btn svg { width: 10px; height: 10px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+
+  /* ── Word target popover ── */
+  .target-popover {
+    position: absolute; top: calc(100% + 8px); right: 0;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+    border-radius: 12px; padding: 12px 14px;
+    display: flex; align-items: center; gap: 8px;
+    opacity: 0; pointer-events: none; transform: translateY(-4px);
+    transition: opacity 0.15s, transform 0.15s cubic-bezier(0.4,0,0.2,1);
+    white-space: nowrap; z-index: 500;
+  }
+  .target-popover.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .target-popover-label { font-size: 13px; font-weight: 500; color: var(--ink-mid); letter-spacing: -0.01em; }
+  .target-input {
+    font-size: 14px; font-weight: 500; color: var(--ink);
+    font-variant-numeric: tabular-nums; width: 80px;
+    background: var(--ink-faint); border: 1px solid var(--panel-border);
+    outline: none; border-radius: 7px; padding: 4px 8px; text-align: center;
+  }
+  .target-input:focus { border-color: var(--accent); }
+  .target-set-btn {
+    font-size: 13px; font-weight: 600; color: #fff;
+    background: var(--accent); border: none; border-radius: 7px;
+    padding: 4px 11px; cursor: pointer; letter-spacing: -0.01em;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .target-set-btn:hover { background: var(--accent-light); transform: translateY(-1px); }
+
+  .word-target-progress {
+    position: absolute; bottom: 0; left: 0; height: 2px; width: 0;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1), background 0.3s;
+    border-radius: 0 1px 1px 0;
+  }
+  .word-target-progress.done { background: linear-gradient(90deg, #4a9e6a, #6ec48a); }
+
+  /* ── Glass icon button — circular, 50px ── */
+  .icon-btn {
+    width: 50px; height: 50px; border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg); box-shadow: var(--glass-shadow);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--ink-mid);
+    transition: background 0.15s, box-shadow 0.15s, color 0.15s, transform 0.15s;
+    flex-shrink: 0;
+  }
+  .icon-btn:hover {
+    background: rgba(255,255,255,0.72);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 10px 40px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+    color: var(--ink); transform: translateY(-2px);
+  }
+  .dark .icon-btn:hover {
+    background: rgba(255,255,255,0.12);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 8px 32px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
+  }
+  .icon-btn.on {
+    background: var(--ink); color: var(--bg-canvas);
+    border-color: transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+  }
+  .icon-btn--sm { width: 40px; height: 40px; }
+
+  /* ── Menu wrapper + dropdown ── */
+  .menu-wrapper { position: relative; }
+
+  .menu-dropdown {
+    position: absolute; top: calc(100% + 6px); right: 0;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+    border-radius: 12px; min-width: 170px; z-index: 500;
+    opacity: 0; pointer-events: none; transform: translateY(-4px);
+    transition: opacity 0.15s, transform 0.15s cubic-bezier(0.4,0,0.2,1);
+    overflow: hidden;
+  }
+  .menu-dropdown.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+  .menu-item {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; padding: 11px 14px;
+    border: none; background: none; cursor: pointer;
+    color: var(--ink-mid); font-size: 14px; font-weight: 500;
+    text-align: left; letter-spacing: -0.01em;
+    transition: background 0.1s, color 0.1s;
+  }
+  .menu-item:hover { background: var(--ink-faint); color: var(--ink); }
+  .menu-item svg { width: 15px; height: 15px; flex-shrink: 0; stroke: currentColor; }
+  .menu-item.on { color: var(--accent); }
+
+  .menu-divider { height: 1px; background: var(--panel-border); margin: 3px 0; }
+
+  /* ── Save status ── */
+  .save-status {
+    font-size: 14px; color: var(--accent);
+    opacity: 0; transition: opacity 0.4s;
+    white-space: nowrap; letter-spacing: 0.01em;
+  }
+  .save-status.show { opacity: 1; }
+
+  /* ── Layout ── */
+  .writing-area {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; overflow: hidden;
+  }
+
+  .editor-wrap {
+    flex: 1; overflow-y: auto; padding: 116px 0 120px;
+    background: var(--editor-bg); transition: background 0.4s;
+    scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.12) transparent;
+  }
+  .editor-wrap::-webkit-scrollbar { width: 3px; }
+  .editor-wrap::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
+
+  .editor-inner { max-width: 640px; margin: 0 auto; padding: 0 36px; }
+
+  .editor {
+    font-family: 'Lora', serif;
+    font-size: 18px; line-height: 1.9;
+    color: var(--ink); caret-color: var(--accent);
+    outline: none; min-height: calc(100vh - 200px);
+    transition: color 0.3s; letter-spacing: 0.005em;
+    overflow-wrap: break-word; word-break: normal;
+  }
+  .editor:empty::before {
+    content: attr(data-placeholder);
+    color: var(--ink-dim); font-style: italic; pointer-events: none;
+  }
+  .editor p, .editor div { margin-top: 1.15em; }
+  .editor ul { padding-left: 1.4em; margin-top: 1.15em; list-style: disc; }
+  .editor ul li { margin-bottom: 0.2em; line-height: 1.9; }
+  .editor ul ul { margin-top: 0; list-style: circle; }
+  .editor ul ul ul { list-style: square; }
+  .editor strong { font-weight: 700; }
+  .editor em { font-style: italic; }
+  .editor h1, .editor h2, .editor h3 {
+    font-family: 'Lora', serif; font-weight: 600; color: var(--ink);
+    line-height: 1.3; margin-top: 1.15em; margin-bottom: 0.5em;
+    letter-spacing: -0.02em;
+  }
+  .editor h1 { font-size: 2em; }
+  .editor h2 { font-size: 1.5em; }
+  .editor h3 { font-size: 1.2em; }
+
+  /* ── Celebration pill ── */
+  .celebration {
+    position: fixed; top: 78px; left: 50%;
+    transform: translateX(-50%) translateY(-12px);
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+    color: var(--ink); font-size: 13px; font-weight: 500;
+    padding: 8px 20px; border-radius: 24px;
+    opacity: 0; pointer-events: none; z-index: 300;
+    transition: opacity 0.3s, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    white-space: nowrap; letter-spacing: -0.01em;
+  }
+  .celebration.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    font-size: 12px; font-weight: 500; color: var(--ink-mid);
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+    border-radius: 10px; padding: 7px 14px;
+    opacity: 0; transition: opacity 0.3s, transform 0.3s;
+    transform: translateY(6px); pointer-events: none; z-index: 300;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── Posts sidebar ── */
+  .posts-panel {
+    position: fixed; top: 64px; left: 0; bottom: 0; width: 220px;
+    border-right: 1px solid var(--panel-border);
+    background: var(--panel-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    display: flex; flex-direction: column; overflow: hidden;
+    z-index: 150;
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s, border-color 0.4s;
+  }
+  .posts-panel.hidden { transform: translateX(-100%); opacity: 0; pointer-events: none; border-right-width: 0; }
+
+  .posts-panel-header {
+    padding: 16px 14px 12px; flex-shrink: 0;
+    border-bottom: 1px solid var(--panel-border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .posts-panel-label {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-dim);
+  }
+  .posts-list {
+    flex: 1; overflow-y: auto;
+    padding: 8px; display: flex; flex-direction: column; gap: 3px;
+    scrollbar-width: thin; scrollbar-color: var(--ink-faint) transparent;
+  }
+  .posts-list::-webkit-scrollbar { width: 2px; }
+  .posts-list::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
+
+  .post-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 9px; cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+  }
+  .post-row:hover { background: rgba(255,255,255,0.55); box-shadow: var(--glass-shadow-sm); }
+  .dark .post-row:hover { background: rgba(255,255,255,0.05); }
+  .post-row.active { background: var(--accent-dim); box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset; }
+  .post-row-info { flex: 1; min-width: 0; }
+  .post-row-title {
+    font-size: 14px; font-weight: 500; color: var(--ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    letter-spacing: -0.01em; line-height: 1.3;
+  }
+  .post-row.active .post-row-title { color: var(--accent); }
+  .post-row-meta { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
+  .post-row-delete {
+    width: 20px; height: 20px; border-radius: 5px;
+    border: none; background: none; cursor: pointer;
+    color: var(--ink-dim); font-size: 13px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: background 0.15s, color 0.15s, opacity 0.15s;
+    flex-shrink: 0;
+  }
+  .post-row:hover .post-row-delete { opacity: 1; }
+  .post-row-delete:hover { background: var(--delete-bg); color: var(--delete-color); }
+
+  .post-row-confirm-title { font-size: 12px; font-weight: 500; color: var(--delete-color); line-height: 1.3; }
+  .post-row-confirm-meta  { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
+  .post-row-confirm-yes {
+    font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
+    border: none; cursor: pointer; flex-shrink: 0;
+    background: var(--delete-bg); color: var(--delete-color);
+  }
+  .post-row-confirm-no {
+    font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
+    border: none; cursor: pointer; flex-shrink: 0;
+    background: var(--ink-faint); color: var(--ink-mid);
+  }
+
+  /* ── Mobile backdrop ── */
+  .posts-panel-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.28); z-index: 149;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .posts-panel-backdrop.show { opacity: 1; }
+
+  /* ── Slash menu ── */
+  .slash-menu {
+    position: fixed;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+    border-radius: 10px; padding: 4px; min-width: 160px; z-index: 400;
+    opacity: 0; transform: translateY(4px); pointer-events: none;
+    transition: opacity 0.15s, transform 0.15s cubic-bezier(0.4,0,0.2,1);
+  }
+  .slash-menu.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .slash-menu-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 7px;
+    cursor: pointer; transition: background 0.1s; user-select: none;
+  }
+  .slash-menu-item:hover, .slash-menu-item.active { background: var(--ink-faint); }
+  .slash-menu-item-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: var(--glass-bg); border: 1px solid var(--panel-border);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    font-family: 'Lora', serif; color: var(--ink-mid); font-weight: 600;
+  }
+  .slash-menu-item-icon.icon-h { font-size: 14px; }
+  .slash-menu-item-icon.icon-p { font-size: 10px; }
+  .slash-menu-item-label { font-size: 13px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+  .slash-menu-item-desc  { font-size: 11px; color: var(--ink-dim); margin-top: 1px; }
+
+  /* ── Compare mode ── */
+  #paneA          { display: contents; }
+  #paneB          { display: none; }
+  #compareDivider { display: none; }
+
+  .writing-area.compare-mode { flex-direction: row; }
+  .writing-area.compare-mode #paneA {
+    display: flex; flex: 1; flex-direction: column;
+    overflow: hidden; position: relative; min-width: 0;
+  }
+  .writing-area.compare-mode #paneA .editor-wrap { flex: 1; }
+  .writing-area.compare-mode #compareDivider {
+    display: block; width: 1px; flex-shrink: 0;
+    background: var(--panel-border); align-self: stretch; margin-top: 64px;
+  }
+  .writing-area.compare-mode #paneB {
+    display: flex; flex: 1; flex-direction: column;
+    overflow: hidden; position: relative; min-width: 0;
+    opacity: 0; transform: translateX(18px);
+    transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+  .writing-area.compare-mode #paneB.visible { opacity: 1; transform: translateX(0); }
+  .writing-area.compare-mode #paneB .editor-wrap { flex: 1; }
+
+  #paneALabel, #paneAFooter { display: none; }
+
+  .compare-label {
+    position: absolute; top: 72px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--ink-dim);
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    padding: 3px 10px; border-radius: 20px;
+    pointer-events: none; z-index: 10; white-space: nowrap;
+  }
+  .pane-footer {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none; z-index: 10;
+  }
+  .pane-word-count {
+    font-size: 13px; font-weight: 400; color: var(--ink-dim);
+    font-variant-numeric: tabular-nums;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px; padding: 3px 12px;
+  }
+
+  .word-count-wrap.compare-mode-active { display: none; }
+
+  /* ── Help modal ── */
+  .help-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.3); z-index: 600;
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .help-backdrop.show { display: block; opacity: 1; }
+
+  .help-modal {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.96);
+    background: var(--panel-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+    border-radius: 16px; padding: 28px 28px 24px;
+    width: 90%; max-width: 520px; max-height: 80vh;
+    overflow-y: auto; z-index: 601;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s cubic-bezier(0.4,0,0.2,1);
+  }
+  .help-modal.show { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+
+  .help-modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .help-modal-title {
+    font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em;
+  }
+  .help-close-btn {
+    width: 28px; height: 28px; border-radius: 7px;
+    border: 1px solid var(--panel-border); background: var(--ink-faint);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--ink-mid); font-size: 16px; line-height: 1;
+    transition: background 0.15s, color 0.15s;
+  }
+  .help-close-btn:hover { background: var(--delete-bg); color: var(--delete-color); }
+
+  .help-section { margin-bottom: 20px; }
+  .help-section:last-child { margin-bottom: 0; }
+  .help-section-title {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--ink-dim); margin-bottom: 10px;
+  }
+  .help-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 0; border-bottom: 1px solid var(--ink-faint);
+  }
+  .help-row:last-child { border-bottom: none; }
+  .help-row-label { font-size: 14px; color: var(--ink-mid); }
+  .help-keys { display: flex; align-items: center; gap: 4px; }
+  kbd {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 24px; height: 22px; padding: 0 6px;
+    background: var(--glass-bg); border: 1px solid var(--panel-border);
+    border-radius: 5px; box-shadow: 0 1px 0 var(--panel-border);
+    font-family: inherit; font-size: 12px; font-weight: 500; color: var(--ink);
+    white-space: nowrap;
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 700px) {
+    .chrome { padding: 0 14px; gap: 8px; }
+    .chrome-left { gap: 8px; flex: 1; min-width: 0; }
+    .chrome-right { gap: 8px; flex-shrink: 0; }
+    .post-title-inline { display: none; }
+    .brand img { height: 34px; }
+    .editor-inner { padding: 0 20px; }
+
+    .posts-panel {
+      top: auto; bottom: 0; left: 0; right: 0;
+      width: 100%; height: 62vh; max-height: 520px;
+      border-right: none; border-top: 1px solid var(--panel-border);
+      border-radius: 20px 20px 0 0;
+      transform: translateY(100%); opacity: 1;
+    }
+    .posts-panel.hidden {
+      transform: translateY(100%); opacity: 1;
+      pointer-events: none; border-top-width: 0;
+    }
+    .posts-panel.mobile-open {
+      transform: translateY(0) !important; opacity: 1 !important;
+      pointer-events: auto !important; border-top-width: 1px !important;
+    }
+    .posts-panel-backdrop { display: block; }
+    .posts-panel-header::before {
+      content: ''; position: absolute; top: 8px; left: 50%;
+      transform: translateX(-50%); width: 36px; height: 4px;
+      background: var(--ink-dim); border-radius: 2px; opacity: 0.35;
+    }
+    .posts-panel-header { position: relative; padding-top: 22px; }
+    .post-row-delete { opacity: 1; }
+
+    .writing-area.compare-mode { flex-direction: column; }
+    .writing-area.compare-mode #compareDivider { width: auto; height: 1px; margin-top: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="chrome">
+  <div class="chrome-left">
+    <button class="icon-btn" id="btnPosts" title="All posts" aria-label="Toggle posts panel">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" aria-hidden="true">
+        <line x1="2" y1="4" x2="14" y2="4"/>
+        <line x1="2" y1="8" x2="14" y2="8"/>
+        <line x1="2" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
+    <div class="brand">
+      <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/PagebreakLogo2.png" alt="Pagebreak">
+    </div>
+    <input class="post-title-inline" id="postTitleInline" type="text"
+      placeholder="Untitled post…" maxlength="80" aria-label="Post title">
+  </div>
+  <div class="chrome-right">
+    <span class="save-status" id="saveStatus" aria-live="polite">Saved</span>
+    <div class="word-count-wrap" id="wordCountWrap" style="position:relative;">
+      <span class="word-count" id="wordCount" aria-live="polite">0 words</span>
+      <button class="target-toggle-btn" id="targetToggleBtn"
+        title="Set word count target" aria-label="Set word count target">
+        <svg id="targetToggleIcon" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+          <line x1="5" y1="1" x2="5" y2="9"/>
+          <line x1="1" y1="5" x2="9" y2="5"/>
+        </svg>
+      </button>
+      <div class="target-popover" id="targetPopover">
+        <span class="target-popover-label">Target</span>
+        <input class="target-input" id="targetInput" type="number" min="1" max="99999"
+          placeholder="e.g. 500" aria-label="Word target">
+        <button class="target-set-btn" id="targetSetBtn">Set</button>
+      </div>
+    </div>
+    <div class="menu-wrapper">
+      <button class="icon-btn" id="btnMenu" title="Menu" aria-label="Open menu" aria-haspopup="true">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="15" height="15" aria-hidden="true">
+          <line x1="2" y1="4" x2="14" y2="4"/>
+          <line x1="2" y1="8" x2="14" y2="8"/>
+          <line x1="2" y1="12" x2="14" y2="12"/>
+        </svg>
+      </button>
+      <div class="menu-dropdown" id="menuDropdown" role="menu">
+        <button class="menu-item" id="btnCopy" role="menuitem">
+          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="5" y="4" width="9" height="11" rx="1.5"/>
+            <path d="M11 4V3a1 1 0 0 0-1-1H3a1.5 1.5 0 0 0-1.5 1.5v8A1 1 0 0 0 3 12.5h2"/>
+          </svg>
+          Copy text
+        </button>
+        <button class="menu-item" id="btnCompare" role="menuitem">
+          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="8" y1="2" x2="8" y2="14"/>
+            <rect x="1" y="4" width="5" height="8" rx="1"/>
+            <rect x="10" y="4" width="5" height="8" rx="1"/>
+          </svg>
+          Compare mode
+        </button>
+        <button class="menu-item" id="btnDark" role="menuitem">
+          <span id="darkIcon" aria-hidden="true">🌙</span>
+          Dark mode
+        </button>
+        <div class="menu-divider"></div>
+        <button class="menu-item" id="btnHelp" role="menuitem">
+          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="8" cy="8" r="6.5"/>
+            <path d="M6.5 6.5a1.5 1.5 0 0 1 3 0c0 1-1.5 1.5-1.5 2.5"/>
+            <circle cx="8" cy="12" r="0.6" fill="currentColor"/>
+          </svg>
+          Keyboard shortcuts
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="word-target-progress" id="wordTargetProgress" role="progressbar" aria-hidden="true"></div>
+</div>
+
+<div class="help-backdrop" id="helpBackdrop"></div>
+<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+  <div class="help-modal-header">
+    <span class="help-modal-title">Keyboard shortcuts</span>
+    <button class="help-close-btn" id="btnCloseHelp" aria-label="Close">✕</button>
+  </div>
+  <div class="help-section">
+    <div class="help-section-title">Formatting</div>
+    <div class="help-row">
+      <span class="help-row-label">Bold</span>
+      <span class="help-keys"><kbd>⌘</kbd><kbd>B</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Italic</span>
+      <span class="help-keys"><kbd>⌘</kbd><kbd>I</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Bullet list</span>
+      <span class="help-keys"><kbd>-</kbd><kbd>Space</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Indent list item</span>
+      <span class="help-keys"><kbd>Tab</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Outdent list item</span>
+      <span class="help-keys"><kbd>⇧</kbd><kbd>Tab</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Insert block (heading / paragraph)</span>
+      <span class="help-keys"><kbd>/</kbd></span>
+    </div>
+  </div>
+  <div class="help-section">
+    <div class="help-section-title">App</div>
+    <div class="help-row">
+      <span class="help-row-label">Save</span>
+      <span class="help-keys"><kbd>⌘</kbd><kbd>S</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Select all</span>
+      <span class="help-keys"><kbd>⌘</kbd><kbd>A</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Copy all (via menu)</span>
+      <span class="help-keys"><kbd>⌘</kbd><kbd>C</kbd></span>
+    </div>
+  </div>
+</div>
+
+<div class="writing-area" id="writingArea">
+  <div class="posts-panel-backdrop" id="postsPanelBackdrop"></div>
+  <div class="posts-panel hidden" id="postsPanel">
+    <div class="posts-panel-header">
+      <span class="posts-panel-label">Posts</span>
+      <button class="icon-btn icon-btn--sm" id="btnNewPost" title="New post" aria-label="New post">＋</button>
+    </div>
+    <div class="posts-list" id="postsList" role="list"></div>
+  </div>
+
+  <div id="paneA">
+    <div class="compare-label" id="paneALabel">Original</div>
+    <div class="pane-footer" id="paneAFooter">
+      <span class="pane-word-count" id="paneACount">0 words</span>
+    </div>
+    <div class="editor-wrap" id="editorWrap">
+      <div class="editor-inner">
+        <div class="editor" id="editor"
+          contenteditable="true"
+          data-placeholder="Start writing…"
+          spellcheck="true"
+          role="textbox"
+          aria-multiline="true"
+          aria-label="Editor"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="compareDivider" aria-hidden="true"></div>
+
+  <div id="paneB">
+    <div class="compare-label">Compare</div>
+    <div class="editor-wrap">
+      <div class="editor-inner">
+        <div class="editor" id="editorB"
+          contenteditable="true"
+          data-placeholder="Paste or type copy to compare…"
+          spellcheck="true"
+          role="textbox"
+          aria-multiline="true"
+          aria-label="Compare editor"></div>
+      </div>
+    </div>
+    <div class="pane-footer">
+      <span class="pane-word-count" id="paneBCount">0 words</span>
+    </div>
+  </div>
+</div>
+
+<div class="celebration" id="celebration" aria-live="polite" aria-atomic="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="slash-menu" id="slashMenu" role="listbox" aria-label="Insert block type">
+  <div class="slash-menu-item" data-index="0" role="option">
+    <div class="slash-menu-item-icon icon-h">H</div>
+    <div>
+      <div class="slash-menu-item-label">Header</div>
+      <div class="slash-menu-item-desc">Section heading</div>
+    </div>
+  </div>
+  <div class="slash-menu-item" data-index="1" role="option">
+    <div class="slash-menu-item-icon icon-p">¶</div>
+    <div>
+      <div class="slash-menu-item-label">Paragraph</div>
+      <div class="slash-menu-item-desc">Plain body text</div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── State ──────────────────────────────────────────────
+let wordTarget       = 0;
+let targetCelebrated = false;
+let isComposing      = false;
+let isTyping         = false;
+let _typingTimer     = null;
+let compareMode      = false;
+let _saveTimer       = null;
+
+// Slash menu state
+let slashMenuOpen  = false;
+let slashMenuIndex = 0;
+let slashBlock     = null;
+let slashBareLine  = null;
+
+// Block tag sets used in DOM-walking hot paths
+const BLOCK_TAGS = new Set(['P', 'DIV', 'LI', 'BR', 'H1', 'H2', 'H3', 'UL', 'OL']);
+const PARA_RE    = /^(P|DIV|LI)$/;
+
+// Cached element references
+let elEditor, elEditorWrap, elPostsPanel, elWordCount, elWordCountWrap,
+    elTargetInput, elTargetPopover, elTargetToggleBtn, elTargetToggleIcon,
+    elSaveStatus, elProgressBar, elCelebration, elToast,
+    elPostTitle, elPostsList, elBtnDark, elDarkIcon, elBtnPosts, elSlashMenu,
+    elBtnCompare, elWritingArea, elPaneB, elEditorB,
+    elPaneALabel, elPaneAFooter, elPostsPanelBackdrop,
+    elBtnMenu, elMenuDropdown, elHelpModal, elHelpBackdrop;
+
+// ── Init ───────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  elEditor              = document.getElementById('editor');
+  elEditorWrap          = document.getElementById('editorWrap');
+  elPostsPanel          = document.getElementById('postsPanel');
+  elWordCount           = document.getElementById('wordCount');
+  elWordCountWrap       = document.getElementById('wordCountWrap');
+  elTargetInput         = document.getElementById('targetInput');
+  elTargetPopover       = document.getElementById('targetPopover');
+  elTargetToggleBtn     = document.getElementById('targetToggleBtn');
+  elTargetToggleIcon    = document.getElementById('targetToggleIcon');
+  elSaveStatus          = document.getElementById('saveStatus');
+  elProgressBar         = document.getElementById('wordTargetProgress');
+  elCelebration         = document.getElementById('celebration');
+  elToast               = document.getElementById('toast');
+  elPostTitle           = document.getElementById('postTitleInline');
+  elPostsList           = document.getElementById('postsList');
+  elBtnDark             = document.getElementById('btnDark');
+  elDarkIcon            = document.getElementById('darkIcon');
+  elBtnPosts            = document.getElementById('btnPosts');
+  elSlashMenu           = document.getElementById('slashMenu');
+  elBtnCompare          = document.getElementById('btnCompare');
+  elWritingArea         = document.getElementById('writingArea');
+  elPaneB               = document.getElementById('paneB');
+  elEditorB             = document.getElementById('editorB');
+  elPaneALabel          = document.getElementById('paneALabel');
+  elPaneAFooter         = document.getElementById('paneAFooter');
+  elPostsPanelBackdrop  = document.getElementById('postsPanelBackdrop');
+  elBtnMenu             = document.getElementById('btnMenu');
+  elMenuDropdown        = document.getElementById('menuDropdown');
+  elHelpModal           = document.getElementById('helpModal');
+  elHelpBackdrop        = document.getElementById('helpBackdrop');
+
+  document.execCommand('defaultParagraphSeparator', false, 'p');
+
+  // Button listeners
+  elBtnPosts.addEventListener('click', togglePostsPanel);
+  elBtnMenu.addEventListener('click', toggleMenu);
+  elBtnDark.addEventListener('click',    () => { toggleDark();    closeMenu(); });
+  elBtnCompare.addEventListener('click', () => { toggleCompare(); closeMenu(); });
+  document.getElementById('btnCopy').addEventListener('click',  () => { copyText();  closeMenu(); });
+  document.getElementById('btnHelp').addEventListener('click',  () => { openHelp();  closeMenu(); });
+  document.getElementById('btnCloseHelp').addEventListener('click', closeHelp);
+  elHelpBackdrop.addEventListener('click', closeHelp);
+  document.getElementById('btnNewPost').addEventListener('click', newPost);
+  elTargetToggleBtn.addEventListener('click', onTargetToggle);
+  document.getElementById('targetSetBtn').addEventListener('click', commitTarget);
+  elPostsPanelBackdrop.addEventListener('click', togglePostsPanel);
+
+  elPostTitle.addEventListener('input', onTitleType);
+
+  // Editor listeners
+  elEditor.addEventListener('keydown', onEditorKeydown);
+  elEditor.addEventListener('input', onEditorInput);
+  elEditor.addEventListener('compositionstart', () => { isComposing = true; });
+  elEditor.addEventListener('compositionend',   () => { isComposing = false; });
+  elEditor.addEventListener('paste', e => {
+    // Strip all formatting — insert plain text only
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
+  });
+
+  elEditorB.addEventListener('paste', e => {
+    e.preventDefault();
+    document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
+  });
+  elEditorB.addEventListener('input', updateComparePaneCount);
+
+  elTargetInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter')  { e.preventDefault(); commitTarget(); }
+    if (e.key === 'Escape') { e.preventDefault(); closeTargetInput(); }
+  });
+
+  // Slash menu items
+  elSlashMenu.querySelectorAll('.slash-menu-item').forEach((item, i) => {
+    item.addEventListener('mousedown', e => { e.preventDefault(); slashSelect(i); });
+  });
+
+  // Global close-on-outside-click handlers
+  document.addEventListener('mousedown', e => {
+    if (slashMenuOpen && !elSlashMenu.contains(e.target)) closeSlashMenu();
+  });
+  document.addEventListener('mousedown', e => {
+    if (elMenuDropdown.classList.contains('show') &&
+        !elMenuDropdown.contains(e.target) &&
+        e.target !== elBtnMenu) {
+      closeMenu();
+    }
+  });
+  document.addEventListener('mousedown', e => {
+    if (elTargetPopover.classList.contains('show') &&
+        !elTargetPopover.contains(e.target) &&
+        !elTargetToggleBtn.contains(e.target)) {
+      closeTargetInput();
+    }
+  }, true);
+
+  // Cmd/Ctrl+S
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); silentSave(); }
+  });
+
+  setInterval(silentSave, 20000);
+  window.addEventListener('beforeunload', silentSave);
+
+  loadDoc();
+  requestAnimationFrame(() => elEditor.focus());
+});
+
+// ── Typewriter scroll ──────────────────────────────────
+function scrollToCursor() {
+  if (!isTyping) return;
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return;
+  const rect = sel.getRangeAt(0).getBoundingClientRect();
+  if (!rect.height) return;
+  const wrapRect = elEditorWrap.getBoundingClientRect();
+  const target   = wrapRect.top + wrapRect.height * 0.5;
+  const delta    = rect.top - target;
+  if (Math.abs(delta) > 4) elEditorWrap.scrollTop += delta;
+}
+
+// ── Editor keydown ─────────────────────────────────────
+function onEditorKeydown(e) {
+  isTyping = true;
+  clearTimeout(_typingTimer);
+  _typingTimer = setTimeout(() => { isTyping = false; }, 1000);
+
+  const mod = e.metaKey || e.ctrlKey;
+
+  if (slashMenuOpen) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setSlashIndex((slashMenuIndex + 1) % 2); return; }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); setSlashIndex((slashMenuIndex - 1 + 2) % 2); return; }
+    if (e.key === 'Enter')     { e.preventDefault(); slashSelect(slashMenuIndex); return; }
+    if (e.key === 'Escape')    { e.preventDefault(); closeSlashMenu(true); return; }
+    if (e.key !== 'Shift' && e.key !== 'Meta' && e.key !== 'Control' && e.key !== 'Alt') {
+      closeSlashMenu();
+    }
+  }
+
+  if (mod && e.key === 'b') { e.preventDefault(); document.execCommand('bold');   return; }
+  if (mod && e.key === 'i') { e.preventDefault(); document.execCommand('italic'); return; }
+
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount) {
+      let node = sel.getRangeAt(0).startContainer;
+      while (node && node !== elEditor) {
+        if (node.nodeName === 'LI') {
+          document.execCommand(e.shiftKey ? 'outdent' : 'indent');
+          return;
+        }
+        node = node.parentNode;
+      }
+    }
+    document.execCommand('insertText', false, '    ');
+    return;
+  }
+
+  // "- " → bullet list
+  if (e.key === ' ') {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    if (!range.collapsed) return;
+    let block = range.startContainer;
+    while (block && block !== elEditor && !PARA_RE.test(block.nodeName)) {
+      block = block.parentNode;
+    }
+    if (!block || block === elEditor) return;
+    const pre = document.createRange();
+    pre.setStart(block, 0);
+    pre.setEnd(range.startContainer, range.startOffset);
+    if (pre.toString() === '-') {
+      e.preventDefault();
+      const del = document.createRange();
+      del.setStart(range.startContainer, range.startOffset - 1);
+      del.setEnd(range.startContainer, range.startOffset);
+      sel.removeAllRanges(); sel.addRange(del);
+      document.execCommand('delete');
+      document.execCommand('insertUnorderedList');
+      onType();
+    }
+  }
+}
+
+// ── Editor input ───────────────────────────────────────
+function onEditorInput() {
+  if (!slashMenuOpen) maybeOpenSlashMenu();
+  onType();
+  requestAnimationFrame(scrollToCursor);
+}
+
+// ── Slash menu ─────────────────────────────────────────
+function maybeOpenSlashMenu() {
+  if (isComposing) return;
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  if (!range.collapsed) return;
+
+  let block = range.startContainer;
+  while (block && block !== elEditor && !PARA_RE.test(block.nodeName)) {
+    block = block.parentNode;
+  }
+  if (!block) return;
+
+  const isBareLine  = (block === elEditor);
+  const textContent = isBareLine ? range.startContainer.textContent : block.textContent;
+  if (textContent !== '/') return;
+
+  slashBlock    = block;
+  slashBareLine = isBareLine ? range.startContainer : null;
+  openSlashMenu(range);
+}
+
+function openSlashMenu(range) {
+  slashMenuIndex = 0;
+  updateSlashMenuItems();
+  const rect = range.getBoundingClientRect();
+  elSlashMenu.style.left = Math.min(rect.left, window.innerWidth - 200) + 'px';
+  elSlashMenu.style.top  = (rect.bottom + 6) + 'px';
+  elSlashMenu.classList.add('visible');
+  slashMenuOpen = true;
+}
+
+function closeSlashMenu(restoreFocus) {
+  slashMenuOpen = false;
+  slashBlock    = null;
+  slashBareLine = null;
+  elSlashMenu.classList.remove('visible');
+  if (restoreFocus) elEditor.focus();
+}
+
+function setSlashIndex(i) {
+  slashMenuIndex = i;
+  updateSlashMenuItems();
+}
+
+function updateSlashMenuItems() {
+  elSlashMenu.querySelectorAll('.slash-menu-item').forEach((el, i) => {
+    el.classList.toggle('active', i === slashMenuIndex);
+  });
+}
+
+// 0 = Header (h2), 1 = Paragraph (p)
+function slashSelect(index) {
+  const block    = slashBlock;
+  const bareLine = slashBareLine;
+  closeSlashMenu();
+
+  const tag   = index === 0 ? 'h2' : 'p';
+  const newEl = document.createElement(tag);
+  newEl.appendChild(document.createElement('br'));
+
+  if (bareLine) {
+    elEditor.replaceChild(newEl, bareLine);
+  } else {
+    if (!block || !block.isConnected) return;
+    block.parentNode.replaceChild(newEl, block);
+  }
+
+  const sel = window.getSelection();
+  const r   = document.createRange();
+  r.setStart(newEl, 0);
+  r.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(r);
+
+  onType();
+}
+
+// ── Word count + target ────────────────────────────────
+function onType() {
+  updateWordCount();
+  if (compareMode) updatePaneACount();
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(silentSave, 5000);
+}
+
+function walkText(sep, el) {
+  const root  = el || elEditor;
+  const parts = [];
+  function walk(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      parts.push(node.textContent);
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const isBlock = BLOCK_TAGS.has(node.tagName);
+      if (isBlock) parts.push(sep);
+      for (const child of node.childNodes) walk(child);
+      if (isBlock) parts.push(sep);
+    }
+  }
+  walk(root);
+  return parts.join('');
+}
+
+function countWords(el) {
+  const t = walkText(' ', el).trim();
+  return t ? t.split(/\s+/).length : 0;
+}
+
+function updateWordCount() {
+  const words = countWords(elEditor);
+  elWordCount.textContent = wordTarget
+    ? `${words} / ${wordTarget} word${wordTarget !== 1 ? 's' : ''}`
+    : `${words} word${words !== 1 ? 's' : ''}`;
+  updateTargetProgress(words);
+  if (wordTarget > 0 && words === wordTarget && !targetCelebrated) {
+    targetCelebrated = true;
+    celebrate(`${words} words — target reached! ✦`);
+  }
+  if (wordTarget > 0 && words < wordTarget) targetCelebrated = false;
+  if (wordTarget > 0 && words > wordTarget) targetCelebrated = true;
+}
+
+function onTargetToggle() {
+  wordTarget > 0 ? clearTarget() : openTargetInput();
+}
+
+function openTargetInput() {
+  elTargetInput.value = wordTarget || '';
+  elTargetPopover.classList.add('show');
+  elTargetInput.focus();
+  elTargetInput.select();
+}
+
+function commitTarget() {
+  const val = parseInt(elTargetInput.value, 10);
+  wordTarget = val > 0 ? val : 0;
+  targetCelebrated = false;
+  wordTarget ? localStorage.setItem('pb_target', wordTarget) : localStorage.removeItem('pb_target');
+  closeTargetInput();
+  updateWordCount();
+  updateTargetToggleBtn();
+}
+
+function clearTarget() {
+  wordTarget = 0;
+  targetCelebrated = false;
+  localStorage.removeItem('pb_target');
+  closeTargetInput();
+  updateWordCount();
+  updateTargetToggleBtn();
+}
+
+function closeTargetInput() { elTargetPopover.classList.remove('show'); }
+
+function updateTargetToggleBtn() {
+  if (wordTarget > 0) {
+    elTargetToggleBtn.classList.add('has-target');
+    elTargetToggleBtn.title = 'Clear word target';
+    elTargetToggleBtn.setAttribute('aria-label', 'Clear word target');
+    elTargetToggleIcon.innerHTML = '<line x1="2" y1="2" x2="8" y2="8"/><line x1="8" y1="2" x2="2" y2="8"/>';
+  } else {
+    elTargetToggleBtn.classList.remove('has-target');
+    elTargetToggleBtn.title = 'Set word count target';
+    elTargetToggleBtn.setAttribute('aria-label', 'Set word count target');
+    elTargetToggleIcon.innerHTML = '<line x1="5" y1="1" x2="5" y2="9"/><line x1="1" y1="5" x2="9" y2="5"/>';
+  }
+}
+
+function updateTargetProgress(words) {
+  if (!wordTarget) { elProgressBar.style.width = '0'; return; }
+  elProgressBar.style.width = Math.min(words / wordTarget * 100, 100) + '%';
+  elProgressBar.classList.toggle('done', words >= wordTarget);
+}
+
+function celebrate(msg) {
+  elCelebration.textContent = msg;
+  elCelebration.classList.add('show');
+  clearTimeout(celebrate._t);
+  celebrate._t = setTimeout(() => elCelebration.classList.remove('show'), 2600);
+}
+
+function onTitleType() {
+  const title = elPostTitle.value.trim();
+  document.title = title ? title + ' — Pagebreak' : 'Pagebreak';
+  if (!elPostsPanel.classList.contains('hidden')) renderPostsList();
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(silentSave, 5000);
+}
+
+// ── Menu ───────────────────────────────────────────────
+function toggleMenu() {
+  const isOpen = elMenuDropdown.classList.toggle('show');
+  elBtnMenu.setAttribute('aria-expanded', isOpen);
+}
+
+function closeMenu() {
+  elMenuDropdown.classList.remove('show');
+  elBtnMenu.setAttribute('aria-expanded', 'false');
+}
+
+// ── Help modal ─────────────────────────────────────────
+function openHelp() {
+  elHelpBackdrop.classList.add('show');
+  elHelpModal.classList.add('show');
+}
+
+function closeHelp() {
+  elHelpBackdrop.classList.remove('show');
+  elHelpModal.classList.remove('show');
+}
+
+// ── Posts management ───────────────────────────────────
+function genId() {
+  return 'pb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+}
+function getAllPostIds() {
+  try { return JSON.parse(localStorage.getItem('pb_posts') || '[]'); } catch { return []; }
+}
+function saveAllPostIds(ids) { localStorage.setItem('pb_posts', JSON.stringify(ids)); }
+function getActiveId()       { return localStorage.getItem('pb_active') || null; }
+function setActiveId(id)     { localStorage.setItem('pb_active', id); }
+function getPost(id) {
+  try { return JSON.parse(localStorage.getItem(id)); } catch { return null; }
+}
+function savePost(id, data)  { localStorage.setItem(id, JSON.stringify(data)); }
+function deletePost(id) {
+  localStorage.removeItem(id);
+  saveAllPostIds(getAllPostIds().filter(i => i !== id));
+}
+function escHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function togglePostsPanel() {
+  const isMobile = window.innerWidth <= 700;
+  const isHidden = isMobile
+    ? !elPostsPanel.classList.contains('mobile-open')
+    : elPostsPanel.classList.contains('hidden');
+
+  if (isHidden) { silentSave(); renderPostsList(); }
+
+  if (isMobile) {
+    if (isHidden) {
+      elPostsPanel.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        elPostsPanel.classList.add('mobile-open');
+        elPostsPanelBackdrop.classList.add('show');
+      });
+    } else {
+      elPostsPanel.classList.remove('mobile-open');
+      elPostsPanelBackdrop.classList.remove('show');
+      setTimeout(() => elPostsPanel.classList.add('hidden'), 350);
+    }
+  } else {
+    elPostsPanel.classList.toggle('hidden', !isHidden);
+  }
+  elBtnPosts.classList.toggle('on', isHidden);
+}
+
+function renderPostsList() {
+  const ids      = getAllPostIds();
+  const activeId = getActiveId();
+  if (!ids.length) {
+    elPostsList.innerHTML = '<div style="font-size:14px;color:var(--ink-dim);padding:8px 2px;">No posts yet.</div>';
+    return;
+  }
+  elPostsList.innerHTML = [...ids].reverse().map(id => {
+    const post = getPost(id);
+    if (!post) return '';
+    const title = post.title || 'Untitled post';
+    const words = post.body
+      ? post.body.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length
+      : 0;
+    const date = post.saved
+      ? new Date(post.saved).toLocaleDateString(navigator.language, { day: 'numeric', month: 'short' })
+      : '';
+    return `
+      <div class="post-row${id === activeId ? ' active' : ''}" data-post-id="${id}" role="listitem">
+        <div class="post-row-info">
+          <div class="post-row-title">${escHtml(title)}</div>
+          <div class="post-row-meta">${words} word${words !== 1 ? 's' : ''} · ${date}</div>
+        </div>
+        <button class="post-row-delete" aria-label="Delete ${escHtml(title)}">×</button>
+      </div>`;
+  }).join('');
+
+  elPostsList.querySelectorAll('.post-row').forEach(row => {
+    const id = row.dataset.postId;
+    row.addEventListener('click', () => openPost(id));
+    row.querySelector('.post-row-delete').addEventListener('click', e => {
+      e.stopPropagation();
+      confirmDeletePost(id);
+    });
+  });
+}
+
+function setEditorContent(body, title) {
+  const t = (title || '').trim();
+  elPostTitle.value  = title || '';
+  elEditor.innerHTML = sanitizeBody(body || '');
+  document.title     = t ? t + ' — Pagebreak' : 'Pagebreak';
+  targetCelebrated   = false;
+  updateWordCount();
+}
+
+function openPost(id) {
+  silentSave();
+  setActiveId(id);
+  const post = getPost(id);
+  if (post) setEditorContent(post.body, post.title);
+  renderPostsList();
+  if (window.innerWidth <= 700 && elPostsPanel.classList.contains('mobile-open')) {
+    togglePostsPanel();
+  }
+  elEditor.focus();
+}
+
+function newPost() {
+  silentSave();
+  const id = genId();
+  try {
+    saveAllPostIds([...getAllPostIds(), id]);
+    savePost(id, { title: '', body: '', saved: Date.now() });
+  } catch {
+    showSaveStatus('⚠ Save failed', true); return;
+  }
+  setActiveId(id);
+  setEditorContent('', '');
+  renderPostsList();
+  if (window.innerWidth <= 700 && elPostsPanel.classList.contains('mobile-open')) {
+    togglePostsPanel();
+  }
+  elEditor.focus();
+}
+
+function confirmDeletePost(id) {
+  const row = elPostsList.querySelector(`.post-row[data-post-id="${id}"]`);
+  if (!row) return;
+  const name = getPost(id)?.title || 'Untitled post';
+  row.innerHTML = `
+    <div class="post-row-info" style="min-width:0">
+      <div class="post-row-confirm-title">Delete "${escHtml(name)}"?</div>
+      <div class="post-row-confirm-meta">This can't be undone</div>
+    </div>
+    <button class="post-row-confirm-yes">Yes</button>
+    <button class="post-row-confirm-no">No</button>
+  `;
+  row.querySelector('.post-row-confirm-yes').addEventListener('click', e => {
+    e.stopPropagation(); doDeletePost(id);
+  });
+  row.querySelector('.post-row-confirm-no').addEventListener('click', e => {
+    e.stopPropagation(); renderPostsList();
+  });
+}
+
+function doDeletePost(id) {
+  silentSave();
+  const activeId = getActiveId();
+  deletePost(id);
+  if (id === activeId) {
+    const ids = getAllPostIds();
+    ids.length ? openPost(ids[ids.length - 1]) : newPost();
+    return;
+  }
+  renderPostsList();
+}
+
+// ── Dark mode ──────────────────────────────────────────
+function setDark(on) {
+  document.body.classList.toggle('dark', on);
+  elDarkIcon.textContent = on ? '☀️' : '🌙';
+  elBtnDark.classList.toggle('on', on);
+}
+
+function toggleDark() {
+  const on = !document.body.classList.contains('dark');
+  setDark(on);
+  localStorage.setItem('pb_dark', on);
+}
+
+// ── Save / Load ────────────────────────────────────────
+function sanitizeBody(html) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  tmp.querySelectorAll('[style]').forEach(el => {
+    el.style.removeProperty('color');
+    el.style.removeProperty('background-color');
+    el.style.removeProperty('background');
+    const remaining = el.getAttribute('style') || '';
+    if (!remaining.trim()) el.removeAttribute('style');
+  });
+  return tmp.innerHTML;
+}
+
+function silentSave() {
+  let id = getActiveId();
+  try {
+    if (!id) {
+      id = genId();
+      saveAllPostIds([...getAllPostIds(), id]);
+      setActiveId(id);
+    }
+    savePost(id, {
+      title: elPostTitle.value,
+      body:  sanitizeBody(elEditor.innerHTML),
+      saved: Date.now(),
+    });
+    showSaveStatus('Saved');
+    if (!elPostsPanel.classList.contains('hidden')) renderPostsList();
+  } catch {
+    showSaveStatus('⚠ Save failed', true);
+  }
+}
+
+function showSaveStatus(msg, isError = false) {
+  elSaveStatus.textContent = msg;
+  elSaveStatus.style.color = isError ? 'var(--delete-color)' : '';
+  elSaveStatus.classList.add('show');
+  clearTimeout(showSaveStatus._t);
+  showSaveStatus._t = setTimeout(() => elSaveStatus.classList.remove('show'), isError ? 4000 : 2000);
+}
+
+function loadDoc() {
+  try {
+    const ids = getAllPostIds();
+
+    const legacy = localStorage.getItem('pb_v4');
+    if (legacy && !ids.length) {
+      const d  = JSON.parse(legacy);
+      const id = genId();
+      saveAllPostIds([id]);
+      setActiveId(id);
+      savePost(id, { title: d.title || '', body: d.body || '', saved: Date.now() });
+      localStorage.removeItem('pb_v4');
+      setEditorContent(d.body, d.title);
+    } else {
+      let activeId = getActiveId();
+      if (!activeId && ids.length) { activeId = ids[ids.length - 1]; setActiveId(activeId); }
+      if (activeId) {
+        const post = getPost(activeId);
+        if (post) setEditorContent(post.body, post.title);
+      }
+    }
+
+    const savedTarget = parseInt(localStorage.getItem('pb_target'), 10);
+    if (savedTarget > 0) wordTarget = savedTarget;
+    updateWordCount();
+    updateTargetToggleBtn();
+
+    if (localStorage.getItem('pb_dark') === 'true') setDark(true);
+  } catch { /* corrupt localStorage — start fresh */ }
+}
+
+function copyText() {
+  const title = elPostTitle.value.trim();
+  const body  = walkText('\n').replace(/\n{3,}/g, '\n\n').trim();
+  navigator.clipboard.writeText((title ? title + '\n\n' : '') + body)
+    .then(() => showToast('Copied ✓'))
+    .catch(() => showToast('Copy failed — try Cmd+A, Cmd+C'));
+}
+
+function showToast(msg) {
+  elToast.textContent = msg;
+  elToast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => elToast.classList.remove('show'), 2000);
+}
+
+// ── Compare mode ───────────────────────────────────────
+function toggleCompare() {
+  compareMode = !compareMode;
+  elWritingArea.classList.toggle('compare-mode', compareMode);
+  elBtnCompare.classList.toggle('on', compareMode);
+
+  if (compareMode) {
+    requestAnimationFrame(() => elPaneB.classList.add('visible'));
+    elPaneALabel.style.display = 'block';
+    elPaneAFooter.style.display = 'flex';
+    elWordCountWrap.classList.add('compare-mode-active');
+    updatePaneACount();
+    updateComparePaneCount();
+  } else {
+    elPaneB.classList.remove('visible');
+    elPaneALabel.style.removeProperty('display');
+    elPaneAFooter.style.removeProperty('display');
+    elWordCountWrap.classList.remove('compare-mode-active');
+  }
+}
+
+function fmtCount(n) { return n + ' word' + (n !== 1 ? 's' : ''); }
+
+function updatePaneACount() {
+  if (!compareMode) return;
+  document.getElementById('paneACount').textContent = fmtCount(countWords(elEditor));
+}
+
+function updateComparePaneCount() {
+  document.getElementById('paneBCount').textContent = fmtCount(countWords(elEditorB));
+}
+</script>
+</body>
+</html>
