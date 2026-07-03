@@ -4,17 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pagebreak</title>
-<style>
-  /* Fallback fonts while CDN loads */
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-  .editor { font-family: 'Georgia', 'Garamond', serif; }
-</style>
-<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* ── Editorial palette ── */
     --bg-canvas:      #edeae2;
     --editor-bg:      #faf9f7;
     --ink:            #1c1b18;
@@ -63,10 +57,8 @@
     transition: background 0.4s;
   }
 
-  /* Ensure inputs/buttons inherit the body font */
   input, button { font-family: inherit; }
 
-  /* Noise grain overlay */
   body::before {
     content: '';
     pointer-events: none;
@@ -80,11 +72,8 @@
     position: fixed; top: 0; left: 0; right: 0; height: 64px;
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 20px; gap: 12px;
-    background: var(--editor-bg);
+    background: transparent;
     z-index: 200;
-    visibility: visible;
-    opacity: 1;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
   }
   .chrome-left  { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
   .chrome-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
@@ -103,69 +92,48 @@
   .post-title-inline:focus { color: var(--ink-mid); }
 
   /* ── Word count + target widget ── */
-  .word-count-wrap {
-    display: flex; align-items: center; gap: 5px;
-  }
+  .word-count-wrap { display: flex; align-items: center; gap: 5px; }
   .word-count {
     font-size: 16px; font-weight: 400; color: var(--ink-dim);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
   }
-  /* Small icon button for adding/clearing target */
   .target-toggle-btn {
     width: 22px; height: 22px;
     border: 1px solid var(--glass-border); border-radius: 6px;
     background: var(--glass-bg); box-shadow: var(--glass-shadow-sm);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
     color: var(--ink-dim);
     transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s;
     flex-shrink: 0;
   }
   .target-toggle-btn:hover {
     background: rgba(255,255,255,0.72);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 4px 14px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(255,255,255,0.5);
-    color: var(--ink);
-    transform: translateY(-1px);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 4px 14px rgba(0,0,0,0.1);
+    color: var(--ink); transform: translateY(-1px);
   }
-  .dark .target-toggle-btn:hover {
-    background: rgba(255,255,255,0.12);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 4px 14px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(255,255,255,0.08);
-  }
+  .dark .target-toggle-btn:hover { background: rgba(255,255,255,0.12); }
   .target-toggle-btn.has-target { color: var(--ink-mid); }
   .target-toggle-btn svg { width: 10px; height: 10px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 
   /* ── Word target popover ── */
   .target-popover {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
+    position: absolute; top: calc(100% + 8px); right: 0;
     background: var(--glass-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    border-radius: 12px;
-    padding: 12px 14px;
+    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+    border-radius: 12px; padding: 12px 14px;
     display: flex; align-items: center; gap: 8px;
-    opacity: 0; pointer-events: none;
-    transform: translateY(-4px);
+    opacity: 0; pointer-events: none; transform: translateY(-4px);
     transition: opacity 0.15s, transform 0.15s cubic-bezier(0.4,0,0.2,1);
-    white-space: nowrap;
-    z-index: 500;
+    white-space: nowrap; z-index: 500;
   }
-  .target-popover.show {
-    opacity: 1; pointer-events: auto; transform: translateY(0);
-  }
-  .target-popover-label {
-    font-size: 13px; font-weight: 500; color: var(--ink-mid);
-    letter-spacing: -0.01em;
-  }
+  .target-popover.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .target-popover-label { font-size: 13px; font-weight: 500; color: var(--ink-mid); letter-spacing: -0.01em; }
   .target-input {
     font-size: 14px; font-weight: 500; color: var(--ink);
     font-variant-numeric: tabular-nums; width: 80px;
     background: var(--ink-faint); border: 1px solid var(--panel-border);
-    outline: none; border-radius: 7px; padding: 4px 8px;
-    text-align: center;
+    outline: none; border-radius: 7px; padding: 4px 8px; text-align: center;
   }
   .target-input:focus { border-color: var(--accent); }
   .target-set-btn {
@@ -177,308 +145,68 @@
   .target-set-btn:hover { background: var(--accent-light); transform: translateY(-1px); }
 
   .word-target-progress {
-    position: absolute; bottom: 0; left: 0;
-    height: 2px; width: 0;
+    position: absolute; bottom: 0; left: 0; height: 2px; width: 0;
     background: linear-gradient(90deg, var(--accent), var(--accent-light));
     transition: width 0.4s cubic-bezier(0.4,0,0.2,1), background 0.3s;
     border-radius: 0 1px 1px 0;
   }
   .word-target-progress.done { background: linear-gradient(90deg, #4a9e6a, #6ec48a); }
 
-  /* Glass icon button — circular, 50px */
+  /* ── Glass icon button — circular, 50px ── */
   .icon-btn {
     width: 50px; height: 50px; border-radius: 50%;
-    border: 1px solid var(--glass-border); 
-    background: var(--glass-bg);
-    box-shadow: var(--glass-shadow);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg); box-shadow: var(--glass-shadow);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
     color: var(--ink-mid);
     transition: background 0.15s, box-shadow 0.15s, color 0.15s, transform 0.15s;
     flex-shrink: 0;
-    font-size: 18px;
-    visibility: visible;
-    opacity: 1;
   }
   .icon-btn:hover {
     background: rgba(255,255,255,0.72);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 10px 40px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08), inset 0 0 0 1.5px rgba(255,255,255,0.6);
-    color: var(--ink);
-    transform: translateY(-2px);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 10px 40px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+    color: var(--ink); transform: translateY(-2px);
   }
   .dark .icon-btn:hover {
     background: rgba(255,255,255,0.12);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 8px 32px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3), inset 0 0 0 1.5px rgba(255,255,255,0.12);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 8px 32px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
   }
   .icon-btn.on {
     background: var(--ink); color: var(--bg-canvas);
-    border-color: transparent;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+    border-color: transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.22);
   }
-  .icon-btn--sm { width: 40px; height: 40px; font-size: 18px; }
+  .icon-btn--sm { width: 40px; height: 40px; }
 
-  /* Glass text button */
-  .copy-btn {
-    font-size: 14px; font-weight: 500;
-    padding: 0 13px; height: 50px;
-    border: 1px solid var(--glass-border); border-radius: 25px;
-    background: var(--glass-bg); box-shadow: var(--glass-shadow);
-    cursor: pointer; color: var(--ink-mid);
-    display: flex; align-items: center; gap: 6px;
-    transition: background 0.15s, box-shadow 0.15s, color 0.15s, transform 0.15s;
-    white-space: nowrap; letter-spacing: 0.01em;
-  }
-  .copy-btn:hover {
-    background: rgba(255,255,255,0.72);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 10px 40px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08), inset 0 0 0 1.5px rgba(255,255,255,0.6);
-    color: var(--ink);
-    transform: translateY(-2px);
-  }
-  .dark .copy-btn:hover {
-    background: rgba(255,255,255,0.12);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 8px 32px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3), inset 0 0 0 1.5px rgba(255,255,255,0.12);
-  }
-  .copy-btn svg { width: 14px; height: 14px; stroke: currentColor; flex-shrink: 0; }
-
-  /* Menu dropdown */
-  .menu-wrapper {
-    position: relative;
-  }
+  /* ── Menu wrapper + dropdown ── */
+  .menu-wrapper { position: relative; }
 
   .menu-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    margin-top: 6px;
+    position: absolute; top: calc(100% + 6px); right: 0;
     background: var(--glass-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    border-radius: 10px;
-    min-width: 160px;
-    z-index: 500;
-    opacity: 0;
-    transform: translateY(-4px);
-    pointer-events: none;
+    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+    border-radius: 12px; min-width: 170px; z-index: 500;
+    opacity: 0; pointer-events: none; transform: translateY(-4px);
     transition: opacity 0.15s, transform 0.15s cubic-bezier(0.4,0,0.2,1);
     overflow: hidden;
   }
-
-  .menu-dropdown.show {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-  }
+  .menu-dropdown.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
 
   .menu-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    padding: 12px 14px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: var(--ink-mid);
-    font-size: 14px;
-    font-weight: 500;
-    text-align: left;
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; padding: 11px 14px;
+    border: none; background: none; cursor: pointer;
+    color: var(--ink-mid); font-size: 14px; font-weight: 500;
+    text-align: left; letter-spacing: -0.01em;
     transition: background 0.1s, color 0.1s;
-    letter-spacing: -0.01em;
   }
+  .menu-item:hover { background: var(--ink-faint); color: var(--ink); }
+  .menu-item svg { width: 15px; height: 15px; flex-shrink: 0; stroke: currentColor; }
+  .menu-item.on { color: var(--accent); }
 
-  .menu-item:hover {
-    background: var(--ink-faint);
-    color: var(--ink);
-  }
+  .menu-divider { height: 1px; background: var(--panel-border); margin: 3px 0; }
 
-  .menu-item:active {
-    background: var(--accent-dim);
-    color: var(--accent);
-  }
-
-  .menu-item svg {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-  }
-
-  .menu-item span:last-child {
-    flex: 1;
-  }
-
-  .menu-divider {
-    height: 1px;
-    background: var(--panel-border);
-    margin: 4px 0;
-  }
-
-  /* Help modal */
-  .help-modal-backdrop {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 600;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
-  .help-modal-backdrop.show {
-    display: block;
-    opacity: 1;
-  }
-
-  .help-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.95);
-    background: var(--glass-bg);
-    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    border-radius: 16px;
-    width: 90%;
-    max-width: 600px;
-    max-height: 80vh;
-    overflow-y: auto;
-    z-index: 601;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    scrollbar-width: thin;
-    scrollbar-color: var(--ink-faint) transparent;
-  }
-
-  .help-modal::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  .help-modal::-webkit-scrollbar-thumb {
-    background: var(--ink-faint);
-    border-radius: 3px;
-  }
-
-  .help-modal.show {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translate(-50%, -50%) scale(1);
-  }
-
-  .help-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--panel-border);
-    position: sticky;
-    top: 0;
-    background: var(--glass-bg);
-    z-index: 1;
-  }
-
-  .help-modal-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--ink);
-    margin: 0;
-    letter-spacing: -0.01em;
-  }
-
-  .help-modal-close {
-    width: 32px;
-    height: 32px;
-    border: 1px solid var(--glass-border);
-    border-radius: 8px;
-    background: none;
-    cursor: pointer;
-    color: var(--ink-mid);
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s, color 0.15s;
-  }
-
-  .help-modal-close:hover {
-    background: var(--ink-faint);
-    color: var(--ink);
-  }
-
-  .help-modal-content {
-    padding: 24px;
-  }
-
-  .help-section {
-    margin-bottom: 28px;
-  }
-
-  .help-section:last-child {
-    margin-bottom: 0;
-  }
-
-  .help-section-title {
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--ink-dim);
-    letter-spacing: 0.1em;
-    margin: 0 0 14px 0;
-  }
-
-  .help-shortcut {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 10px 0;
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  kbd {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 28px;
-    height: 28px;
-    padding: 0 8px;
-    background: var(--ink-faint);
-    border: 1px solid var(--panel-border);
-    border-radius: 6px;
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--ink-mid);
-    white-space: nowrap;
-  }
-
-  .help-desc {
-    color: var(--ink-mid);
-    flex: 1;
-  }
-
-  .help-feature {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--panel-border);
-  }
-
-  .help-feature:last-child {
-    border-bottom: none;
-  }
-
-  .help-feature-name {
-    font-weight: 600;
-    color: var(--ink);
-    font-size: 14px;
-  }
-
-  .help-feature .help-desc {
-    font-size: 13px;
-  }
-
+  /* ── Save status ── */
   .save-status {
     font-size: 14px; color: var(--accent);
     opacity: 0; transition: opacity 0.4s;
@@ -494,10 +222,8 @@
 
   .editor-wrap {
     flex: 1; overflow-y: auto; padding: 116px 0 120px;
-    background: var(--editor-bg);
-    transition: background 0.4s;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0,0,0,0.12) transparent;
+    background: var(--editor-bg); transition: background 0.4s;
+    scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.12) transparent;
   }
   .editor-wrap::-webkit-scrollbar { width: 3px; }
   .editor-wrap::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
@@ -509,28 +235,20 @@
     font-size: 18px; line-height: 1.9;
     color: var(--ink); caret-color: var(--accent);
     outline: none; min-height: calc(100vh - 200px);
-    transition: color 0.3s;
-    letter-spacing: 0.005em;
-    overflow-wrap: break-word;
-    word-break: normal;
+    transition: color 0.3s; letter-spacing: 0.005em;
+    overflow-wrap: break-word; word-break: normal;
   }
   .editor:empty::before {
     content: attr(data-placeholder);
     color: var(--ink-dim); font-style: italic; pointer-events: none;
   }
-
-  /* Uniform paragraph spacing */
-  .editor p,
-  .editor div { margin-top: 1.15em; }
-
+  .editor p, .editor div { margin-top: 1.15em; }
   .editor ul { padding-left: 1.4em; margin-top: 1.15em; list-style: disc; }
   .editor ul li { margin-bottom: 0.2em; line-height: 1.9; }
   .editor ul ul { margin-top: 0; list-style: circle; }
   .editor ul ul ul { list-style: square; }
-
   .editor strong { font-weight: 700; }
   .editor em { font-style: italic; }
-
   .editor h1, .editor h2, .editor h3 {
     font-family: 'Lora', serif; font-weight: 600; color: var(--ink);
     line-height: 1.3; margin-top: 1.15em; margin-bottom: 0.5em;
@@ -570,8 +288,7 @@
 
   /* ── Posts sidebar ── */
   .posts-panel {
-    position: fixed; top: 64px; left: 0; bottom: 0;
-    width: 220px;
+    position: fixed; top: 64px; left: 0; bottom: 0; width: 220px;
     border-right: 1px solid var(--panel-border);
     background: var(--panel-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
@@ -588,22 +305,19 @@
   }
   .posts-panel-label {
     font-size: 11px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.14em;
-    color: var(--ink-dim);
+    text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-dim);
   }
   .posts-list {
     flex: 1; overflow-y: auto;
     padding: 8px; display: flex; flex-direction: column; gap: 3px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--ink-faint) transparent;
+    scrollbar-width: thin; scrollbar-color: var(--ink-faint) transparent;
   }
   .posts-list::-webkit-scrollbar { width: 2px; }
   .posts-list::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
 
   .post-row {
     display: flex; align-items: center; gap: 8px;
-    padding: 8px 10px; border-radius: 9px;
-    cursor: pointer;
+    padding: 8px 10px; border-radius: 9px; cursor: pointer;
     transition: background 0.15s, box-shadow 0.15s;
   }
   .post-row:hover { background: rgba(255,255,255,0.55); box-shadow: var(--glass-shadow-sm); }
@@ -628,120 +342,48 @@
   .post-row:hover .post-row-delete { opacity: 1; }
   .post-row-delete:hover { background: var(--delete-bg); color: var(--delete-color); }
 
-  /* ── Delete confirm inline UI ── */
-  .post-row-confirm-title {
-    font-size: 12px; font-weight: 500; color: var(--delete-color); line-height: 1.3;
-  }
-  .post-row-confirm-meta {
-    font-size: 12px; color: var(--ink-dim); margin-top: 2px;
-  }
+  .post-row-confirm-title { font-size: 12px; font-weight: 500; color: var(--delete-color); line-height: 1.3; }
+  .post-row-confirm-meta  { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
   .post-row-confirm-yes {
-    font-size: 11px; font-weight: 600; padding: 2px 7px;
-    border-radius: 4px; border: none; cursor: pointer; flex-shrink: 0;
+    font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
+    border: none; cursor: pointer; flex-shrink: 0;
     background: var(--delete-bg); color: var(--delete-color);
   }
   .post-row-confirm-no {
-    font-size: 11px; font-weight: 600; padding: 2px 7px;
-    border-radius: 4px; border: none; cursor: pointer; flex-shrink: 0;
+    font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
+    border: none; cursor: pointer; flex-shrink: 0;
     background: var(--ink-faint); color: var(--ink-mid);
   }
 
-  /* ── Mobile bottom sheet backdrop ── */
+  /* ── Mobile backdrop ── */
   .posts-panel-backdrop {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.28);
-    z-index: 149;
-    opacity: 0;
-    transition: opacity 0.3s;
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.28); z-index: 149;
+    opacity: 0; transition: opacity 0.3s;
   }
   .posts-panel-backdrop.show { opacity: 1; }
-
-  @media (max-width: 700px) {
-    .chrome { padding: 0 14px; gap: 8px; }
-    .chrome-left { gap: 8px; flex: 1; min-width: 0; }
-    .chrome-right { gap: 8px; flex-shrink: 0; }
-
-    .post-title-inline { display: none; }
-    .copy-btn { display: none; }
-
-    .brand img { height: 34px; }
-
-    .editor-inner { padding: 0 20px; }
-
-    /* Posts panel: bottom sheet */
-    .posts-panel {
-      top: auto; bottom: 0; left: 0; right: 0;
-      width: 100%; height: 62vh; max-height: 520px;
-      border-right: none;
-      border-top: 1px solid var(--panel-border);
-      border-radius: 20px 20px 0 0;
-      transform: translateY(100%);
-      opacity: 1;
-    }
-    .posts-panel.hidden {
-      transform: translateY(100%);
-      opacity: 1;
-      pointer-events: none;
-      border-top-width: 0;
-    }
-    .posts-panel.mobile-open {
-      transform: translateY(0) !important;
-      opacity: 1 !important;
-      pointer-events: auto !important;
-      border-top-width: 1px !important;
-    }
-
-    .posts-panel-backdrop { display: block; }
-
-    /* Drag handle */
-    .posts-panel-header::before {
-      content: '';
-      position: absolute; top: 8px; left: 50%;
-      transform: translateX(-50%);
-      width: 36px; height: 4px;
-      background: var(--ink-dim);
-      border-radius: 2px; opacity: 0.35;
-    }
-    .posts-panel-header { position: relative; padding-top: 22px; }
-
-    .post-row-delete { opacity: 1; }
-  }
 
   /* ── Slash menu ── */
   .slash-menu {
     position: fixed;
     background: var(--glass-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    border-radius: 10px;
-    padding: 4px;
-    min-width: 160px;
-    z-index: 400;
-    opacity: 0;
-    transform: translateY(4px);
-    pointer-events: none;
+    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+    border-radius: 10px; padding: 4px; min-width: 160px; z-index: 400;
+    opacity: 0; transform: translateY(4px); pointer-events: none;
     transition: opacity 0.15s, transform 0.15s cubic-bezier(0.4,0,0.2,1);
   }
-  .slash-menu.visible {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
+  .slash-menu.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
   .slash-menu-item {
     display: flex; align-items: center; gap: 10px;
     padding: 7px 10px; border-radius: 7px;
-    cursor: pointer; transition: background 0.1s;
-    user-select: none;
+    cursor: pointer; transition: background 0.1s; user-select: none;
   }
-  .slash-menu-item:hover,
-  .slash-menu-item.active { background: var(--ink-faint); }
+  .slash-menu-item:hover, .slash-menu-item.active { background: var(--ink-faint); }
   .slash-menu-item-icon {
     width: 28px; height: 28px; border-radius: 6px;
     background: var(--glass-bg); border: 1px solid var(--panel-border);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     font-family: 'Lora', serif; color: var(--ink-mid); font-weight: 600;
   }
   .slash-menu-item-icon.icon-h { font-size: 14px; }
@@ -749,39 +391,30 @@
   .slash-menu-item-label { font-size: 13px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
   .slash-menu-item-desc  { font-size: 11px; color: var(--ink-dim); margin-top: 1px; }
 
-  /* ── Compare mode ──
-     Default: #paneA is display:contents (layout-invisible); #paneB and
-     the divider are display:none. */
+  /* ── Compare mode ── */
   #paneA          { display: contents; }
   #paneB          { display: none; }
   #compareDivider { display: none; }
 
   .writing-area.compare-mode { flex-direction: row; }
-
   .writing-area.compare-mode #paneA {
     display: flex; flex: 1; flex-direction: column;
     overflow: hidden; position: relative; min-width: 0;
   }
   .writing-area.compare-mode #paneA .editor-wrap { flex: 1; }
-
   .writing-area.compare-mode #compareDivider {
     display: block; width: 1px; flex-shrink: 0;
-    background: var(--panel-border);
-    align-self: stretch; margin-top: 64px;
+    background: var(--panel-border); align-self: stretch; margin-top: 64px;
   }
-
   .writing-area.compare-mode #paneB {
     display: flex; flex: 1; flex-direction: column;
     overflow: hidden; position: relative; min-width: 0;
     opacity: 0; transform: translateX(18px);
     transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.4,0,0.2,1);
   }
-  .writing-area.compare-mode #paneB.visible {
-    opacity: 1; transform: translateX(0);
-  }
+  .writing-area.compare-mode #paneB.visible { opacity: 1; transform: translateX(0); }
   .writing-area.compare-mode #paneB .editor-wrap { flex: 1; }
 
-  /* Compare-only overlays hidden by default */
   #paneALabel, #paneAFooter { display: none; }
 
   .compare-label {
@@ -794,7 +427,6 @@
     padding: 3px 10px; border-radius: 20px;
     pointer-events: none; z-index: 10; white-space: nowrap;
   }
-
   .pane-footer {
     position: absolute; bottom: 0; left: 0; right: 0; height: 44px;
     display: flex; align-items: center; justify-content: center;
@@ -809,9 +441,104 @@
     border-radius: 20px; padding: 3px 12px;
   }
 
-  /* Hide chrome word count in compare mode */
   .word-count-wrap.compare-mode-active { display: none; }
 
+  /* ── Help modal ── */
+  .help-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.3); z-index: 600;
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .help-backdrop.show { display: block; opacity: 1; }
+
+  .help-modal {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.96);
+    background: var(--panel-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
+    border-radius: 16px; padding: 28px 28px 24px;
+    width: 90%; max-width: 520px; max-height: 80vh;
+    overflow-y: auto; z-index: 601;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s cubic-bezier(0.4,0,0.2,1);
+  }
+  .help-modal.show { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+
+  .help-modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .help-modal-title {
+    font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em;
+  }
+  .help-close-btn {
+    width: 28px; height: 28px; border-radius: 7px;
+    border: 1px solid var(--panel-border); background: var(--ink-faint);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--ink-mid); font-size: 16px; line-height: 1;
+    transition: background 0.15s, color 0.15s;
+  }
+  .help-close-btn:hover { background: var(--delete-bg); color: var(--delete-color); }
+
+  .help-section { margin-bottom: 20px; }
+  .help-section:last-child { margin-bottom: 0; }
+  .help-section-title {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--ink-dim); margin-bottom: 10px;
+  }
+  .help-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 0; border-bottom: 1px solid var(--ink-faint);
+  }
+  .help-row:last-child { border-bottom: none; }
+  .help-row-label { font-size: 14px; color: var(--ink-mid); }
+  .help-keys { display: flex; align-items: center; gap: 4px; }
+  kbd {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 24px; height: 22px; padding: 0 6px;
+    background: var(--glass-bg); border: 1px solid var(--panel-border);
+    border-radius: 5px; box-shadow: 0 1px 0 var(--panel-border);
+    font-family: inherit; font-size: 12px; font-weight: 500; color: var(--ink);
+    white-space: nowrap;
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 700px) {
+    .chrome { padding: 0 14px; gap: 8px; }
+    .chrome-left { gap: 8px; flex: 1; min-width: 0; }
+    .chrome-right { gap: 8px; flex-shrink: 0; }
+    .post-title-inline { display: none; }
+    .brand img { height: 34px; }
+    .editor-inner { padding: 0 20px; }
+
+    .posts-panel {
+      top: auto; bottom: 0; left: 0; right: 0;
+      width: 100%; height: 62vh; max-height: 520px;
+      border-right: none; border-top: 1px solid var(--panel-border);
+      border-radius: 20px 20px 0 0;
+      transform: translateY(100%); opacity: 1;
+    }
+    .posts-panel.hidden {
+      transform: translateY(100%); opacity: 1;
+      pointer-events: none; border-top-width: 0;
+    }
+    .posts-panel.mobile-open {
+      transform: translateY(0) !important; opacity: 1 !important;
+      pointer-events: auto !important; border-top-width: 1px !important;
+    }
+    .posts-panel-backdrop { display: block; }
+    .posts-panel-header::before {
+      content: ''; position: absolute; top: 8px; left: 50%;
+      transform: translateX(-50%); width: 36px; height: 4px;
+      background: var(--ink-dim); border-radius: 2px; opacity: 0.35;
+    }
+    .posts-panel-header { position: relative; padding-top: 22px; }
+    .post-row-delete { opacity: 1; }
+
+    .writing-area.compare-mode { flex-direction: column; }
+    .writing-area.compare-mode #compareDivider { width: auto; height: 1px; margin-top: 0; }
+  }
 </style>
 </head>
 <body>
@@ -819,22 +546,24 @@
 <div class="chrome">
   <div class="chrome-left">
     <button class="icon-btn" id="btnPosts" title="All posts" aria-label="Toggle posts panel">
-      📄
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="15" height="15" aria-hidden="true">
+        <line x1="2" y1="4" x2="14" y2="4"/>
+        <line x1="2" y1="8" x2="14" y2="8"/>
+        <line x1="2" y1="12" x2="9" y2="12"/>
+      </svg>
     </button>
     <div class="brand">
-      <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/PagebreakLogo2.png" alt="Pagebreak"/>
+      <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/PagebreakLogo2.png" alt="Pagebreak">
     </div>
     <input class="post-title-inline" id="postTitleInline" type="text"
-      placeholder="Untitled post…" maxlength="80"
-      aria-label="Post title"/>
+      placeholder="Untitled post…" maxlength="80" aria-label="Post title">
   </div>
   <div class="chrome-right">
     <span class="save-status" id="saveStatus" aria-live="polite">Saved</span>
     <div class="word-count-wrap" id="wordCountWrap" style="position:relative;">
       <span class="word-count" id="wordCount" aria-live="polite">0 words</span>
       <button class="target-toggle-btn" id="targetToggleBtn"
-        title="Set word count target"
-        aria-label="Set word count target">
+        title="Set word count target" aria-label="Set word count target">
         <svg id="targetToggleIcon" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
           <line x1="5" y1="1" x2="5" y2="9"/>
           <line x1="1" y1="5" x2="9" y2="5"/>
@@ -843,37 +572,101 @@
       <div class="target-popover" id="targetPopover">
         <span class="target-popover-label">Target</span>
         <input class="target-input" id="targetInput" type="number" min="1" max="99999"
-          placeholder="e.g. 500"
-          aria-label="Word target — press Enter to set, Escape to cancel"/>
+          placeholder="e.g. 500" aria-label="Word target">
         <button class="target-set-btn" id="targetSetBtn">Set</button>
       </div>
     </div>
-    <!-- Menu button with dropdown -->
     <div class="menu-wrapper">
-      <button class="icon-btn" id="btnMenu" title="More options" aria-label="More options">
-        ☰
+      <button class="icon-btn" id="btnMenu" title="Menu" aria-label="Open menu" aria-haspopup="true">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="15" height="15" aria-hidden="true">
+          <line x1="2" y1="4" x2="14" y2="4"/>
+          <line x1="2" y1="8" x2="14" y2="8"/>
+          <line x1="2" y1="12" x2="14" y2="12"/>
+        </svg>
       </button>
       <div class="menu-dropdown" id="menuDropdown" role="menu">
-        <button class="menu-item" id="btnCopy" role="menuitem" title="Copy all text to clipboard">
-          <span>📋</span>
-          <span>Copy</span>
+        <button class="menu-item" id="btnCopy" role="menuitem">
+          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="5" y="4" width="9" height="11" rx="1.5"/>
+            <path d="M11 4V3a1 1 0 0 0-1-1H3a1.5 1.5 0 0 0-1.5 1.5v8A1 1 0 0 0 3 12.5h2"/>
+          </svg>
+          Copy text
         </button>
-        <button class="menu-item" id="btnCompare" role="menuitem" title="Toggle compare mode">
-          <span>🔀</span>
-          <span>Compare</span>
+        <button class="menu-item" id="btnCompare" role="menuitem">
+          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="8" y1="2" x2="8" y2="14"/>
+            <rect x="1" y="4" width="5" height="8" rx="1"/>
+            <rect x="10" y="4" width="5" height="8" rx="1"/>
+          </svg>
+          Compare mode
         </button>
-        <button class="menu-item" id="btnDark" role="menuitem" title="Toggle dark mode">
+        <button class="menu-item" id="btnDark" role="menuitem">
           <span id="darkIcon" aria-hidden="true">🌙</span>
-          <span>Dark mode</span>
+          Dark mode
         </button>
         <div class="menu-divider"></div>
-        <button class="menu-item" id="btnHelp" role="menuitem" title="Keyboard shortcuts and tips">
-          <span>❓</span>
-          <span>Keyboard shortcuts</span>
+        <button class="menu-item" id="btnHelp" role="menuitem">
+          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="8" cy="8" r="6.5"/>
+            <path d="M6.5 6.5a1.5 1.5 0 0 1 3 0c0 1-1.5 1.5-1.5 2.5"/>
+            <circle cx="8" cy="12" r="0.6" fill="currentColor"/>
+          </svg>
+          Keyboard shortcuts
         </button>
+      </div>
     </div>
   </div>
   <div class="word-target-progress" id="wordTargetProgress" role="progressbar" aria-hidden="true"></div>
+</div>
+
+<div class="help-backdrop" id="helpBackdrop"></div>
+<div class="help-modal" id="helpModal" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts">
+  <div class="help-modal-header">
+    <span class="help-modal-title">Keyboard shortcuts</span>
+    <button class="help-close-btn" id="btnCloseHelp" aria-label="Close">✕</button>
+  </div>
+  <div class="help-section">
+    <div class="help-section-title">Formatting</div>
+    <div class="help-row">
+      <span class="help-row-label">Bold</span>
+      <span class="help-keys"><kbd>⌘</kbd><kbd>B</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Italic</span>
+      <span class="help-keys"><kbd>⌘</kbd><kbd>I</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Bullet list</span>
+      <span class="help-keys"><kbd>-</kbd><kbd>Space</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Indent list item</span>
+      <span class="help-keys"><kbd>Tab</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Outdent list item</span>
+      <span class="help-keys"><kbd>⇧</kbd><kbd>Tab</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Insert block (heading / paragraph)</span>
+      <span class="help-keys"><kbd>/</kbd></span>
+    </div>
+  </div>
+  <div class="help-section">
+    <div class="help-section-title">App</div>
+    <div class="help-row">
+      <span class="help-row-label">Save</span>
+      <span class="help-keys"><kbd>⌘</kbd><kbd>S</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Select all</span>
+      <span class="help-keys"><kbd>⌘</kbd><kbd>A</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Copy all (via menu)</span>
+      <span class="help-keys"><kbd>⌘</kbd><kbd>C</kbd></span>
+    </div>
+  </div>
 </div>
 
 <div class="writing-area" id="writingArea">
@@ -944,87 +737,8 @@
   </div>
 </div>
 
-<!-- Help modal with keyboard shortcuts -->
-<div class="help-modal-backdrop" id="helpModalBackdrop"></div>
-<div class="help-modal" id="helpModal">
-  <div class="help-modal-header">
-    <h2 class="help-modal-title">Keyboard Shortcuts & Tips</h2>
-    <button class="help-modal-close" id="btnCloseHelp" aria-label="Close">✕</button>
-  </div>
-  <div class="help-modal-content">
-    <div class="help-section">
-      <h3 class="help-section-title">Formatting</h3>
-      <div class="help-shortcut">
-        <kbd>⌘</kbd><kbd>B</kbd> or <kbd>Ctrl</kbd><kbd>B</kbd>
-        <span class="help-desc">Bold text</span>
-      </div>
-      <div class="help-shortcut">
-        <kbd>⌘</kbd><kbd>I</kbd> or <kbd>Ctrl</kbd><kbd>I</kbd>
-        <span class="help-desc">Italic text</span>
-      </div>
-      <div class="help-shortcut">
-        <kbd>/</kbd>
-        <span class="help-desc">Insert block (type / at start of line)</span>
-      </div>
-      <div class="help-shortcut">
-        <kbd>-</kbd> <kbd>Space</kbd>
-        <span class="help-desc">Create bullet list (type at line start)</span>
-      </div>
-      <div class="help-shortcut">
-        <kbd>Tab</kbd>
-        <span class="help-desc">Indent list items</span>
-      </div>
-      <div class="help-shortcut">
-        <kbd>Shift</kbd><kbd>Tab</kbd>
-        <span class="help-desc">Outdent list items</span>
-      </div>
-    </div>
-
-    <div class="help-section">
-      <h3 class="help-section-title">Navigation & Editing</h3>
-      <div class="help-shortcut">
-        <kbd>⌘</kbd><kbd>S</kbd> or <kbd>Ctrl</kbd><kbd>S</kbd>
-        <span class="help-desc">Save (auto-saves in background)</span>
-      </div>
-      <div class="help-shortcut">
-        <kbd>⌘</kbd><kbd>A</kbd> or <kbd>Ctrl</kbd><kbd>A</kbd>
-        <span class="help-desc">Select all text</span>
-      </div>
-      <div class="help-shortcut">
-        <kbd>⌘</kbd><kbd>C</kbd> or <kbd>Ctrl</kbd><kbd>C</kbd>
-        <span class="help-desc">Copy selected text</span>
-      </div>
-    </div>
-
-    <div class="help-section">
-      <h3 class="help-section-title">Features</h3>
-      <div class="help-feature">
-        <span class="help-feature-name">Word Count</span>
-        <span class="help-desc">Set a target to track your progress. Click the + button next to word count.</span>
-      </div>
-      <div class="help-feature">
-        <span class="help-feature-name">Compare Mode</span>
-        <span class="help-desc">Paste text on the right to compare two versions side-by-side.</span>
-      </div>
-      <div class="help-feature">
-        <span class="help-feature-name">Posts</span>
-        <span class="help-desc">Create multiple posts and switch between them. Click the document icon on the left.</span>
-      </div>
-      <div class="help-feature">
-        <span class="help-feature-name">Auto-save</span>
-        <span class="help-desc">Your work is saved automatically every 5 seconds and when you switch posts.</span>
-      </div>
-      <div class="help-feature">
-        <span class="help-feature-name">Dark Mode</span>
-        <span class="help-desc">Toggle dark mode from the menu for comfortable writing in low light.</span>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
 'use strict';
-
 
 // ── State ──────────────────────────────────────────────
 let wordTarget       = 0;
@@ -1052,16 +766,10 @@ let elEditor, elEditorWrap, elPostsPanel, elWordCount, elWordCountWrap,
     elPostTitle, elPostsList, elBtnDark, elDarkIcon, elBtnPosts, elSlashMenu,
     elBtnCompare, elWritingArea, elPaneB, elEditorB,
     elPaneALabel, elPaneAFooter, elPostsPanelBackdrop,
-    elBtnMenu, elMenuDropdown, elHelpModal, elHelpModalBackdrop;
+    elBtnMenu, elMenuDropdown, elHelpModal, elHelpBackdrop;
 
 // ── Init ───────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  // Ensure all elements are found
-  if (!document.getElementById('editor')) {
-    console.error('Critical elements not found - DOM may not be ready');
-    return;
-  }
-
   elEditor              = document.getElementById('editor');
   elEditorWrap          = document.getElementById('editorWrap');
   elPostsPanel          = document.getElementById('postsPanel');
@@ -1091,21 +799,19 @@ window.addEventListener('DOMContentLoaded', () => {
   elBtnMenu             = document.getElementById('btnMenu');
   elMenuDropdown        = document.getElementById('menuDropdown');
   elHelpModal           = document.getElementById('helpModal');
-  elHelpModalBackdrop   = document.getElementById('helpModalBackdrop');
+  elHelpBackdrop        = document.getElementById('helpBackdrop');
 
-  // NOTE: execCommand is deprecated but remains the only viable API for
-  // contenteditable editing at this level without a full editor framework.
   document.execCommand('defaultParagraphSeparator', false, 'p');
 
-  // Wire up all event listeners (no inline onclick handlers in HTML)
+  // Button listeners
   elBtnPosts.addEventListener('click', togglePostsPanel);
   elBtnMenu.addEventListener('click', toggleMenu);
-  elBtnDark.addEventListener('click', () => { toggleDark(); closeMenu(); });
+  elBtnDark.addEventListener('click',    () => { toggleDark();    closeMenu(); });
   elBtnCompare.addEventListener('click', () => { toggleCompare(); closeMenu(); });
-  document.getElementById('btnCopy').addEventListener('click', () => { copyText(); closeMenu(); });
-  document.getElementById('btnHelp').addEventListener('click', () => { openHelp(); closeMenu(); });
+  document.getElementById('btnCopy').addEventListener('click',  () => { copyText();  closeMenu(); });
+  document.getElementById('btnHelp').addEventListener('click',  () => { openHelp();  closeMenu(); });
   document.getElementById('btnCloseHelp').addEventListener('click', closeHelp);
-  elHelpModalBackdrop.addEventListener('click', closeHelp);
+  elHelpBackdrop.addEventListener('click', closeHelp);
   document.getElementById('btnNewPost').addEventListener('click', newPost);
   elTargetToggleBtn.addEventListener('click', onTargetToggle);
   document.getElementById('targetSetBtn').addEventListener('click', commitTarget);
@@ -1113,65 +819,66 @@ window.addEventListener('DOMContentLoaded', () => {
 
   elPostTitle.addEventListener('input', onTitleType);
 
+  // Editor listeners
   elEditor.addEventListener('keydown', onEditorKeydown);
   elEditor.addEventListener('input', onEditorInput);
   elEditor.addEventListener('compositionstart', () => { isComposing = true; });
   elEditor.addEventListener('compositionend',   () => { isComposing = false; });
   elEditor.addEventListener('paste', e => {
+    // Strip all formatting — insert plain text only
     e.preventDefault();
-    document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
+    const text = e.clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
   });
 
   elEditorB.addEventListener('paste', e => {
     e.preventDefault();
     document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
   });
-  elEditorB.addEventListener('input', updatePaneACount);
+  elEditorB.addEventListener('input', updateComparePaneCount);
 
   elTargetInput.addEventListener('keydown', e => {
     if (e.key === 'Enter')  { e.preventDefault(); commitTarget(); }
     if (e.key === 'Escape') { e.preventDefault(); closeTargetInput(); }
   });
 
-  // Slash menu: wire items via JS
+  // Slash menu items
   elSlashMenu.querySelectorAll('.slash-menu-item').forEach((item, i) => {
     item.addEventListener('mousedown', e => { e.preventDefault(); slashSelect(i); });
   });
 
-  // Global: close slash menu on outside click
+  // Global close-on-outside-click handlers
   document.addEventListener('mousedown', e => {
     if (slashMenuOpen && !elSlashMenu.contains(e.target)) closeSlashMenu();
   });
-  // Global: close menu on outside click
   document.addEventListener('mousedown', e => {
-    if (elMenuDropdown.classList.contains('show') && !elMenuDropdown.contains(e.target) && e.target !== elBtnMenu) {
+    if (elMenuDropdown.classList.contains('show') &&
+        !elMenuDropdown.contains(e.target) &&
+        e.target !== elBtnMenu) {
       closeMenu();
     }
   });
-  // Global: close target popover on outside click
   document.addEventListener('mousedown', e => {
-    if (elTargetPopover.classList.contains('show') && !elTargetPopover.contains(e.target)) {
+    if (elTargetPopover.classList.contains('show') &&
+        !elTargetPopover.contains(e.target) &&
+        !elTargetToggleBtn.contains(e.target)) {
       closeTargetInput();
     }
   }, true);
-  // Global: Cmd/Ctrl+S
+
+  // Cmd/Ctrl+S
   document.addEventListener('keydown', e => {
     if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); silentSave(); }
   });
 
-  // Autosave backstop every 20s
   setInterval(silentSave, 20000);
-  // Flush on tab close
   window.addEventListener('beforeunload', silentSave);
 
   loadDoc();
-  if (elEditor) requestAnimationFrame(() => elEditor.focus());
+  requestAnimationFrame(() => elEditor.focus());
 });
 
 // ── Typewriter scroll ──────────────────────────────────
-// Keeps the cursor at ~50% of the visible editor height while typing.
-// Only fires during keyboard input (isTyping guard) to avoid disrupting
-// click-to-reposition behaviour.
 function scrollToCursor() {
   if (!isTyping) return;
   const sel = window.getSelection();
@@ -1222,7 +929,7 @@ function onEditorKeydown(e) {
     return;
   }
 
-  // Space: "- " → unordered list
+  // "- " → bullet list
   if (e.key === ' ') {
     const sel = window.getSelection();
     if (!sel || !sel.rangeCount) return;
@@ -1289,14 +996,12 @@ function openSlashMenu(range) {
   slashMenuOpen = true;
 }
 
-// closeWithFocus=true restores editor focus (used on Escape); omit when user
-// is still actively typing and focus should stay where it is naturally.
-function closeSlashMenu(closeWithFocus) {
+function closeSlashMenu(restoreFocus) {
   slashMenuOpen = false;
   slashBlock    = null;
   slashBareLine = null;
   elSlashMenu.classList.remove('visible');
-  if (closeWithFocus) elEditor.focus();
+  if (restoreFocus) elEditor.focus();
 }
 
 function setSlashIndex(i) {
@@ -1310,7 +1015,7 @@ function updateSlashMenuItems() {
   });
 }
 
-// index 0 = Header (h2), index 1 = Paragraph (p)
+// 0 = Header (h2), 1 = Paragraph (p)
 function slashSelect(index) {
   const block    = slashBlock;
   const bareLine = slashBareLine;
@@ -1345,10 +1050,6 @@ function onType() {
   _saveTimer = setTimeout(silentSave, 5000);
 }
 
-// Walk an element's tree and collect text.
-// sep=' ' for word-counting (block boundaries become whitespace).
-// sep='\n' for copy (block boundaries become line breaks).
-// Defaults to elEditor when no element is provided.
 function walkText(sep, el) {
   const root  = el || elEditor;
   const parts = [];
@@ -1415,9 +1116,7 @@ function clearTarget() {
   updateTargetToggleBtn();
 }
 
-function closeTargetInput() {
-  elTargetPopover.classList.remove('show');
-}
+function closeTargetInput() { elTargetPopover.classList.remove('show'); }
 
 function updateTargetToggleBtn() {
   if (wordTarget > 0) {
@@ -1454,6 +1153,28 @@ function onTitleType() {
   _saveTimer = setTimeout(silentSave, 5000);
 }
 
+// ── Menu ───────────────────────────────────────────────
+function toggleMenu() {
+  const isOpen = elMenuDropdown.classList.toggle('show');
+  elBtnMenu.setAttribute('aria-expanded', isOpen);
+}
+
+function closeMenu() {
+  elMenuDropdown.classList.remove('show');
+  elBtnMenu.setAttribute('aria-expanded', 'false');
+}
+
+// ── Help modal ─────────────────────────────────────────
+function openHelp() {
+  elHelpBackdrop.classList.add('show');
+  elHelpModal.classList.add('show');
+}
+
+function closeHelp() {
+  elHelpBackdrop.classList.remove('show');
+  elHelpModal.classList.remove('show');
+}
+
 // ── Posts management ───────────────────────────────────
 function genId() {
   return 'pb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
@@ -1465,8 +1186,6 @@ function saveAllPostIds(ids) { localStorage.setItem('pb_posts', JSON.stringify(i
 function getActiveId()       { return localStorage.getItem('pb_active') || null; }
 function setActiveId(id)     { localStorage.setItem('pb_active', id); }
 function getPost(id) {
-  // JSON.parse(null) === null, so missing keys return null without throwing.
-  // The try/catch only fires on malformed JSON.
   try { return JSON.parse(localStorage.getItem(id)); } catch { return null; }
 }
 function savePost(id, data)  { localStorage.setItem(id, JSON.stringify(data)); }
@@ -1515,7 +1234,6 @@ function renderPostsList() {
     const post = getPost(id);
     if (!post) return '';
     const title = post.title || 'Untitled post';
-    // Strip HTML tags to count words; safe because content passed through sanitizeBody
     const words = post.body
       ? post.body.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length
       : 0;
@@ -1532,7 +1250,6 @@ function renderPostsList() {
       </div>`;
   }).join('');
 
-  // Attach event listeners after rendering
   elPostsList.querySelectorAll('.post-row').forEach(row => {
     const id = row.dataset.postId;
     row.addEventListener('click', () => openPost(id));
@@ -1614,26 +1331,6 @@ function doDeletePost(id) {
   renderPostsList();
 }
 
-// ── Menu ───────────────────────────────────────────────
-function toggleMenu() {
-  elMenuDropdown.classList.toggle('show');
-}
-
-function closeMenu() {
-  elMenuDropdown.classList.remove('show');
-}
-
-// ── Help Modal ─────────────────────────────────────────
-function openHelp() {
-  elHelpModalBackdrop.classList.add('show');
-  elHelpModal.classList.add('show');
-}
-
-function closeHelp() {
-  elHelpModalBackdrop.classList.remove('show');
-  elHelpModal.classList.remove('show');
-}
-
 // ── Dark mode ──────────────────────────────────────────
 function setDark(on) {
   document.body.classList.toggle('dark', on);
@@ -1644,12 +1341,10 @@ function setDark(on) {
 function toggleDark() {
   const on = !document.body.classList.contains('dark');
   setDark(on);
-  localStorage.setItem('pb_dark', on ? 'true' : 'false');
+  localStorage.setItem('pb_dark', on);
 }
 
 // ── Save / Load ────────────────────────────────────────
-// Strip inline color/background injected by Chromium's contenteditable
-// so saved HTML defers to CSS variables correctly in light and dark mode.
 function sanitizeBody(html) {
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
@@ -1695,7 +1390,6 @@ function loadDoc() {
   try {
     const ids = getAllPostIds();
 
-    // Migrate legacy single-doc save (pb_v4) into the multi-post system
     const legacy = localStorage.getItem('pb_v4');
     if (legacy && !ids.length) {
       const d  = JSON.parse(legacy);
@@ -1750,7 +1444,7 @@ function toggleCompare() {
     elPaneAFooter.style.display = 'flex';
     elWordCountWrap.classList.add('compare-mode-active');
     updatePaneACount();
-    updateWordCount();
+    updateComparePaneCount();
   } else {
     elPaneB.classList.remove('visible');
     elPaneALabel.style.removeProperty('display');
@@ -1766,6 +1460,9 @@ function updatePaneACount() {
   document.getElementById('paneACount').textContent = fmtCount(countWords(elEditor));
 }
 
+function updateComparePaneCount() {
+  document.getElementById('paneBCount').textContent = fmtCount(countWords(elEditorB));
+}
 </script>
 </body>
 </html>
