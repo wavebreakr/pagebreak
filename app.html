@@ -748,6 +748,8 @@ let isTyping         = false;
 let _typingTimer     = null;
 let compareMode      = false;
 let _saveTimer       = null;
+let _lastSavedBody   = '';
+let _lastSavedTitle  = '';
 
 // Slash menu state
 let slashMenuOpen  = false;
@@ -1263,9 +1265,12 @@ function renderPostsList() {
 function setEditorContent(body, title) {
   const t = (title || '').trim();
   elPostTitle.value  = title || '';
-  elEditor.innerHTML = sanitizeBody(body || '');
+  const sanitized = sanitizeBody(body || '');
+  elEditor.innerHTML = sanitized;
   document.title     = t ? t + ' — Pagebreak' : 'Pagebreak';
   targetCelebrated   = false;
+  _lastSavedTitle    = title || '';
+  _lastSavedBody     = sanitized;
   updateWordCount();
 }
 
@@ -1366,12 +1371,22 @@ function silentSave() {
       saveAllPostIds([...getAllPostIds(), id]);
       setActiveId(id);
     }
+    const currentTitle = elPostTitle.value;
+    const currentBody  = sanitizeBody(elEditor.innerHTML);
+    const hasChanged   = currentTitle !== _lastSavedTitle || currentBody !== _lastSavedBody;
+    
     savePost(id, {
-      title: elPostTitle.value,
-      body:  sanitizeBody(elEditor.innerHTML),
+      title: currentTitle,
+      body:  currentBody,
       saved: Date.now(),
     });
-    showSaveStatus('Saved');
+    
+    if (hasChanged) {
+      showSaveStatus('Saved');
+      _lastSavedTitle = currentTitle;
+      _lastSavedBody  = currentBody;
+    }
+    
     if (!elPostsPanel.classList.contains('hidden')) renderPostsList();
   } catch {
     showSaveStatus('⚠ Save failed', true);
