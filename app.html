@@ -827,10 +827,40 @@ window.addEventListener('DOMContentLoaded', () => {
   elEditor.addEventListener('compositionstart', () => { isComposing = true; });
   elEditor.addEventListener('compositionend',   () => { isComposing = false; });
   elEditor.addEventListener('paste', e => {
-    // Strip all formatting — insert plain text only
+    // Strip all formatting — insert plain text only, wrapped in paragraphs
     e.preventDefault();
     const text = e.clipboardData.getData('text/plain');
-    document.execCommand('insertText', false, text);
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    
+    // Split by double newlines for paragraphs, single newlines within
+    const paragraphs = text.split(/\n\n+/);
+    const fragments = [];
+    
+    paragraphs.forEach((para, i) => {
+      const p = document.createElement('p');
+      const lines = para.split('\n');
+      lines.forEach((line, j) => {
+        p.appendChild(document.createTextNode(line));
+        if (j < lines.length - 1) p.appendChild(document.createElement('br'));
+      });
+      fragments.push(p);
+      if (i < paragraphs.length - 1) fragments.push(document.createTextNode('\n'));
+    });
+    
+    fragments.forEach(node => range.insertNode(node));
+    
+    // Move cursor to end
+    const lastNode = fragments[fragments.length - 1];
+    range.setStartAfter(lastNode);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    
+    onType();
   });
 
   elEditorB.addEventListener('paste', e => {
