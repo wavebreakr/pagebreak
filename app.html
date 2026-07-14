@@ -6,7 +6,7 @@
 <title>Pagebreak</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-canvas:      #edeae2;
@@ -15,9 +15,9 @@
     --ink-mid:        #6b6860;
     --ink-dim:        #a8a49c;
     --ink-faint:      rgba(0,0,0,0.07);
-    --accent:         #c2692a;
-    --accent-light:   #e8874a;
-    --accent-dim:     rgba(194,105,42,0.1);
+    --accent:         #0066ff;
+    --accent-light:   #3385ff;
+    --accent-dim:     rgba(0,102,255,0.12);
     --panel-bg:       rgba(250,248,244,0.82);
     --panel-border:   rgba(0,0,0,0.08);
     --glass-bg:       rgba(255,255,255,0.65);
@@ -83,10 +83,12 @@
   .dark .brand img { filter: invert(1); }
 
   .post-title-inline {
-    font-size: 16px;
+    font-size: 15px;
+    font-weight: 500;
     color: var(--ink-dim); background: none; border: none; outline: none;
     width: 220px; max-width: 30vw;
     transition: color 0.2s;
+    letter-spacing: -0.01em;
   }
   .post-title-inline::placeholder { color: var(--ink-dim); }
   .post-title-inline:focus { color: var(--ink-mid); }
@@ -94,26 +96,29 @@
   /* ── Word count + target widget ── */
   .word-count-wrap { display: flex; align-items: center; gap: 5px; }
   .word-count {
-    font-size: 16px; font-weight: 400; color: var(--ink-dim);
+    font-size: 15px; font-weight: 500; color: var(--ink-dim);
     font-variant-numeric: tabular-nums; white-space: nowrap;
+    letter-spacing: -0.01em;
   }
   .target-toggle-btn {
     width: 22px; height: 22px;
-    border: 1px solid var(--glass-border); border-radius: 50%;
+    border: 1.2px solid var(--glass-border); border-radius: 50%;
     background: var(--glass-bg); box-shadow: var(--glass-shadow-sm);
     cursor: pointer; display: flex; align-items: center; justify-content: center;
     color: var(--ink-dim);
-    transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s, border-color 0.15s;
     flex-shrink: 0;
   }
   .target-toggle-btn:hover {
     background: rgba(255,255,255,0.72);
     box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 4px 14px rgba(0,0,0,0.1);
-    color: var(--ink); transform: translateY(-1px);
+    color: var(--accent);
+    transform: translateY(-1px);
+    border-color: var(--accent-dim);
   }
   .dark .target-toggle-btn:hover { background: rgba(255,255,255,0.12); }
-  .target-toggle-btn.has-target { color: var(--ink-mid); }
-  .target-toggle-btn svg { width: 10px; height: 10px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+  .target-toggle-btn.has-target { color: var(--accent); border-color: rgba(0,102,255,0.3); }
+  .target-toggle-btn svg { width: 10px; height: 10px; stroke: currentColor; stroke-width: 1.2; stroke-linecap: round; }
 
   /* ── Word target popover ── */
   .target-popover {
@@ -128,12 +133,13 @@
     white-space: nowrap; z-index: 500;
   }
   .target-popover.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
-  .target-popover-label { font-size: 13px; font-weight: 500; color: var(--ink-mid); letter-spacing: -0.01em; }
+  .target-popover-label { font-size: 13px; font-weight: 600; color: var(--ink-mid); letter-spacing: -0.01em; }
   .target-input {
     font-size: 14px; font-weight: 500; color: var(--ink);
     font-variant-numeric: tabular-nums; width: 80px;
-    background: var(--ink-faint); border: 1px solid var(--panel-border);
+    background: var(--ink-faint); border: 1.2px solid var(--panel-border);
     outline: none; border-radius: 7px; padding: 4px 8px; text-align: center;
+    transition: border-color 0.15s;
   }
   .target-input:focus { border-color: var(--accent); }
   .target-set-btn {
@@ -155,17 +161,19 @@
   /* ── Glass icon button — circular, 50px ── */
   .icon-btn {
     width: 50px; height: 50px; border-radius: 50%;
-    border: 1px solid var(--glass-border);
+    border: 1.2px solid var(--glass-border);
     background: var(--glass-bg); box-shadow: var(--glass-shadow);
     cursor: pointer; display: flex; align-items: center; justify-content: center;
     color: var(--ink-mid);
-    transition: background 0.15s, box-shadow 0.15s, color 0.15s, transform 0.15s;
+    transition: background 0.15s, box-shadow 0.15s, color 0.15s, transform 0.15s, border-color 0.15s;
     flex-shrink: 0;
   }
   .icon-btn:hover {
     background: rgba(255,255,255,0.72);
     box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 10px 40px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
-    color: var(--ink); transform: translateY(-2px);
+    color: var(--ink);
+    transform: translateY(-2px);
+    border-color: rgba(0,102,255,0.2);
   }
   .dark .icon-btn:hover {
     background: rgba(255,255,255,0.12);
@@ -201,16 +209,16 @@
     transition: background 0.1s, color 0.1s;
   }
   .menu-item:hover { background: var(--ink-faint); color: var(--ink); }
-  .menu-item svg { width: 15px; height: 15px; flex-shrink: 0; stroke: currentColor; }
+  .menu-item svg { width: 15px; height: 15px; flex-shrink: 0; stroke: currentColor; stroke-width: 1.2; }
   .menu-item.on { color: var(--accent); }
 
   .menu-divider { height: 1px; background: var(--panel-border); margin: 3px 0; }
 
   /* ── Save status ── */
   .save-status {
-    font-size: 14px; color: var(--accent);
+    font-size: 13px; font-weight: 500; color: var(--accent);
     opacity: 0; transition: opacity 0.4s;
-    white-space: nowrap; letter-spacing: 0.01em;
+    white-space: nowrap; letter-spacing: -0.01em;
   }
   .save-status.show { opacity: 1; }
 
@@ -304,7 +312,7 @@
     display: flex; align-items: center; justify-content: space-between;
   }
   .posts-panel-label {
-    font-size: 11px; font-weight: 600;
+    font-size: 11px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-dim);
   }
   .posts-list {
@@ -419,7 +427,7 @@
 
   .compare-label {
     position: absolute; top: 72px; left: 50%; transform: translateX(-50%);
-    font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
     text-transform: uppercase; color: var(--ink-dim);
     background: var(--glass-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
@@ -433,7 +441,7 @@
     pointer-events: none; z-index: 10;
   }
   .pane-word-count {
-    font-size: 13px; font-weight: 400; color: var(--ink-dim);
+    font-size: 13px; font-weight: 500; color: var(--ink-dim);
     font-variant-numeric: tabular-nums;
     background: var(--glass-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
@@ -470,7 +478,7 @@
     margin-bottom: 20px;
   }
   .help-modal-title {
-    font-size: 16px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em;
+    font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em;
   }
   .help-close-btn {
     width: 28px; height: 28px; border-radius: 7px;
@@ -484,7 +492,7 @@
   .help-section { margin-bottom: 20px; }
   .help-section:last-child { margin-bottom: 0; }
   .help-section-title {
-    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.12em; color: var(--ink-dim); margin-bottom: 10px;
   }
   .help-row {
@@ -586,14 +594,14 @@
       </button>
       <div class="menu-dropdown" id="menuDropdown" role="menu">
         <button class="menu-item" id="btnCopy" role="menuitem">
-          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="5" y="4" width="9" height="11" rx="1.5"/>
             <path d="M11 4V3a1 1 0 0 0-1-1H3a1.5 1.5 0 0 0-1.5 1.5v8A1 1 0 0 0 3 12.5h2"/>
           </svg>
           Copy text
         </button>
         <button class="menu-item" id="btnCompare" role="menuitem">
-          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="8" y1="2" x2="8" y2="14"/>
             <rect x="1" y="4" width="5" height="8" rx="1"/>
             <rect x="10" y="4" width="5" height="8" rx="1"/>
@@ -606,7 +614,7 @@
         </button>
         <div class="menu-divider"></div>
         <button class="menu-item" id="btnHelp" role="menuitem">
-          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="8" cy="8" r="6.5"/>
             <path d="M6.5 6.5a1.5 1.5 0 0 1 3 0c0 1-1.5 1.5-1.5 2.5"/>
             <circle cx="8" cy="12" r="0.6" fill="currentColor"/>
