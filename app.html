@@ -112,7 +112,10 @@
   }
   .target-toggle-btn:hover {
     color: var(--accent);
+    border-color: var(--accent-dim);
+    background: rgba(255,255,255,0.5);
   }
+  .dark .target-toggle-btn:hover { background: rgba(255,255,255,0.09); }
   .target-toggle-btn:active {
     background: rgba(255,255,255,0.72);
     box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 4px 14px rgba(0,0,0,0.1);
@@ -176,11 +179,15 @@
     flex-shrink: 0;
   }
   .icon-btn:hover {
-    background: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.62);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 4px 16px rgba(0,0,0,0.09), 0 1px 3px rgba(0,0,0,0.06);
     color: var(--ink);
+    border-color: rgba(0,102,255,0.35);
+    transform: translateY(-1px);
   }
   .dark .icon-btn:hover {
-    background: rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.1);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 4px 16px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
   }
   .icon-btn:active {
     background: rgba(255,255,255,0.72);
@@ -327,6 +334,7 @@
     display: flex; align-items: center; justify-content: space-between;
   }
   .posts-panel-label {
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 11px; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-dim);
   }
@@ -353,7 +361,7 @@
     letter-spacing: -0.01em; line-height: 1.3;
   }
   .post-row.active .post-row-title { color: var(--accent); }
-  .post-row-meta { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
+  .post-row-meta { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-dim); margin-top: 2px; }
   .post-row-delete {
     width: 20px; height: 20px; border-radius: 5px;
     border: none; background: none; cursor: pointer;
@@ -442,7 +450,8 @@
 
   .compare-label {
     position: absolute; top: 72px; left: 50%; transform: translateX(-50%);
-    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
     text-transform: uppercase; color: var(--ink-dim);
     background: var(--glass-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
@@ -456,7 +465,8 @@
     pointer-events: none; z-index: 10;
   }
   .pane-word-count {
-    font-size: 13px; font-weight: 500; color: var(--ink-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; font-weight: 500; color: var(--ink-dim);
     font-variant-numeric: tabular-nums;
     background: var(--glass-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
@@ -493,7 +503,8 @@
     margin-bottom: 20px;
   }
   .help-modal-title {
-    font-size: 16px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em;
   }
   .help-close-btn {
     width: 28px; height: 28px; border-radius: 7px;
@@ -507,7 +518,8 @@
   .help-section { margin-bottom: 20px; }
   .help-section:last-child { margin-bottom: 0; }
   .help-section-title {
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.12em; color: var(--ink-dim); margin-bottom: 10px;
   }
   .help-row {
@@ -515,14 +527,14 @@
     padding: 6px 0; border-bottom: 1px solid var(--ink-faint);
   }
   .help-row:last-child { border-bottom: none; }
-  .help-row-label { font-size: 14px; color: var(--ink-mid); }
+  .help-row-label { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-mid); }
   .help-keys { display: flex; align-items: center; gap: 4px; }
   kbd {
     display: inline-flex; align-items: center; justify-content: center;
     min-width: 24px; height: 22px; padding: 0 6px;
     background: var(--glass-bg); border: 1px solid var(--panel-border);
     border-radius: 5px; box-shadow: 0 1px 0 var(--panel-border);
-    font-family: inherit; font-size: 12px; font-weight: 500; color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; color: var(--ink);
     white-space: nowrap;
   }
 
