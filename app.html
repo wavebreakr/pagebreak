@@ -859,12 +859,12 @@ window.addEventListener('DOMContentLoaded', () => {
       if (i < paragraphs.length - 1) fragments.push(document.createTextNode('\n'));
     });
     
-    fragments.forEach(node => range.insertNode(node));
+    fragments.forEach(node => {
+      range.insertNode(node);
+      range.setStartAfter(node);
+      range.collapse(true);
+    });
     
-    // Move cursor to end
-    const lastNode = fragments[fragments.length - 1];
-    range.setStartAfter(lastNode);
-    range.collapse(true);
     sel.removeAllRanges();
     sel.addRange(range);
     
