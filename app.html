@@ -6,7 +6,7 @@
 <title>Pagebreak</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-canvas:      #edeae2;
@@ -96,7 +96,8 @@
   /* ── Word count + target widget ── */
   .word-count-wrap { display: flex; align-items: center; gap: 5px; }
   .word-count {
-    font-size: 15px; font-weight: 500; color: var(--ink-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px; font-weight: 500; color: var(--ink-dim);
     font-variant-numeric: tabular-nums; white-space: nowrap;
     letter-spacing: -0.01em;
   }
@@ -110,13 +111,16 @@
     flex-shrink: 0;
   }
   .target-toggle-btn:hover {
+    color: var(--accent);
+  }
+  .target-toggle-btn:active {
     background: rgba(255,255,255,0.72);
     box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 4px 14px rgba(0,0,0,0.1);
     color: var(--accent);
     transform: translateY(-1px);
     border-color: var(--accent-dim);
   }
-  .dark .target-toggle-btn:hover { background: rgba(255,255,255,0.12); }
+  .dark .target-toggle-btn:active { background: rgba(255,255,255,0.12); }
   .target-toggle-btn.has-target { color: var(--accent); border-color: rgba(0,102,255,0.3); }
   .target-toggle-btn svg { width: 10px; height: 10px; stroke: currentColor; stroke-width: 1.2; stroke-linecap: round; }
 
@@ -133,9 +137,10 @@
     white-space: nowrap; z-index: 500;
   }
   .target-popover.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
-  .target-popover-label { font-size: 13px; font-weight: 600; color: var(--ink-mid); letter-spacing: -0.01em; }
+  .target-popover-label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: var(--ink-mid); letter-spacing: -0.01em; }
   .target-input {
-    font-size: 14px; font-weight: 500; color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px; font-weight: 500; color: var(--ink);
     font-variant-numeric: tabular-nums; width: 80px;
     background: var(--ink-faint); border: 1.2px solid var(--panel-border);
     outline: none; border-radius: 7px; padding: 4px 8px; text-align: center;
@@ -143,12 +148,14 @@
   }
   .target-input:focus { border-color: var(--accent); }
   .target-set-btn {
-    font-size: 13px; font-weight: 600; color: #fff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; font-weight: 600; color: #fff;
     background: var(--accent); border: none; border-radius: 7px;
     padding: 4px 11px; cursor: pointer; letter-spacing: -0.01em;
     transition: background 0.15s, transform 0.1s;
   }
-  .target-set-btn:hover { background: var(--accent-light); transform: translateY(-1px); }
+  .target-set-btn:hover { background: var(--accent-light); }
+  .target-set-btn:active { background: var(--accent-light); transform: translateY(-1px); }
 
   .word-target-progress {
     position: absolute; bottom: 0; left: 0; height: 2px; width: 0;
@@ -169,13 +176,20 @@
     flex-shrink: 0;
   }
   .icon-btn:hover {
+    background: rgba(255,255,255,0.4);
+    color: var(--ink);
+  }
+  .dark .icon-btn:hover {
+    background: rgba(255,255,255,0.07);
+  }
+  .icon-btn:active {
     background: rgba(255,255,255,0.72);
     box-shadow: 0 1px 0 rgba(255,255,255,0.95) inset, 0 10px 40px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
     color: var(--ink);
     transform: translateY(-2px);
     border-color: rgba(0,102,255,0.2);
   }
-  .dark .icon-btn:hover {
+  .dark .icon-btn:active {
     background: rgba(255,255,255,0.12);
     box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 8px 32px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
   }
@@ -204,7 +218,8 @@
     display: flex; align-items: center; gap: 10px;
     width: 100%; padding: 11px 14px;
     border: none; background: none; cursor: pointer;
-    color: var(--ink-mid); font-size: 14px; font-weight: 500;
+    color: var(--ink-mid); font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px; font-weight: 500;
     text-align: left; letter-spacing: -0.01em;
     transition: background 0.1s, color 0.1s;
   }
@@ -396,8 +411,8 @@
   }
   .slash-menu-item-icon.icon-h { font-size: 14px; }
   .slash-menu-item-icon.icon-p { font-size: 10px; }
-  .slash-menu-item-label { font-size: 13px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
-  .slash-menu-item-desc  { font-size: 11px; color: var(--ink-dim); margin-top: 1px; }
+  .slash-menu-item-label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+  .slash-menu-item-desc  { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--ink-dim); margin-top: 1px; }
 
   /* ── Compare mode ── */
   #paneA          { display: contents; }
