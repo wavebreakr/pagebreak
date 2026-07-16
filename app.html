@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pagebreak</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -588,7 +590,7 @@
       </svg>
     </button>
     <div class="brand">
-      <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/Pagebreak_Logo.png" alt="Pagebreak">
+      <img src="Pagebreak_Logo.png" alt="Pagebreak">
     </div>
     <input class="post-title-inline" id="postTitleInline" type="text"
       placeholder="Untitled post…" maxlength="80" aria-label="Post title">
@@ -596,7 +598,7 @@
   <div class="chrome-right">
     <span class="save-status" id="saveStatus" aria-live="polite">Saved</span>
     <div class="word-count-wrap" id="wordCountWrap" style="position:relative;">
-      <span class="word-count" id="wordCount" aria-live="polite">0 words</span>
+      <span class="word-count" id="wordCount">0 words</span>
       <button class="target-toggle-btn" id="targetToggleBtn"
         title="Set word count target" aria-label="Set word count target">
         <svg id="targetToggleIcon" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true">
@@ -612,7 +614,7 @@
       </div>
     </div>
     <div class="menu-wrapper">
-      <button class="icon-btn" id="btnMenu" title="Menu" aria-label="Open menu" aria-haspopup="true">
+      <button class="icon-btn" id="btnMenu" title="Menu" aria-label="Open menu" aria-haspopup="true" aria-expanded="false">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" width="15" height="15" aria-hidden="true">
           <line x1="2" y1="4" x2="14" y2="4"/>
           <line x1="2" y1="8" x2="14" y2="8"/>
@@ -651,7 +653,7 @@
       </div>
     </div>
   </div>
-  <div class="word-target-progress" id="wordTargetProgress" role="progressbar" aria-hidden="true"></div>
+  <div class="word-target-progress" id="wordTargetProgress" aria-hidden="true"></div>
 </div>
 
 <div class="help-backdrop" id="helpBackdrop"></div>
@@ -873,19 +875,16 @@ window.addEventListener('DOMContentLoaded', () => {
     
     // Split by double newlines for paragraphs, single newlines within
     const paragraphs = text.split(/\n\n+/);
-    const fragments = [];
-    
-    paragraphs.forEach((para, i) => {
+    const fragments = paragraphs.map(para => {
       const p = document.createElement('p');
       const lines = para.split('\n');
       lines.forEach((line, j) => {
         p.appendChild(document.createTextNode(line));
         if (j < lines.length - 1) p.appendChild(document.createElement('br'));
       });
-      fragments.push(p);
-      if (i < paragraphs.length - 1) fragments.push(document.createTextNode('\n'));
+      return p;
     });
-    
+
     fragments.forEach(node => {
       range.insertNode(node);
       range.setStartAfter(node);
