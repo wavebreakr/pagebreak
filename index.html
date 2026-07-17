@@ -3,1394 +3,553 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pagebreak</title>
+<title>Pagebreak — Write Without Distractions</title>
+<meta name="description" content="The distraction-free writing tool for creators.">
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* ── Theme: Paper (default) ── */
-    --bg-canvas:      #edeae2;
-    --editor-bg:      #faf9f7;
-    --ink:            #1c1b18;
-    --ink-mid:        #6b6860;
-    --ink-dim:        #a8a49c;
-    --ink-faint:      rgba(0,0,0,0.07);
-    --accent:         #c2692a;
-    --accent-light:   #e8874a;
-    --accent-dim:     rgba(194,105,42,0.1);
-    --panel-bg:       rgba(250,248,244,0.82);
-    --panel-border:   rgba(0,0,0,0.08);
-    --glass-bg:       rgba(255,255,255,0.58);
-    --glass-border:   rgba(255,255,255,0.75);
-    --glass-shadow:    0 1px 0 rgba(255,255,255,0.9) inset, 0 8px 32px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
-    --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.8) inset, 0 2px 8px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
-    --blur:           blur(18px) saturate(1.6);
-    --delete-bg:      rgba(184,74,74,0.15);
-    --delete-color:   #b84a4a;
-  }
-
-  .dark {
-    --bg-canvas:      #18160f;
-    --editor-bg:      #141412;
-    --ink:            #e8e4db;
-    --ink-mid:        #968f84;
-    --ink-dim:        #4a4740;
-    --ink-faint:      rgba(255,255,255,0.06);
-    --panel-bg:       rgba(24,22,16,0.85);
-    --panel-border:   rgba(255,255,255,0.07);
-    --glass-bg:       rgba(38,35,28,0.62);
-    --glass-border:   rgba(255,255,255,0.1);
-    --glass-shadow:    0 1px 0 rgba(255,255,255,0.06) inset, 0 8px 32px rgba(0,0,0,0.32), 0 1px 2px rgba(0,0,0,0.2);
-    --glass-shadow-sm: 0 1px 0 rgba(255,255,255,0.05) inset, 0 2px 8px rgba(0,0,0,0.28), 0 1px 2px rgba(0,0,0,0.16);
-    --blur:           blur(20px) saturate(1.4);
+    --bg:           #edeae2;
+    --editor-bg:    #faf9f7;
+    --ink:          #1c1b18;
+    --ink-mid:      #6b6860;
+    --ink-dim:      #a8a49c;
+    --ink-faint:    rgba(0,0,0,0.06);
+    --accent:       #c2692a;
+    --accent-light: #e08040;
+    --glass-bg:     rgba(255,255,255,0.58);
+    --glass-border: rgba(255,255,255,0.78);
+    --glass-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 8px 40px rgba(0,0,0,0.09), 0 1px 2px rgba(0,0,0,0.06);
+    --blur:         blur(22px) saturate(1.7);
+    --radius-pill:  100px;
+    --radius-card:  20px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; overflow: hidden; }
+
+  html { scroll-behavior: smooth; }
 
   body {
     font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background: var(--bg-canvas);
-    transition: background 0.4s;
+    overflow-x: hidden;
   }
 
-  /* Ensure inputs/buttons inherit the body font */
-  input, button { font-family: inherit; }
-
-  /* Noise grain overlay */
+  /* Grain overlay */
   body::before {
     content: '';
     pointer-events: none;
-    position: fixed; inset: 0; z-index: 0; opacity: 0.028;
+    position: fixed; inset: 0; z-index: 0; opacity: 0.025;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size: 180px;
+    background-size: 160px;
   }
 
-  /* ── Chrome ── */
-  .chrome {
-    position: fixed; top: 0; left: 0; right: 0; height: 64px;
+  /* Soft ambient blobs */
+  .blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.28;
+  }
+  .blob-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, #d4895a 0%, transparent 70%);
+    top: -200px; right: -100px;
+  }
+  .blob-2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #c8b89a 0%, transparent 70%);
+    bottom: -150px; left: -100px;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 16px 24px;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 20px; gap: 12px;
-    background: transparent;
-    z-index: 200;
   }
-  .chrome-left  { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  .chrome-right { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
 
-  .brand { display: flex; align-items: center; flex-shrink: 0; }
-  .brand img { height: 42px; width: auto; display: block; }
-  .dark .brand img { filter: invert(1); }
+  .nav-glass {
+    position: absolute; inset: 0;
+    background: rgba(237,234,226,0.7);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border-bottom: 1px solid rgba(255,255,255,0.5);
+    z-index: -1;
+  }
 
-  .post-title-inline {
-    font-size: 16px;
-    color: var(--ink-dim); background: none; border: none; outline: none;
-    width: 220px; max-width: 30vw;
-    transition: color 0.2s;
+  .nav-logo img {
+    height: 26px; width: auto; display: block;
   }
-  .post-title-inline::placeholder { color: var(--ink-dim); }
-  .post-title-inline:focus { color: var(--ink-mid); }
 
-  /* ── Word count + target widget ── */
-  .word-count-wrap {
-    display: flex; align-items: center; gap: 5px;
+  .nav-cta {
+    display: flex; align-items: center; gap: 10px;
   }
-  .word-count {
-    font-size: 16px; font-weight: 400; color: var(--ink-dim);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
+
+  .btn-ghost {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    color: var(--ink-mid);
+    background: none; border: none;
+    cursor: pointer; padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    transition: color 0.2s, background 0.2s;
   }
-  /* Small icon button for adding/clearing target */
-  .target-toggle-btn {
-    width: 22px; height: 22px;
-    border: 1px solid var(--glass-border); border-radius: 6px;
-    background: var(--glass-bg); box-shadow: var(--glass-shadow-sm);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--ink-dim);
-    transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s;
-    flex-shrink: 0;
+  .btn-ghost:hover { color: var(--ink); background: var(--ink-faint); }
+
+  .btn-primary {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    color: #fff;
+    background: var(--accent);
+    border: none; cursor: pointer;
+    padding: 9px 20px;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    box-shadow: 0 2px 10px rgba(194,105,42,0.3), 0 1px 0 rgba(255,255,255,0.15) inset;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
   }
-  .target-toggle-btn:hover {
-    background: rgba(255,255,255,0.82);
-    box-shadow: 0 1px 0 #fff inset, 0 4px 14px rgba(0,0,0,0.1);
-    color: var(--ink);
+  .btn-primary:hover {
+    background: var(--accent-light);
+    box-shadow: 0 4px 18px rgba(194,105,42,0.38), 0 1px 0 rgba(255,255,255,0.15) inset;
     transform: translateY(-1px);
   }
-  .dark .target-toggle-btn:hover { background: rgba(255,255,255,0.1); }
-  .target-toggle-btn.has-target { color: var(--ink-mid); }
-  .target-toggle-btn svg { width: 10px; height: 10px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 
-  /* ── Word target popover ── */
-  .target-popover {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 1;
+    min-height: 100svh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+  }
+
+  .hero-eyebrow {
+    font-size: 14px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.1s forwards cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .hero-headline {
+    font-family: 'Lora', serif;
+    font-size: clamp(42px, 7vw, 82px);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    max-width: 760px;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.2s forwards cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .hero-headline em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 18px; font-weight: 400;
+    color: var(--ink-mid);
+    max-width: 480px; line-height: 1.6;
+    margin-bottom: 44px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.32s forwards cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .hero-actions {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 64px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.44s forwards cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .btn-hero {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600;
+    color: #fff;
+    background: var(--accent);
+    border: none; cursor: pointer;
+    padding: 14px 32px;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 20px rgba(194,105,42,0.32), 0 1px 0 rgba(255,255,255,0.2) inset;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+  }
+  .btn-hero:hover {
+    background: var(--accent-light);
+    box-shadow: 0 6px 28px rgba(194,105,42,0.42), 0 1px 0 rgba(255,255,255,0.2) inset;
+    transform: translateY(-2px);
+  }
+
+  .hero-note {
+    font-size: 12px; color: var(--ink-dim);
+    letter-spacing: 0.01em;
+  }
+
+  /* ── EDITOR PREVIEW ── */
+  .editor-preview-wrap {
+    width: min(760px, 90vw);
+    opacity: 0;
+    animation: fadeUp 1s 0.56s forwards cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .editor-preview {
     background: var(--glass-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
-    border-radius: 12px;
-    padding: 12px 14px;
-    display: flex; align-items: center; gap: 8px;
-    opacity: 0; pointer-events: none;
-    transform: translateY(-4px);
-    transition: opacity 0.15s, transform 0.15s cubic-bezier(0.4,0,0.2,1);
-    white-space: nowrap;
-    z-index: 500;
+    border-radius: var(--radius-card);
+    overflow: hidden;
   }
-  .target-popover.show {
-    opacity: 1; pointer-events: auto; transform: translateY(0);
+
+  .editor-chrome {
+    height: 44px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
   }
-  .target-popover-label {
-    font-size: 13px; font-weight: 500; color: var(--ink-mid);
+
+  .chrome-dots { display: flex; gap: 6px; }
+  .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(0,0,0,0.12);
+  }
+
+  .chrome-title {
+    font-size: 11px; font-weight: 500; color: var(--ink-dim);
+    letter-spacing: 0.02em;
+  }
+
+  .chrome-actions { display: flex; gap: 6px; }
+  .chrome-pill {
+    height: 20px; padding: 0 10px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.06);
+    font-size: 10px; font-weight: 500; color: var(--ink-dim);
+    display: flex; align-items: center;
+  }
+
+  .editor-body {
+    padding: 36px 48px 44px;
+    font-family: 'Lora', serif;
+    font-size: 17px; line-height: 1.85;
+    color: var(--ink);
+    text-align: left;
+  }
+
+  .editor-body h2 {
+    font-size: 1.5em; font-weight: 600;
+    letter-spacing: -0.025em; margin-bottom: 14px;
+    color: var(--ink);
+  }
+
+  .editor-body p { margin-bottom: 1em; color: var(--ink-mid); }
+  .editor-body p.lead { color: var(--ink); }
+
+  .cursor {
+    display: inline-block; width: 2px; height: 1.1em;
+    background: var(--accent); vertical-align: text-bottom;
+    margin-left: 1px;
+    animation: blink 1.1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ── FEATURES ── */
+  .features {
+    position: relative; z-index: 1;
+    padding: 80px 24px 100px;
+    max-width: 960px; margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 14px; font-weight: 600;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent); text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Lora', serif;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 600; letter-spacing: -0.025em;
+    text-align: center; line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 64px;
+    max-width: 560px; margin-left: auto; margin-right: auto;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .feature-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--radius-card);
+    padding: 28px 28px 30px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 14px 48px rgba(0,0,0,0.11), 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  .feature-icon {
+    width: 40px; height: 40px;
+    border-radius: 11px;
+    background: rgba(194,105,42,0.1);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+    color: var(--accent);
+  }
+
+  .feature-icon svg {
+    width: 18px; height: 18px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  .feature-name {
+    font-size: 15px; font-weight: 600;
+    color: var(--ink); margin-bottom: 8px;
     letter-spacing: -0.01em;
   }
-  .target-input {
-    font-size: 14px; font-weight: 500; color: var(--ink);
-    font-variant-numeric: tabular-nums; width: 80px;
-    background: var(--ink-faint); border: 1px solid var(--panel-border);
-    outline: none; border-radius: 7px; padding: 4px 8px;
-    text-align: center;
-  }
-  .target-input:focus { border-color: var(--accent); }
-  .target-set-btn {
-    font-size: 13px; font-weight: 600; color: #fff;
-    background: var(--accent); border: none; border-radius: 7px;
-    padding: 4px 11px; cursor: pointer; letter-spacing: -0.01em;
-    transition: background 0.15s, transform 0.1s;
-  }
-  .target-set-btn:hover { background: var(--accent-light); transform: translateY(-1px); }
 
-  .word-target-progress {
-    position: absolute; bottom: 0; left: 0;
-    height: 2px; width: 0;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
-    transition: width 0.4s cubic-bezier(0.4,0,0.2,1), background 0.3s;
-    border-radius: 0 1px 1px 0;
-  }
-  .word-target-progress.done { background: linear-gradient(90deg, #4a9e6a, #6ec48a); }
-
-  /* Glass icon button */
-  .icon-btn {
-    width: 34px; height: 34px;
-    border: 1px solid var(--glass-border); border-radius: 9px;
-    background: var(--glass-bg); box-shadow: var(--glass-shadow-sm);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; color: var(--ink-mid);
-    transition: background 0.15s, box-shadow 0.15s, color 0.15s, transform 0.15s;
-  }
-  .icon-btn:hover {
-    background: rgba(255,255,255,0.82);
-    box-shadow: 0 1px 0 #fff inset, 0 4px 14px rgba(0,0,0,0.1);
-    color: var(--ink);
-    transform: translateY(-1px);
-  }
-  .dark .icon-btn:hover { background: rgba(255,255,255,0.1); }
-  .icon-btn.on {
-    background: var(--ink); color: var(--bg-canvas);
-    border-color: transparent;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.22);
-  }
-  /* Small variant used for the new-post button in the sidebar header */
-  .icon-btn--sm { width: 24px; height: 24px; font-size: 16px; border-radius: 5px; }
-
-  /* Glass text button */
-  .copy-btn {
-    font-size: 14px; font-weight: 500;
-    padding: 0 13px; height: 34px;
-    border: 1px solid var(--glass-border); border-radius: 8px;
-    background: var(--glass-bg); box-shadow: var(--glass-shadow-sm);
-    cursor: pointer; color: var(--ink-mid);
-    display: flex; align-items: center; gap: 5px;
-    transition: background 0.15s, box-shadow 0.15s, color 0.15s, transform 0.15s;
-    white-space: nowrap; letter-spacing: 0.01em;
-  }
-  .copy-btn:hover {
-    background: rgba(255,255,255,0.82);
-    box-shadow: 0 1px 0 #fff inset, 0 4px 14px rgba(0,0,0,0.1);
-    color: var(--ink);
-    transform: translateY(-1px);
-  }
-  .dark .copy-btn:hover { background: rgba(255,255,255,0.1); }
-  .copy-btn svg { width: 12px; height: 12px; stroke: currentColor; flex-shrink: 0; }
-
-  .save-status {
-    font-size: 14px; color: var(--accent);
-    opacity: 0; transition: opacity 0.4s;
-    white-space: nowrap; letter-spacing: 0.01em;
-  }
-  .save-status.show { opacity: 1; }
-
-  /* ── Layout ── */
-  .writing-area {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    display: flex; overflow: hidden;
+  .feature-desc {
+    font-size: 13.5px; color: var(--ink-mid);
+    line-height: 1.65;
   }
 
-  .editor-wrap {
-    flex: 1; overflow-y: auto; padding: 116px 0 120px;
-    background: var(--editor-bg);
-    transition: background 0.4s;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0,0,0,0.12) transparent;
-  }
-  .editor-wrap::-webkit-scrollbar { width: 3px; }
-  .editor-wrap::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
-
-  .editor-inner { max-width: 640px; margin: 0 auto; padding: 0 36px; }
-
-  .editor {
-    font-family: 'Lora', serif;
-    font-size: 18px; line-height: 1.9;
-    color: var(--ink); caret-color: var(--accent);
-    outline: none; min-height: calc(100vh - 200px);
-    transition: color 0.3s;
-    letter-spacing: 0.005em;
-    overflow-wrap: break-word;
-    word-break: normal;
-  }
-  .editor:empty::before {
-    content: attr(data-placeholder);
-    color: var(--ink-dim); font-style: italic; pointer-events: none;
+  /* ── CLOSING CTA ── */
+  .cta-close {
+    position: relative; z-index: 1;
+    padding: 0 24px 100px;
   }
 
-  /* Uniform paragraph spacing */
-  .editor p,
-  .editor div { margin-top: 1.15em; }
-
-  .editor ul { padding-left: 1.4em; margin-top: 1.15em; list-style: disc; }
-  .editor ul li { margin-bottom: 0.2em; line-height: 1.9; }
-  .editor ul ul { margin-top: 0; list-style: circle; }
-  .editor ul ul ul { list-style: square; }
-
-  .editor strong { font-weight: 700; }
-  .editor em { font-style: italic; }
-
-  .editor h1, .editor h2, .editor h3 {
-    font-family: 'Lora', serif; font-weight: 600; color: var(--ink);
-    line-height: 1.3; margin-top: 1.15em; margin-bottom: 0.5em;
-    letter-spacing: -0.02em;
-  }
-  .editor h1 { font-size: 2em; }
-  .editor h2 { font-size: 1.5em; }
-  .editor h3 { font-size: 1.2em; }
-
-  /* ── Celebration pill ── */
-  .celebration {
-    position: fixed; top: 78px; left: 50%;
-    transform: translateX(-50%) translateY(-12px);
-    background: var(--glass-bg);
-    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
-    color: var(--ink); font-size: 13px; font-weight: 500;
-    padding: 8px 20px; border-radius: 24px;
-    opacity: 0; pointer-events: none; z-index: 300;
-    transition: opacity 0.3s, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
-    white-space: nowrap; letter-spacing: -0.01em;
-  }
-  .celebration.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* ── Toast ── */
-  .toast {
-    position: fixed; bottom: 24px; right: 24px;
-    font-size: 12px; font-weight: 500; color: var(--ink-mid);
-    background: var(--glass-bg);
-    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
-    border-radius: 10px; padding: 7px 14px;
-    opacity: 0; transition: opacity 0.3s, transform 0.3s;
-    transform: translateY(6px); pointer-events: none; z-index: 300;
-  }
-  .toast.show { opacity: 1; transform: translateY(0); }
-
-  /* ── Posts sidebar ── */
-  .posts-panel {
-    position: fixed; top: 64px; left: 0; bottom: 0;
-    width: 220px;
-    border-right: 1px solid var(--panel-border);
-    background: var(--panel-bg);
-    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    display: flex; flex-direction: column; overflow: hidden;
-    z-index: 150;
-    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s, border-color 0.4s;
-  }
-  .posts-panel.hidden { transform: translateX(-100%); opacity: 0; pointer-events: none; border-right-width: 0; }
-
-  .posts-panel-header {
-    padding: 16px 14px 12px; flex-shrink: 0;
-    border-bottom: 1px solid var(--panel-border);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .posts-panel-label {
-    font-size: 11px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.14em;
-    color: var(--ink-dim);
-  }
-  .posts-list {
-    flex: 1; overflow-y: auto;
-    padding: 8px; display: flex; flex-direction: column; gap: 3px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--ink-faint) transparent;
-  }
-  .posts-list::-webkit-scrollbar { width: 2px; }
-  .posts-list::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 2px; }
-
-  .post-row {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 10px; border-radius: 9px;
-    cursor: pointer;
-    transition: background 0.15s, box-shadow 0.15s;
-  }
-  .post-row:hover { background: rgba(255,255,255,0.55); box-shadow: var(--glass-shadow-sm); }
-  .dark .post-row:hover { background: rgba(255,255,255,0.05); }
-  .post-row.active { background: var(--accent-dim); box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset; }
-  .post-row-info { flex: 1; min-width: 0; }
-  .post-row-title {
-    font-size: 14px; font-weight: 500; color: var(--ink);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    letter-spacing: -0.01em; line-height: 1.3;
-  }
-  .post-row.active .post-row-title { color: var(--accent); }
-  .post-row-meta { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
-  .post-row-delete {
-    width: 20px; height: 20px; border-radius: 5px;
-    border: none; background: none; cursor: pointer;
-    color: var(--ink-dim); font-size: 13px; line-height: 1;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; transition: background 0.15s, color 0.15s, opacity 0.15s;
-    flex-shrink: 0;
-  }
-  .post-row:hover .post-row-delete { opacity: 1; }
-  .post-row-delete:hover { background: var(--delete-bg); color: var(--delete-color); }
-
-  /* ── Delete confirm inline UI ── */
-  .post-row-confirm-title {
-    font-size: 12px; font-weight: 500; color: var(--delete-color); line-height: 1.3;
-  }
-  .post-row-confirm-meta {
-    font-size: 12px; color: var(--ink-dim); margin-top: 2px;
-  }
-  .post-row-confirm-yes {
-    font-size: 11px; font-weight: 600; padding: 2px 7px;
-    border-radius: 4px; border: none; cursor: pointer; flex-shrink: 0;
-    background: var(--delete-bg); color: var(--delete-color);
-  }
-  .post-row-confirm-no {
-    font-size: 11px; font-weight: 600; padding: 2px 7px;
-    border-radius: 4px; border: none; cursor: pointer; flex-shrink: 0;
-    background: var(--ink-faint); color: var(--ink-mid);
-  }
-
-  /* ── Mobile bottom sheet backdrop ── */
-  .posts-panel-backdrop {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.28);
-    z-index: 149;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .posts-panel-backdrop.show { opacity: 1; }
-
-  @media (max-width: 700px) {
-    .chrome { padding: 0 14px; gap: 8px; }
-    .chrome-left { gap: 8px; flex: 1; min-width: 0; }
-    .chrome-right { gap: 8px; flex-shrink: 0; }
-
-    .post-title-inline { display: none; }
-    .copy-btn { display: none; }
-
-    .brand img { height: 34px; }
-
-    .editor-inner { padding: 0 20px; }
-
-    /* Posts panel: bottom sheet */
-    .posts-panel {
-      top: auto; bottom: 0; left: 0; right: 0;
-      width: 100%; height: 62vh; max-height: 520px;
-      border-right: none;
-      border-top: 1px solid var(--panel-border);
-      border-radius: 20px 20px 0 0;
-      transform: translateY(100%);
-      opacity: 1;
-    }
-    .posts-panel.hidden {
-      transform: translateY(100%);
-      opacity: 1;
-      pointer-events: none;
-      border-top-width: 0;
-    }
-    .posts-panel.mobile-open {
-      transform: translateY(0) !important;
-      opacity: 1 !important;
-      pointer-events: auto !important;
-      border-top-width: 1px !important;
-    }
-
-    .posts-panel-backdrop { display: block; }
-
-    /* Drag handle */
-    .posts-panel-header::before {
-      content: '';
-      position: absolute; top: 8px; left: 50%;
-      transform: translateX(-50%);
-      width: 36px; height: 4px;
-      background: var(--ink-dim);
-      border-radius: 2px; opacity: 0.35;
-    }
-    .posts-panel-header { position: relative; padding-top: 22px; }
-
-    .post-row-delete { opacity: 1; }
-  }
-
-  /* ── Slash menu ── */
-  .slash-menu {
-    position: fixed;
+  .cta-close-inner {
+    max-width: 960px; margin: 0 auto;
     background: var(--glass-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
-    border-radius: 10px;
-    padding: 4px;
-    min-width: 160px;
-    z-index: 400;
-    opacity: 0;
-    transform: translateY(4px);
-    pointer-events: none;
-    transition: opacity 0.15s, transform 0.15s cubic-bezier(0.4,0,0.2,1);
-  }
-  .slash-menu.visible {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
-  .slash-menu-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 7px 10px; border-radius: 7px;
-    cursor: pointer; transition: background 0.1s;
-    user-select: none;
-  }
-  .slash-menu-item:hover,
-  .slash-menu-item.active { background: var(--ink-faint); }
-  .slash-menu-item-icon {
-    width: 28px; height: 28px; border-radius: 6px;
-    background: var(--glass-bg); border: 1px solid var(--panel-border);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    font-family: 'Lora', serif; color: var(--ink-mid); font-weight: 600;
-  }
-  .slash-menu-item-icon.icon-h { font-size: 14px; }
-  .slash-menu-item-icon.icon-p { font-size: 10px; }
-  .slash-menu-item-label { font-size: 13px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
-  .slash-menu-item-desc  { font-size: 11px; color: var(--ink-dim); margin-top: 1px; }
-
-  /* ── Compare mode ──
-     Default: #paneA is display:contents (layout-invisible); #paneB and
-     the divider are display:none. */
-  #paneA          { display: contents; }
-  #paneB          { display: none; }
-  #compareDivider { display: none; }
-
-  .writing-area.compare-mode { flex-direction: row; }
-
-  .writing-area.compare-mode #paneA {
-    display: flex; flex: 1; flex-direction: column;
-    overflow: hidden; position: relative; min-width: 0;
-  }
-  .writing-area.compare-mode #paneA .editor-wrap { flex: 1; }
-
-  .writing-area.compare-mode #compareDivider {
-    display: block; width: 1px; flex-shrink: 0;
-    background: var(--panel-border);
-    align-self: stretch; margin-top: 64px;
+    border-radius: var(--radius-card);
+    padding: 72px 40px 76px;
+    display: flex; flex-direction: column;
+    align-items: center; text-align: center;
   }
 
-  .writing-area.compare-mode #paneB {
-    display: flex; flex: 1; flex-direction: column;
-    overflow: hidden; position: relative; min-width: 0;
-    opacity: 0; transform: translateX(18px);
-    transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.4,0,0.2,1);
-  }
-  .writing-area.compare-mode #paneB.visible {
-    opacity: 1; transform: translateX(0);
-  }
-  .writing-area.compare-mode #paneB .editor-wrap { flex: 1; }
-
-  /* Compare-only overlays hidden by default */
-  #paneALabel, #paneAFooter { display: none; }
-
-  .compare-label {
-    position: absolute; top: 72px; left: 50%; transform: translateX(-50%);
-    font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--ink-dim);
-    background: var(--glass-bg);
-    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border);
-    padding: 3px 10px; border-radius: 20px;
-    pointer-events: none; z-index: 10; white-space: nowrap;
+  .cta-close-headline {
+    font-family: 'Lora', serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 600; letter-spacing: -0.03em;
+    line-height: 1.15; color: var(--ink);
+    margin-bottom: 14px;
+    max-width: 560px;
   }
 
-  .pane-footer {
-    position: absolute; bottom: 0; left: 0; right: 0; height: 44px;
-    display: flex; align-items: center; justify-content: center;
-    pointer-events: none; z-index: 10;
-  }
-  .pane-word-count {
-    font-size: 13px; font-weight: 400; color: var(--ink-dim);
-    font-variant-numeric: tabular-nums;
-    background: var(--glass-bg);
-    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px; padding: 3px 12px;
+  .cta-close-sub {
+    font-size: 17px; color: var(--ink-mid);
+    margin-bottom: 36px; line-height: 1.5;
   }
 
-  /* Hide chrome word count in compare mode */
-  .word-count-wrap.compare-mode-active { display: none; }
+  .cta-close-note {
+    font-size: 14px; color: var(--ink-dim);
+    margin-top: 16px; letter-spacing: 0.01em;
+  }
 
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 1;
+    padding: 32px 24px;
+    text-align: center;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .footer-logo img { height: 22px; width: auto; opacity: 0.45; }
+  .footer-copy {
+    font-size: 12px; color: var(--ink-dim);
+    margin-top: 12px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* scroll-reveal */
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1);
+  }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* ── RESPONSIVE ── */
   @media (max-width: 700px) {
-    .writing-area.compare-mode { flex-direction: column; }
-    .writing-area.compare-mode #compareDivider { width: auto; height: 1px; margin-top: 0; }
+    .editor-body { padding: 24px 24px 32px; }
+    .features-grid { grid-template-columns: 1fr; }
+    nav { padding: 12px 16px; }
+    .btn-ghost { display: none; }
   }
 </style>
 </head>
 <body>
 
-<div class="chrome">
-  <div class="chrome-left">
-    <button class="icon-btn" id="btnPosts" title="All posts" aria-label="Toggle posts panel">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
-        <line x1="2" y1="4" x2="14" y2="4"/>
-        <line x1="2" y1="8" x2="14" y2="8"/>
-        <line x1="2" y1="12" x2="9" y2="12"/>
-      </svg>
-    </button>
-    <div class="brand">
-      <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/PagebreakLogo2.png" alt="Pagebreak">
-    </div>
-    <input class="post-title-inline" id="postTitleInline" type="text"
-      placeholder="Untitled post…" maxlength="80"
-      aria-label="Post title">
+<div class="blob blob-1" aria-hidden="true"></div>
+<div class="blob blob-2" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav aria-label="Site navigation">
+  <div class="nav-glass" aria-hidden="true"></div>
+  <a href="#" class="nav-logo" aria-label="Pagebreak home">
+    <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/Pagebreak-Logo-3.png" alt="Pagebreak">
+  </a>
+  <div class="nav-cta">
+    <a href="app.html" class="btn-primary">Start writing free</a>
   </div>
-  <div class="chrome-right">
-    <span class="save-status" id="saveStatus" aria-live="polite">Saved</span>
-    <div class="word-count-wrap" id="wordCountWrap" style="position:relative;">
-      <span class="word-count" id="wordCount" aria-live="polite">0 words</span>
-      <button class="target-toggle-btn" id="targetToggleBtn"
-        title="Set word count target"
-        aria-label="Set word count target">
-        <svg id="targetToggleIcon" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-          <line x1="5" y1="1" x2="5" y2="9"/>
-          <line x1="1" y1="5" x2="9" y2="5"/>
-        </svg>
-      </button>
-      <div class="target-popover" id="targetPopover">
-        <span class="target-popover-label">Target</span>
-        <input class="target-input" id="targetInput" type="number" min="1" max="99999"
-          placeholder="e.g. 500"
-          aria-label="Word target — press Enter to set, Escape to cancel">
-        <button class="target-set-btn" id="targetSetBtn">Set</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" aria-label="Hero">
+  <p class="hero-eyebrow">Writing, simplified</p>
+  <h1 class="hero-headline">The editor that gets <em>out of your way.</em></h1>
+  <p class="hero-sub">A distraction-free writing space for creators.</p>
+  <div class="hero-actions">
+    <a href="app.html" class="btn-hero">Start writing (it's free)</a>
+  </div>
+
+  <!-- Editor preview -->
+  <div class="editor-preview-wrap">
+    <div class="editor-preview" role="img" aria-label="Screenshot of Pagebreak editor">
+      <div class="editor-chrome">
+        <div class="chrome-dots" aria-hidden="true">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <span class="chrome-title">Why I Write Every Morning</span>
+        <div class="chrome-actions" aria-hidden="true">
+          <span class="chrome-pill">312 words</span>
+          <span class="chrome-pill">Saved</span>
+        </div>
       </div>
-    </div>
-    <button class="copy-btn" id="btnCopy" title="Copy all text to clipboard" aria-label="Copy to clipboard">
-      <svg viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="5" y="4" width="9" height="11" rx="1.5"/>
-        <path d="M11 4V3a1 1 0 0 0-1-1H3a1.5 1.5 0 0 0-1.5 1.5v8A1 1 0 0 0 3 12.5h2"/>
-      </svg>
-      Copy
-    </button>
-    <button class="icon-btn" id="btnCompare" title="Compare mode" aria-label="Toggle compare mode">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" aria-hidden="true">
-        <line x1="8" y1="2" x2="8" y2="14"/>
-        <rect x="1" y="4" width="5" height="8" rx="1"/>
-        <rect x="10" y="4" width="5" height="8" rx="1"/>
-      </svg>
-    </button>
-    <button class="icon-btn" id="btnDark" title="Toggle dark mode" aria-label="Toggle dark mode">
-      <span id="darkIcon" aria-hidden="true">🌙</span>
-    </button>
-  </div>
-  <div class="word-target-progress" id="wordTargetProgress" role="progressbar" aria-hidden="true"></div>
-</div>
-
-<div class="writing-area" id="writingArea">
-  <div class="posts-panel-backdrop" id="postsPanelBackdrop"></div>
-  <div class="posts-panel hidden" id="postsPanel">
-    <div class="posts-panel-header">
-      <span class="posts-panel-label">Posts</span>
-      <button class="icon-btn icon-btn--sm" id="btnNewPost" title="New post" aria-label="New post">＋</button>
-    </div>
-    <div class="posts-list" id="postsList" role="list"></div>
-  </div>
-
-  <div id="paneA">
-    <div class="compare-label" id="paneALabel">Original</div>
-    <div class="pane-footer" id="paneAFooter">
-      <span class="pane-word-count" id="paneACount">0 words</span>
-    </div>
-    <div class="editor-wrap" id="editorWrap">
-      <div class="editor-inner">
-        <div class="editor" id="editor"
-          contenteditable="true"
-          data-placeholder="Start writing…"
-          spellcheck="true"
-          role="textbox"
-          aria-multiline="true"
-          aria-label="Editor"></div>
+      <div class="editor-body" aria-hidden="true">
+        <h2>The habit that changed everything</h2>
+        <p class="lead">There's something about the quiet hour before the world wakes up.</p>
+        <p>I started writing every morning three years ago. While at first it felt forced, it became the part of the day I looked forward to the most.<span class="cursor"></span></p>
       </div>
     </div>
   </div>
+</section>
 
-  <div id="compareDivider" aria-hidden="true"></div>
+<!-- FEATURES -->
+<section class="features reveal" aria-labelledby="features-heading">
+  <p class="section-label">Built for flow</p>
+  <h2 class="section-title" id="features-heading">Everything a writer needs. Nothing they don't.</h2>
+  <div class="features-grid">
 
-  <div id="paneB">
-    <div class="compare-label">Compare</div>
-    <div class="editor-wrap">
-      <div class="editor-inner">
-        <div class="editor" id="editorB"
-          contenteditable="true"
-          data-placeholder="Paste or type copy to compare…"
-          spellcheck="true"
-          role="textbox"
-          aria-multiline="true"
-          aria-label="Compare editor"></div>
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 20 20"><path d="M3 5h14M3 10h10M3 15h7"/></svg>
       </div>
+      <p class="feature-name">Distraction-free editor</p>
+      <p class="feature-desc">A clean, full-screen writing canvas so you can focus on your words.</p>
     </div>
-    <div class="pane-footer">
-      <span class="pane-word-count" id="paneBCount">0 words</span>
-    </div>
-  </div>
-</div>
 
-<div class="celebration" id="celebration" aria-live="polite" aria-atomic="true"></div>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-<div class="slash-menu" id="slashMenu" role="listbox" aria-label="Insert block type">
-  <div class="slash-menu-item" data-index="0" role="option">
-    <div class="slash-menu-item-icon icon-h">H</div>
-    <div>
-      <div class="slash-menu-item-label">Header</div>
-      <div class="slash-menu-item-desc">Section heading</div>
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="14" rx="3"/><path d="M7 10h6M10 7v6"/></svg>
+      </div>
+      <p class="feature-name">Multiple posts</p>
+      <p class="feature-desc">Keep all your drafts in one place. Switch between posts instantly from the slide-out panel, with no files to manage.</p>
     </div>
-  </div>
-  <div class="slash-menu-item" data-index="1" role="option">
-    <div class="slash-menu-item-icon icon-p">¶</div>
-    <div>
-      <div class="slash-menu-item-label">Paragraph</div>
-      <div class="slash-menu-item-desc">Plain body text</div>
+
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2"/></svg>
+      </div>
+      <p class="feature-name">Hit your writing goals</p>
+      <p class="feature-desc">Set a word target and watch the progress bar fill, then get a small celebration when you hit it.</p>
     </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 20 20"><path d="M4 6l3 3 3-3M4 14l3-3 3 3M13 4l3 8-3 4"/></svg>
+      </div>
+      <p class="feature-name">Structure your writing instantly</p>
+      <p class="feature-desc">Type <code style="font-size:12px;background:rgba(0,0,0,0.06);padding:1px 5px;border-radius:4px;">/</code> on an empty line to drop in a heading or paragraph block. Your thinking, organised.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 20 20"><path d="M17 3l-7 7-7-7M17 10l-7 7-7-7"/></svg>
+      </div>
+      <p class="feature-name">Dark mode</p>
+      <p class="feature-desc">A light and dark mode, one click to toggle. Your preference is remembered every time you return.</p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" aria-hidden="true">
+        <svg viewBox="0 0 20 20"><path d="M5 4h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M3 8h14"/></svg>
+      </div>
+      <p class="feature-name">Autosave — always</p>
+      <p class="feature-desc">Saves automatically to your browser as you type. No account, no server, no data leaving your machine.</p>
+    </div>
+
   </div>
-</div>
+</section>
+
+
+<!-- CLOSING CTA -->
+<section class="cta-close reveal" aria-label="Get started">
+  <div class="cta-close-inner">
+    <p class="cta-close-headline">Your best writing is still ahead of you.</p>
+    <p class="cta-close-sub">Open the editor. Start with one sentence.</p>
+    <a href="app.html" class="btn-hero">Start writing free →</a>
+    <p class="cta-close-note">No account or download, just open and write.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/Pagebreak-Logo-3.png" alt="Pagebreak">
+  </div>
+  <p class="footer-copy">© 2026 Pagebreak. Built for writers who just want to write.</p>
+</footer>
 
 <script>
 'use strict';
-
-// ── State ──────────────────────────────────────────────
-let wordTarget       = 0;
-let targetCelebrated = false;
-let isComposing      = false;
-let isTyping         = false;
-let _typingTimer     = null;
-let compareMode      = false;
-let _saveTimer       = null;
-
-// Slash menu state
-let slashMenuOpen  = false;
-let slashMenuIndex = 0;
-let slashBlock     = null;
-let slashBareLine  = null;
-
-// Block tag sets used in DOM-walking hot paths
-const BLOCK_TAGS = new Set(['P', 'DIV', 'LI', 'BR', 'H1', 'H2', 'H3', 'UL', 'OL']);
-const PARA_RE    = /^(P|DIV|LI)$/;
-
-// Cached element references
-let elEditor, elEditorWrap, elPostsPanel, elWordCount, elWordCountWrap,
-    elTargetInput, elTargetPopover, elTargetToggleBtn, elTargetToggleIcon,
-    elSaveStatus, elProgressBar, elCelebration, elToast,
-    elPostTitle, elPostsList, elBtnDark, elDarkIcon, elBtnPosts, elSlashMenu,
-    elBtnCompare, elWritingArea, elPaneB, elEditorB,
-    elPaneALabel, elPaneAFooter, elPostsPanelBackdrop;
-
-// ── Init ───────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  elEditor              = document.getElementById('editor');
-  elEditorWrap          = document.getElementById('editorWrap');
-  elPostsPanel          = document.getElementById('postsPanel');
-  elWordCount           = document.getElementById('wordCount');
-  elWordCountWrap       = document.getElementById('wordCountWrap');
-  elTargetInput         = document.getElementById('targetInput');
-  elTargetPopover       = document.getElementById('targetPopover');
-  elTargetToggleBtn     = document.getElementById('targetToggleBtn');
-  elTargetToggleIcon    = document.getElementById('targetToggleIcon');
-  elSaveStatus          = document.getElementById('saveStatus');
-  elProgressBar         = document.getElementById('wordTargetProgress');
-  elCelebration         = document.getElementById('celebration');
-  elToast               = document.getElementById('toast');
-  elPostTitle           = document.getElementById('postTitleInline');
-  elPostsList           = document.getElementById('postsList');
-  elBtnDark             = document.getElementById('btnDark');
-  elDarkIcon            = document.getElementById('darkIcon');
-  elBtnPosts            = document.getElementById('btnPosts');
-  elSlashMenu           = document.getElementById('slashMenu');
-  elBtnCompare          = document.getElementById('btnCompare');
-  elWritingArea         = document.getElementById('writingArea');
-  elPaneB               = document.getElementById('paneB');
-  elEditorB             = document.getElementById('editorB');
-  elPaneALabel          = document.getElementById('paneALabel');
-  elPaneAFooter         = document.getElementById('paneAFooter');
-  elPostsPanelBackdrop  = document.getElementById('postsPanelBackdrop');
-
-  // NOTE: execCommand is deprecated but remains the only viable API for
-  // contenteditable editing at this level without a full editor framework.
-  document.execCommand('defaultParagraphSeparator', false, 'p');
-
-  // Wire up all event listeners (no inline onclick handlers in HTML)
-  elBtnPosts.addEventListener('click', togglePostsPanel);
-  elBtnDark.addEventListener('click', toggleDark);
-  elBtnCompare.addEventListener('click', toggleCompare);
-  document.getElementById('btnCopy').addEventListener('click', copyText);
-  document.getElementById('btnNewPost').addEventListener('click', newPost);
-  elTargetToggleBtn.addEventListener('click', onTargetToggle);
-  document.getElementById('targetSetBtn').addEventListener('click', commitTarget);
-  elPostsPanelBackdrop.addEventListener('click', togglePostsPanel);
-
-  elPostTitle.addEventListener('input', onTitleType);
-
-  elEditor.addEventListener('keydown', onEditorKeydown);
-  elEditor.addEventListener('input', onEditorInput);
-  elEditor.addEventListener('compositionstart', () => { isComposing = true; });
-  elEditor.addEventListener('compositionend',   () => { isComposing = false; });
-  elEditor.addEventListener('paste', e => {
-    e.preventDefault();
-    document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
+// Scroll reveal
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
   });
-
-  elEditorB.addEventListener('paste', e => {
-    e.preventDefault();
-    document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
-  });
-  elEditorB.addEventListener('input', updateComparePaneCount);
-
-  elTargetInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter')  { e.preventDefault(); commitTarget(); }
-    if (e.key === 'Escape') { e.preventDefault(); closeTargetInput(); }
-  });
-
-  // Slash menu: wire items via JS
-  elSlashMenu.querySelectorAll('.slash-menu-item').forEach((item, i) => {
-    item.addEventListener('mousedown', e => { e.preventDefault(); slashSelect(i); });
-  });
-
-  // Global: close slash menu on outside click
-  document.addEventListener('mousedown', e => {
-    if (slashMenuOpen && !elSlashMenu.contains(e.target)) closeSlashMenu();
-  });
-  // Global: close target popover on outside click
-  document.addEventListener('mousedown', e => {
-    if (elTargetPopover.classList.contains('show') && !elTargetPopover.contains(e.target)) {
-      closeTargetInput();
-    }
-  }, true);
-  // Global: Cmd/Ctrl+S
-  document.addEventListener('keydown', e => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); silentSave(); }
-  });
-
-  // Autosave backstop every 20s
-  setInterval(silentSave, 20000);
-  // Flush on tab close
-  window.addEventListener('beforeunload', silentSave);
-
-  loadDoc();
-  requestAnimationFrame(() => elEditor.focus());
-});
-
-// ── Typewriter scroll ──────────────────────────────────
-// Keeps the cursor at ~50% of the visible editor height while typing.
-// Only fires during keyboard input (isTyping guard) to avoid disrupting
-// click-to-reposition behaviour.
-function scrollToCursor() {
-  if (!isTyping) return;
-  const sel = window.getSelection();
-  if (!sel || !sel.rangeCount) return;
-  const rect = sel.getRangeAt(0).getBoundingClientRect();
-  if (!rect.height) return;
-  const wrapRect = elEditorWrap.getBoundingClientRect();
-  const target   = wrapRect.top + wrapRect.height * 0.5;
-  const delta    = rect.top - target;
-  if (Math.abs(delta) > 4) elEditorWrap.scrollTop += delta;
-}
-
-// ── Editor keydown ─────────────────────────────────────
-function onEditorKeydown(e) {
-  isTyping = true;
-  clearTimeout(_typingTimer);
-  _typingTimer = setTimeout(() => { isTyping = false; }, 1000);
-
-  const mod = e.metaKey || e.ctrlKey;
-
-  if (slashMenuOpen) {
-    if (e.key === 'ArrowDown') { e.preventDefault(); setSlashIndex((slashMenuIndex + 1) % 2); return; }
-    if (e.key === 'ArrowUp')   { e.preventDefault(); setSlashIndex((slashMenuIndex - 1 + 2) % 2); return; }
-    if (e.key === 'Enter')     { e.preventDefault(); slashSelect(slashMenuIndex); return; }
-    if (e.key === 'Escape')    { e.preventDefault(); closeSlashMenu(true); return; }
-    if (e.key !== 'Shift' && e.key !== 'Meta' && e.key !== 'Control' && e.key !== 'Alt') {
-      closeSlashMenu();
-    }
-  }
-
-  if (mod && e.key === 'b') { e.preventDefault(); document.execCommand('bold');   return; }
-  if (mod && e.key === 'i') { e.preventDefault(); document.execCommand('italic'); return; }
-
-  if (e.key === 'Tab') {
-    e.preventDefault();
-    const sel = window.getSelection();
-    if (sel && sel.rangeCount) {
-      let node = sel.getRangeAt(0).startContainer;
-      while (node && node !== elEditor) {
-        if (node.nodeName === 'LI') {
-          document.execCommand(e.shiftKey ? 'outdent' : 'indent');
-          return;
-        }
-        node = node.parentNode;
-      }
-    }
-    document.execCommand('insertText', false, '    ');
-    return;
-  }
-
-  // Space: "- " → unordered list
-  if (e.key === ' ') {
-    const sel = window.getSelection();
-    if (!sel || !sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-    if (!range.collapsed) return;
-    let block = range.startContainer;
-    while (block && block !== elEditor && !PARA_RE.test(block.nodeName)) {
-      block = block.parentNode;
-    }
-    if (!block || block === elEditor) return;
-    const pre = document.createRange();
-    pre.setStart(block, 0);
-    pre.setEnd(range.startContainer, range.startOffset);
-    if (pre.toString() === '-') {
-      e.preventDefault();
-      const del = document.createRange();
-      del.setStart(range.startContainer, range.startOffset - 1);
-      del.setEnd(range.startContainer, range.startOffset);
-      sel.removeAllRanges(); sel.addRange(del);
-      document.execCommand('delete');
-      document.execCommand('insertUnorderedList');
-      onType();
-    }
-  }
-}
-
-// ── Editor input ───────────────────────────────────────
-function onEditorInput() {
-  if (!slashMenuOpen) maybeOpenSlashMenu();
-  onType();
-  requestAnimationFrame(scrollToCursor);
-}
-
-// ── Slash menu ─────────────────────────────────────────
-function maybeOpenSlashMenu() {
-  if (isComposing) return;
-  const sel = window.getSelection();
-  if (!sel || !sel.rangeCount) return;
-  const range = sel.getRangeAt(0);
-  if (!range.collapsed) return;
-
-  let block = range.startContainer;
-  while (block && block !== elEditor && !PARA_RE.test(block.nodeName)) {
-    block = block.parentNode;
-  }
-  if (!block) return;
-
-  const isBareLine  = (block === elEditor);
-  const textContent = isBareLine ? range.startContainer.textContent : block.textContent;
-  if (textContent !== '/') return;
-
-  slashBlock    = block;
-  slashBareLine = isBareLine ? range.startContainer : null;
-  openSlashMenu(range);
-}
-
-function openSlashMenu(range) {
-  slashMenuIndex = 0;
-  updateSlashMenuItems();
-  const rect = range.getBoundingClientRect();
-  elSlashMenu.style.left = Math.min(rect.left, window.innerWidth - 200) + 'px';
-  elSlashMenu.style.top  = (rect.bottom + 6) + 'px';
-  elSlashMenu.classList.add('visible');
-  slashMenuOpen = true;
-}
-
-// closeWithFocus=true restores editor focus (used on Escape); omit when user
-// is still actively typing and focus should stay where it is naturally.
-function closeSlashMenu(closeWithFocus) {
-  slashMenuOpen = false;
-  slashBlock    = null;
-  slashBareLine = null;
-  elSlashMenu.classList.remove('visible');
-  if (closeWithFocus) elEditor.focus();
-}
-
-function setSlashIndex(i) {
-  slashMenuIndex = i;
-  updateSlashMenuItems();
-}
-
-function updateSlashMenuItems() {
-  elSlashMenu.querySelectorAll('.slash-menu-item').forEach((el, i) => {
-    el.classList.toggle('active', i === slashMenuIndex);
-  });
-}
-
-// index 0 = Header (h2), index 1 = Paragraph (p)
-function slashSelect(index) {
-  const block    = slashBlock;
-  const bareLine = slashBareLine;
-  closeSlashMenu();
-
-  const tag   = index === 0 ? 'h2' : 'p';
-  const newEl = document.createElement(tag);
-  newEl.appendChild(document.createElement('br'));
-
-  if (bareLine) {
-    elEditor.replaceChild(newEl, bareLine);
-  } else {
-    if (!block || !block.isConnected) return;
-    block.parentNode.replaceChild(newEl, block);
-  }
-
-  const sel = window.getSelection();
-  const r   = document.createRange();
-  r.setStart(newEl, 0);
-  r.collapse(true);
-  sel.removeAllRanges();
-  sel.addRange(r);
-
-  onType();
-}
-
-// ── Word count + target ────────────────────────────────
-function onType() {
-  updateWordCount();
-  if (compareMode) updatePaneACount();
-  clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(silentSave, 5000);
-}
-
-// Walk an element's tree and collect text.
-// sep=' ' for word-counting (block boundaries become whitespace).
-// sep='\n' for copy (block boundaries become line breaks).
-// Defaults to elEditor when no element is provided.
-function walkText(sep, el) {
-  const root  = el || elEditor;
-  const parts = [];
-  function walk(node) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      parts.push(node.textContent);
-    } else if (node.nodeType === Node.ELEMENT_NODE) {
-      const isBlock = BLOCK_TAGS.has(node.tagName);
-      if (isBlock) parts.push(sep);
-      for (const child of node.childNodes) walk(child);
-      if (isBlock) parts.push(sep);
-    }
-  }
-  walk(root);
-  return parts.join('');
-}
-
-function countWords(el) {
-  const t = walkText(' ', el).trim();
-  return t ? t.split(/\s+/).length : 0;
-}
-
-function updateWordCount() {
-  const words = countWords(elEditor);
-  elWordCount.textContent = wordTarget
-    ? `${words} / ${wordTarget} word${wordTarget !== 1 ? 's' : ''}`
-    : `${words} word${words !== 1 ? 's' : ''}`;
-  updateTargetProgress(words);
-  if (wordTarget > 0 && words === wordTarget && !targetCelebrated) {
-    targetCelebrated = true;
-    celebrate(`${words} words — target reached! ✦`);
-  }
-  if (wordTarget > 0 && words < wordTarget) targetCelebrated = false;
-  if (wordTarget > 0 && words > wordTarget) targetCelebrated = true;
-}
-
-function onTargetToggle() {
-  wordTarget > 0 ? clearTarget() : openTargetInput();
-}
-
-function openTargetInput() {
-  elTargetInput.value = wordTarget || '';
-  elTargetPopover.classList.add('show');
-  elTargetInput.focus();
-  elTargetInput.select();
-}
-
-function commitTarget() {
-  const val = parseInt(elTargetInput.value, 10);
-  wordTarget = val > 0 ? val : 0;
-  targetCelebrated = false;
-  wordTarget ? localStorage.setItem('pb_target', wordTarget) : localStorage.removeItem('pb_target');
-  closeTargetInput();
-  updateWordCount();
-  updateTargetToggleBtn();
-}
-
-function clearTarget() {
-  wordTarget = 0;
-  targetCelebrated = false;
-  localStorage.removeItem('pb_target');
-  closeTargetInput();
-  updateWordCount();
-  updateTargetToggleBtn();
-}
-
-function closeTargetInput() {
-  elTargetPopover.classList.remove('show');
-}
-
-function updateTargetToggleBtn() {
-  if (wordTarget > 0) {
-    elTargetToggleBtn.classList.add('has-target');
-    elTargetToggleBtn.title = 'Clear word target';
-    elTargetToggleBtn.setAttribute('aria-label', 'Clear word target');
-    elTargetToggleIcon.innerHTML = '<line x1="2" y1="2" x2="8" y2="8"/><line x1="8" y1="2" x2="2" y2="8"/>';
-  } else {
-    elTargetToggleBtn.classList.remove('has-target');
-    elTargetToggleBtn.title = 'Set word count target';
-    elTargetToggleBtn.setAttribute('aria-label', 'Set word count target');
-    elTargetToggleIcon.innerHTML = '<line x1="5" y1="1" x2="5" y2="9"/><line x1="1" y1="5" x2="9" y2="5"/>';
-  }
-}
-
-function updateTargetProgress(words) {
-  if (!wordTarget) { elProgressBar.style.width = '0'; return; }
-  elProgressBar.style.width = Math.min(words / wordTarget * 100, 100) + '%';
-  elProgressBar.classList.toggle('done', words >= wordTarget);
-}
-
-function celebrate(msg) {
-  elCelebration.textContent = msg;
-  elCelebration.classList.add('show');
-  clearTimeout(celebrate._t);
-  celebrate._t = setTimeout(() => elCelebration.classList.remove('show'), 2600);
-}
-
-function onTitleType() {
-  const title = elPostTitle.value.trim();
-  document.title = title ? title + ' — Pagebreak' : 'Pagebreak';
-  if (!elPostsPanel.classList.contains('hidden')) renderPostsList();
-  clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(silentSave, 5000);
-}
-
-// ── Posts management ───────────────────────────────────
-function genId() {
-  return 'pb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-}
-function getAllPostIds() {
-  try { return JSON.parse(localStorage.getItem('pb_posts') || '[]'); } catch { return []; }
-}
-function saveAllPostIds(ids) { localStorage.setItem('pb_posts', JSON.stringify(ids)); }
-function getActiveId()       { return localStorage.getItem('pb_active') || null; }
-function setActiveId(id)     { localStorage.setItem('pb_active', id); }
-function getPost(id) {
-  // JSON.parse(null) === null, so missing keys return null without throwing.
-  // The try/catch only fires on malformed JSON.
-  try { return JSON.parse(localStorage.getItem(id)); } catch { return null; }
-}
-function savePost(id, data)  { localStorage.setItem(id, JSON.stringify(data)); }
-function deletePost(id) {
-  localStorage.removeItem(id);
-  saveAllPostIds(getAllPostIds().filter(i => i !== id));
-}
-function escHtml(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-function togglePostsPanel() {
-  const isMobile = window.innerWidth <= 700;
-  const isHidden = isMobile
-    ? !elPostsPanel.classList.contains('mobile-open')
-    : elPostsPanel.classList.contains('hidden');
-
-  if (isHidden) { silentSave(); renderPostsList(); }
-
-  if (isMobile) {
-    if (isHidden) {
-      elPostsPanel.classList.remove('hidden');
-      requestAnimationFrame(() => {
-        elPostsPanel.classList.add('mobile-open');
-        elPostsPanelBackdrop.classList.add('show');
-      });
-    } else {
-      elPostsPanel.classList.remove('mobile-open');
-      elPostsPanelBackdrop.classList.remove('show');
-      setTimeout(() => elPostsPanel.classList.add('hidden'), 350);
-    }
-  } else {
-    elPostsPanel.classList.toggle('hidden', !isHidden);
-  }
-  elBtnPosts.classList.toggle('on', isHidden);
-}
-
-function renderPostsList() {
-  const ids      = getAllPostIds();
-  const activeId = getActiveId();
-  if (!ids.length) {
-    elPostsList.innerHTML = '<div style="font-size:14px;color:var(--ink-dim);padding:8px 2px;">No posts yet.</div>';
-    return;
-  }
-  elPostsList.innerHTML = [...ids].reverse().map(id => {
-    const post = getPost(id);
-    if (!post) return '';
-    const title = post.title || 'Untitled post';
-    // Strip HTML tags to count words; safe because content passed through sanitizeBody
-    const words = post.body
-      ? post.body.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length
-      : 0;
-    const date = post.saved
-      ? new Date(post.saved).toLocaleDateString(navigator.language, { day: 'numeric', month: 'short' })
-      : '';
-    return `
-      <div class="post-row${id === activeId ? ' active' : ''}" data-post-id="${id}" role="listitem">
-        <div class="post-row-info">
-          <div class="post-row-title">${escHtml(title)}</div>
-          <div class="post-row-meta">${words} word${words !== 1 ? 's' : ''} · ${date}</div>
-        </div>
-        <button class="post-row-delete" aria-label="Delete ${escHtml(title)}">×</button>
-      </div>`;
-  }).join('');
-
-  // Attach event listeners after rendering
-  elPostsList.querySelectorAll('.post-row').forEach(row => {
-    const id = row.dataset.postId;
-    row.addEventListener('click', () => openPost(id));
-    row.querySelector('.post-row-delete').addEventListener('click', e => {
-      e.stopPropagation();
-      confirmDeletePost(id);
-    });
-  });
-}
-
-function setEditorContent(body, title) {
-  const t = (title || '').trim();
-  elPostTitle.value  = title || '';
-  elEditor.innerHTML = sanitizeBody(body || '');
-  document.title     = t ? t + ' — Pagebreak' : 'Pagebreak';
-  targetCelebrated   = false;
-  updateWordCount();
-}
-
-function openPost(id) {
-  silentSave();
-  setActiveId(id);
-  const post = getPost(id);
-  if (post) setEditorContent(post.body, post.title);
-  renderPostsList();
-  if (window.innerWidth <= 700 && elPostsPanel.classList.contains('mobile-open')) {
-    togglePostsPanel();
-  }
-  elEditor.focus();
-}
-
-function newPost() {
-  silentSave();
-  const id = genId();
-  try {
-    saveAllPostIds([...getAllPostIds(), id]);
-    savePost(id, { title: '', body: '', saved: Date.now() });
-  } catch {
-    showSaveStatus('⚠ Save failed', true); return;
-  }
-  setActiveId(id);
-  setEditorContent('', '');
-  renderPostsList();
-  if (window.innerWidth <= 700 && elPostsPanel.classList.contains('mobile-open')) {
-    togglePostsPanel();
-  }
-  elEditor.focus();
-}
-
-function confirmDeletePost(id) {
-  const row = elPostsList.querySelector(`.post-row[data-post-id="${id}"]`);
-  if (!row) return;
-  const name = getPost(id)?.title || 'Untitled post';
-  row.innerHTML = `
-    <div class="post-row-info" style="min-width:0">
-      <div class="post-row-confirm-title">Delete "${escHtml(name)}"?</div>
-      <div class="post-row-confirm-meta">This can't be undone</div>
-    </div>
-    <button class="post-row-confirm-yes">Yes</button>
-    <button class="post-row-confirm-no">No</button>
-  `;
-  row.querySelector('.post-row-confirm-yes').addEventListener('click', e => {
-    e.stopPropagation(); doDeletePost(id);
-  });
-  row.querySelector('.post-row-confirm-no').addEventListener('click', e => {
-    e.stopPropagation(); renderPostsList();
-  });
-}
-
-function doDeletePost(id) {
-  silentSave();
-  const activeId = getActiveId();
-  deletePost(id);
-  if (id === activeId) {
-    const ids = getAllPostIds();
-    ids.length ? openPost(ids[ids.length - 1]) : newPost();
-    return;
-  }
-  renderPostsList();
-}
-
-// ── Dark mode ──────────────────────────────────────────
-function setDark(on) {
-  document.body.classList.toggle('dark', on);
-  elDarkIcon.textContent = on ? '☀️' : '🌙';
-  elBtnDark.classList.toggle('on', on);
-}
-
-function toggleDark() {
-  const on = !document.body.classList.contains('dark');
-  setDark(on);
-  // stored as the string "true"/"false"; read back with === 'true'
-  localStorage.setItem('pb_dark', on);
-}
-
-// ── Save / Load ────────────────────────────────────────
-// Strip inline color/background injected by Chromium's contenteditable
-// so saved HTML defers to CSS variables correctly in light and dark mode.
-function sanitizeBody(html) {
-  const tmp = document.createElement('div');
-  tmp.innerHTML = html;
-  tmp.querySelectorAll('[style]').forEach(el => {
-    el.style.removeProperty('color');
-    el.style.removeProperty('background-color');
-    el.style.removeProperty('background');
-    const remaining = el.getAttribute('style') || '';
-    if (!remaining.trim()) el.removeAttribute('style');
-  });
-  return tmp.innerHTML;
-}
-
-function silentSave() {
-  let id = getActiveId();
-  try {
-    if (!id) {
-      id = genId();
-      saveAllPostIds([...getAllPostIds(), id]);
-      setActiveId(id);
-    }
-    savePost(id, {
-      title: elPostTitle.value,
-      body:  sanitizeBody(elEditor.innerHTML),
-      saved: Date.now(),
-    });
-    showSaveStatus('Saved');
-    if (!elPostsPanel.classList.contains('hidden')) renderPostsList();
-  } catch {
-    showSaveStatus('⚠ Save failed', true);
-  }
-}
-
-function showSaveStatus(msg, isError = false) {
-  elSaveStatus.textContent = msg;
-  elSaveStatus.style.color = isError ? 'var(--delete-color)' : '';
-  elSaveStatus.classList.add('show');
-  clearTimeout(showSaveStatus._t);
-  showSaveStatus._t = setTimeout(() => elSaveStatus.classList.remove('show'), isError ? 4000 : 2000);
-}
-
-function loadDoc() {
-  try {
-    const ids = getAllPostIds();
-
-    // Migrate legacy single-doc save (pb_v4) into the multi-post system
-    const legacy = localStorage.getItem('pb_v4');
-    if (legacy && !ids.length) {
-      const d  = JSON.parse(legacy);
-      const id = genId();
-      saveAllPostIds([id]);
-      setActiveId(id);
-      savePost(id, { title: d.title || '', body: d.body || '', saved: Date.now() });
-      localStorage.removeItem('pb_v4');
-      setEditorContent(d.body, d.title);
-    } else {
-      let activeId = getActiveId();
-      if (!activeId && ids.length) { activeId = ids[ids.length - 1]; setActiveId(activeId); }
-      if (activeId) {
-        const post = getPost(activeId);
-        if (post) setEditorContent(post.body, post.title);
-      }
-    }
-
-    const savedTarget = parseInt(localStorage.getItem('pb_target'), 10);
-    if (savedTarget > 0) wordTarget = savedTarget;
-    updateWordCount();
-    updateTargetToggleBtn();
-
-    if (localStorage.getItem('pb_dark') === 'true') setDark(true);
-  } catch { /* corrupt localStorage — start fresh */ }
-}
-
-function copyText() {
-  const title = elPostTitle.value.trim();
-  const body  = walkText('\n').replace(/\n{3,}/g, '\n\n').trim();
-  navigator.clipboard.writeText((title ? title + '\n\n' : '') + body)
-    .then(() => showToast('Copied ✓'))
-    .catch(() => showToast('Copy failed — try Cmd+A, Cmd+C'));
-}
-
-function showToast(msg) {
-  elToast.textContent = msg;
-  elToast.classList.add('show');
-  clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => elToast.classList.remove('show'), 2000);
-}
-
-// ── Compare mode ───────────────────────────────────────
-function toggleCompare() {
-  compareMode = !compareMode;
-  elWritingArea.classList.toggle('compare-mode', compareMode);
-  elBtnCompare.classList.toggle('on', compareMode);
-
-  if (compareMode) {
-    requestAnimationFrame(() => elPaneB.classList.add('visible'));
-    elPaneALabel.style.display = 'block';
-    elPaneAFooter.style.display = 'flex';
-    elWordCountWrap.classList.add('compare-mode-active');
-    updatePaneACount();
-    updateComparePaneCount();
-  } else {
-    elPaneB.classList.remove('visible');
-    elPaneALabel.style.removeProperty('display');
-    elPaneAFooter.style.removeProperty('display');
-    elWordCountWrap.classList.remove('compare-mode-active');
-  }
-}
-
-function fmtCount(n) { return n + ' word' + (n !== 1 ? 's' : ''); }
-
-function updatePaneACount() {
-  if (!compareMode) return;
-  document.getElementById('paneACount').textContent = fmtCount(countWords(elEditor));
-}
-
-function updateComparePaneCount() {
-  document.getElementById('paneBCount').textContent = fmtCount(countWords(elEditorB));
-}
+}, { threshold: 0.12 });
+revealEls.forEach(el => io.observe(el));
 </script>
 </body>
 </html>
