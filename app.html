@@ -928,13 +928,24 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Cmd/Ctrl+S
+  // Cmd/Ctrl+S, Escape (help modal)
   document.addEventListener('keydown', e => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); silentSave(); }
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); silentSave(); return; }
+    if (e.key === 'Escape' && elHelpModal.classList.contains('show')) {
+      e.preventDefault();
+      closeHelp();
+    }
   });
 
   setInterval(silentSave, 20000);
   window.addEventListener('beforeunload', silentSave);
+  // beforeunload doesn't fire reliably on mobile browsers (backgrounding,
+  // tab switch, iOS Safari) — these cover those cases without changing any
+  // existing save behavior.
+  window.addEventListener('pagehide', silentSave);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) silentSave();
+  });
 
   loadDoc();
   requestAnimationFrame(() => elEditor.focus());
@@ -1022,7 +1033,25 @@ function onEditorKeydown(e) {
 function onEditorInput() {
   if (!slashMenuOpen) maybeOpenSlashMenu();
   onType();
+  normalizeEmptyEditor();
   requestAnimationFrame(scrollToCursor);
+}
+
+// Contenteditable often leaves a stray <br> or an empty <p>/<div> behind
+// after the last character is deleted, which defeats the CSS `:empty`
+// placeholder rule (data-placeholder stops showing). This detects that
+// specific "visually empty but not actually empty" state and clears it.
+// Bails out immediately (O(1)) whenever there's real content, so it adds
+// no cost on normal typing.
+function normalizeEmptyEditor() {
+  const first = elEditor.firstChild;
+  if (!first || elEditor.childNodes.length > 1) return;
+  if (first.nodeName === 'BR') { elEditor.innerHTML = ''; return; }
+  if ((first.nodeName === 'P' || first.nodeName === 'DIV') &&
+      (first.childNodes.length === 0 ||
+       (first.childNodes.length === 1 && first.firstChild.nodeName === 'BR'))) {
+    elEditor.innerHTML = '';
+  }
 }
 
 // ── Slash menu ─────────────────────────────────────────
@@ -1237,14 +1266,20 @@ function closeMenu() {
 }
 
 // ── Help modal ─────────────────────────────────────────
+let _helpTriggerEl = null;
+
 function openHelp() {
+  _helpTriggerEl = document.activeElement;
   elHelpBackdrop.classList.add('show');
   elHelpModal.classList.add('show');
+  document.getElementById('btnCloseHelp').focus();
 }
 
 function closeHelp() {
   elHelpBackdrop.classList.remove('show');
   elHelpModal.classList.remove('show');
+  if (_helpTriggerEl && typeof _helpTriggerEl.focus === 'function') _helpTriggerEl.focus();
+  _helpTriggerEl = null;
 }
 
 // ── Posts management ───────────────────────────────────
