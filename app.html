@@ -628,6 +628,14 @@
           </svg>
           Copy text
         </button>
+        <button class="menu-item" id="btnDownload" role="menuitem">
+          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M8 2.5v8"/>
+            <path d="M4.5 7 8 10.5 11.5 7"/>
+            <path d="M3 13.5h10"/>
+          </svg>
+          Download .txt
+        </button>
         <button class="menu-item" id="btnCompare" role="menuitem">
           <svg viewBox="0 0 16 16" fill="none" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="8" y1="2" x2="8" y2="14"/>
@@ -848,6 +856,7 @@ window.addEventListener('DOMContentLoaded', () => {
   elBtnDark.addEventListener('click',    () => { toggleDark();    closeMenu(); });
   elBtnCompare.addEventListener('click', () => { toggleCompare(); closeMenu(); });
   document.getElementById('btnCopy').addEventListener('click',  () => { copyText();  closeMenu(); });
+  document.getElementById('btnDownload').addEventListener('click', () => { downloadText(); closeMenu(); });
   document.getElementById('btnHelp').addEventListener('click',  () => { openHelp();  closeMenu(); });
   document.getElementById('btnCloseHelp').addEventListener('click', closeHelp);
   elHelpBackdrop.addEventListener('click', closeHelp);
@@ -1558,6 +1567,24 @@ function showToast(msg) {
   elToast.classList.add('show');
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => elToast.classList.remove('show'), 2000);
+}
+
+function downloadText() {
+  const title = elPostTitle.value.trim();
+  const body  = walkText('\n').replace(/\n{3,}/g, '\n\n').trim();
+  const text  = (title ? title + '\n\n' : '') + body;
+  const safeName = (title || 'untitled').replace(/[\\/:*?"<>|]+/g, '').trim().slice(0, 80) || 'untitled';
+
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = safeName + '.txt';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Downloaded ✓');
 }
 
 // ── Compare mode ───────────────────────────────────────
