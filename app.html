@@ -786,6 +786,7 @@ let compareMode      = false;
 let _saveTimer       = null;
 let _lastSavedBody   = '';
 let _lastSavedTitle  = '';
+let _wordCountRAF    = null;
 
 // Slash menu state
 let slashMenuOpen  = false;
@@ -912,24 +913,20 @@ window.addEventListener('DOMContentLoaded', () => {
     item.addEventListener('mousedown', e => { e.preventDefault(); slashSelect(i); });
   });
 
-  // Global close-on-outside-click handlers
+  // Global close-on-outside-click handler (covers slash menu, main menu, target popover)
   document.addEventListener('mousedown', e => {
     if (slashMenuOpen && !elSlashMenu.contains(e.target)) closeSlashMenu();
-  });
-  document.addEventListener('mousedown', e => {
     if (elMenuDropdown.classList.contains('show') &&
         !elMenuDropdown.contains(e.target) &&
         e.target !== elBtnMenu) {
       closeMenu();
     }
-  });
-  document.addEventListener('mousedown', e => {
     if (elTargetPopover.classList.contains('show') &&
         !elTargetPopover.contains(e.target) &&
         !elTargetToggleBtn.contains(e.target)) {
       closeTargetInput();
     }
-  }, true);
+  });
 
   // Cmd/Ctrl+S
   document.addEventListener('keydown', e => {
@@ -1109,10 +1106,20 @@ function slashSelect(index) {
 
 // ── Word count + target ────────────────────────────────
 function onType() {
-  updateWordCount();
-  if (compareMode) updatePaneACount();
+  scheduleWordCountUpdate();
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(silentSave, 5000);
+}
+
+// Coalesces bursts of input events (fast typing, paste, IME) into a single
+// word-count recalculation per animation frame instead of one per keystroke.
+function scheduleWordCountUpdate() {
+  if (_wordCountRAF !== null) return;
+  _wordCountRAF = requestAnimationFrame(() => {
+    _wordCountRAF = null;
+    updateWordCount();
+    if (compareMode) updatePaneACount();
+  });
 }
 
 function walkText(sep, el) {
@@ -1242,6 +1249,7 @@ function closeHelp() {
 
 // ── Posts management ───────────────────────────────────
 function genId() {
+  if (window.crypto && typeof crypto.randomUUID === 'function') return 'pb_' + crypto.randomUUID();
   return 'pb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
 }
 function getAllPostIds() {
@@ -1260,6 +1268,9 @@ function deletePost(id) {
 }
 function escHtml(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function countWordsFromHtml(html) {
+  return html ? html.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length : 0;
 }
 
 function togglePostsPanel() {
@@ -1299,9 +1310,7 @@ function renderPostsList() {
     const post = getPost(id);
     if (!post) return '';
     const title = post.title || 'Untitled post';
-    const words = post.body
-      ? post.body.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length
-      : 0;
+    const words = post.words !== undefined ? post.words : countWordsFromHtml(post.body);
     const date = post.saved
       ? new Date(post.saved).toLocaleDateString(navigator.language, { day: 'numeric', month: 'short' })
       : '';
@@ -1354,7 +1363,7 @@ function newPost() {
   const id = genId();
   try {
     saveAllPostIds([...getAllPostIds(), id]);
-    savePost(id, { title: '', body: '', saved: Date.now() });
+    savePost(id, { title: '', body: '', saved: Date.now(), words: 0 });
   } catch {
     showSaveStatus('⚠ Save failed', true); return;
   }
@@ -1414,6 +1423,11 @@ function toggleDark() {
 
 // ── Save / Load ────────────────────────────────────────
 function sanitizeBody(html) {
+  if (!html) return '';
+  // Fast path: most content never carries an inline style attribute (paste is
+  // stripped to plain text already), so skip the temp-DOM rebuild entirely
+  // unless one is actually present.
+  if (!/\sstyle\s*=/i.test(html)) return html;
   const tmp = document.createElement('div');
   tmp.innerHTML = html;
   tmp.querySelectorAll('[style]').forEach(el => {
@@ -1442,6 +1456,7 @@ function silentSave() {
       title: currentTitle,
       body:  currentBody,
       saved: Date.now(),
+      words: countWordsFromHtml(currentBody),
     });
     
     if (hasChanged) {
@@ -1474,7 +1489,7 @@ function loadDoc() {
       const id = genId();
       saveAllPostIds([id]);
       setActiveId(id);
-      savePost(id, { title: d.title || '', body: d.body || '', saved: Date.now() });
+      savePost(id, { title: d.title || '', body: d.body || '', saved: Date.now(), words: countWordsFromHtml(d.body || '') });
       localStorage.removeItem('pb_v4');
       setEditorContent(d.body, d.title);
     } else {
