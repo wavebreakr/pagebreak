@@ -540,8 +540,43 @@
     white-space: nowrap;
   }
 
+  /* ── Desktop-only gate ── */
+  .desktop-gate {
+    display: none;
+    position: fixed; inset: 0; z-index: 9999;
+    align-items: center; justify-content: center;
+    padding: 24px;
+    background: var(--panel-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  }
+  .desktop-gate-card {
+    max-width: 340px; text-align: center;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 20px;
+    padding: 36px 28px 32px;
+  }
+  .desktop-gate-icon {
+    width: 44px; height: 44px; margin: 0 auto 18px;
+    border-radius: 12px;
+    background: var(--accent-dim);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent);
+  }
+  .desktop-gate-icon svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 1.5; }
+  .desktop-gate-title {
+    font-family: 'Lora', serif; font-size: 19px; font-weight: 600;
+    color: var(--ink); letter-spacing: -0.01em; margin-bottom: 10px;
+  }
+  .desktop-gate-body {
+    font-size: 14px; color: var(--ink-mid); line-height: 1.6;
+  }
+
   /* ── Mobile ── */
   @media (max-width: 700px) {
+    .desktop-gate { display: flex; }
+
     .chrome { padding: 0 14px; gap: 8px; }
     .chrome-left { gap: 8px; flex: 1; min-width: 0; }
     .chrome-right { gap: 8px; flex-shrink: 0; }
@@ -579,6 +614,19 @@
 </style>
 </head>
 <body>
+
+<div class="desktop-gate" role="dialog" aria-modal="true" aria-label="Desktop required">
+  <div class="desktop-gate-card">
+    <div class="desktop-gate-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="12" rx="2"/>
+        <path d="M8 20h8M12 16v4"/>
+      </svg>
+    </div>
+    <p class="desktop-gate-title">Pagebreak needs a bit more room</p>
+    <p class="desktop-gate-body">It's built around a full keyboard and a proper screen, so the writing experience isn't quite there yet on mobile. Come back on a laptop or desktop and it'll be waiting for you.</p>
+  </div>
+</div>
 
 <div class="chrome">
   <div class="chrome-left">
