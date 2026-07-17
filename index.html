@@ -366,6 +366,38 @@
     line-height: 1.65;
   }
 
+  /* ── FAQ ── */
+  .faq {
+    position: relative; z-index: 1;
+    padding: 0 24px 100px;
+    max-width: 700px; margin: 0 auto;
+  }
+
+  .faq-list {
+    display: flex; flex-direction: column; gap: 14px;
+  }
+
+  .faq-item {
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: var(--radius-card);
+    padding: 22px 26px;
+  }
+
+  .faq-q {
+    font-family: 'Lora', serif;
+    font-size: 16.5px; font-weight: 600;
+    color: var(--ink); letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+
+  .faq-a {
+    font-size: 14px; color: var(--ink-mid);
+    line-height: 1.65;
+  }
+
   /* ── CLOSING CTA ── */
   .cta-close {
     position: relative; z-index: 1;
@@ -487,7 +519,7 @@
       <div class="editor-body" aria-hidden="true">
         <h2>The habit that changed everything</h2>
         <p class="lead">There's something about the quiet hour before the world wakes up.</p>
-        <p>I started writing every morning three years ago. While at first it felt forced, it became the part of the day I looked forward to the most.<span class="cursor"></span></p>
+        <p>I started writing every morning three years ago. While at first it felt forced, it became the part of the day I looked forward to the most.<span id="typewriterText"></span><span class="cursor"></span></p>
       </div>
     </div>
   </div>
@@ -551,6 +583,27 @@
 </section>
 
 
+<!-- FAQ -->
+<section class="faq reveal" aria-labelledby="faq-heading">
+  <p class="section-label">Before you ask</p>
+  <h2 class="section-title" id="faq-heading">A few things people wonder</h2>
+  <div class="faq-list">
+    <div class="faq-item">
+      <p class="faq-q">Do I need an account?</p>
+      <p class="faq-a">No. Open the editor and start typing — there's no signup, login, or setup screen of any kind.</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">Where does my writing get saved?</p>
+      <p class="faq-a">Right in your browser, automatically, as you type. Nothing is sent to a server. Pagebreak is built for writing in the moment rather than long-term storage, so it's worth copying out anything you want to keep for good — the menu has a one-click "Download .txt" for exactly that.</p>
+    </div>
+    <div class="faq-item">
+      <p class="faq-q">Does it work offline?</p>
+      <p class="faq-a">Once the page has loaded, yes — the editor itself needs no connection to keep working.</p>
+    </div>
+  </div>
+</section>
+
+
 <!-- CLOSING CTA -->
 <section class="cta-close reveal" aria-label="Get started">
   <div class="cta-close-inner">
@@ -579,6 +632,46 @@ const io = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.12 });
 revealEls.forEach(el => io.observe(el));
+
+// Editor preview: subtle looping typewriter effect on the trailing line
+(function () {
+  const el = document.getElementById('typewriterText');
+  if (!el) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const lines = [
+    " There's no perfect time to start — so I stopped waiting for one.",
+    " Some mornings the words come easy. Most mornings, they don't.",
+    " I still don't know where this one is going. That's kind of the point."
+  ];
+  const TYPE_MS = 32, DELETE_MS = 16, HOLD_MS = 2800, SWITCH_MS = 500, START_DELAY_MS = 2600;
+  let line = 0, pos = 0, deleting = false;
+
+  function step() {
+    const full = lines[line];
+    if (deleting) {
+      pos--;
+      el.textContent = full.slice(0, pos);
+      if (pos <= 0) {
+        deleting = false;
+        line = (line + 1) % lines.length;
+        setTimeout(step, SWITCH_MS);
+      } else {
+        setTimeout(step, DELETE_MS);
+      }
+    } else {
+      pos++;
+      el.textContent = full.slice(0, pos);
+      if (pos >= full.length) {
+        setTimeout(() => { deleting = true; step(); }, HOLD_MS);
+      } else {
+        setTimeout(step, TYPE_MS);
+      }
+    }
+  }
+
+  setTimeout(step, START_DELAY_MS);
+})();
 </script>
 </body>
 </html>
