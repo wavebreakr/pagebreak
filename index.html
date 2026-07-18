@@ -646,13 +646,42 @@ revealEls.forEach(el => io.observe(el));
 (function () {
   const el = document.getElementById('typewriterText');
   if (!el) return;
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+  const p = el.closest('p');
   const lines = [
     " There's no perfect time to start, so I stopped waiting for one.",
     " Some mornings the words come easy. Most mornings, they don't.",
     " I still don't know where this one is going. That's kind of the point."
   ];
+
+  // Reserve enough height up front for the tallest possible state of this
+  // paragraph, so typing/deleting the line never changes its wrap height
+  // and never pushes the rest of the page up or down while it loops.
+  function reserveHeight() {
+    if (!p) return;
+    p.style.minHeight = '';
+    const original = el.textContent;
+    let maxH = 0;
+    lines.forEach(line => {
+      el.textContent = line;
+      maxH = Math.max(maxH, p.getBoundingClientRect().height);
+    });
+    el.textContent = original;
+    p.style.minHeight = maxH + 'px';
+  }
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(reserveHeight);
+  } else {
+    reserveHeight();
+  }
+  window.addEventListener('resize', () => {
+    clearTimeout(reserveHeight._t);
+    reserveHeight._t = setTimeout(reserveHeight, 150);
+  });
+
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
   const TYPE_MS = 32, DELETE_MS = 16, HOLD_MS = 2800, SWITCH_MS = 500, START_DELAY_MS = 2600;
   let line = 0, pos = 0, deleting = false;
 
