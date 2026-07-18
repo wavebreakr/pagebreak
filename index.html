@@ -13,7 +13,6 @@
 <style>
   :root {
     --bg:           #edeae2;
-    --editor-bg:    #faf9f7;
     --ink:          #1c1b18;
     --ink-mid:      #6b6860;
     --ink-dim:      #a8a49c;
@@ -21,7 +20,6 @@
     --accent:       #0066ff;
     --accent-light: #3385ff;
     --accent-dim:   rgba(0,102,255,0.12);
-    --accent-glow:  rgba(0,102,255,0.35);
     --glass-bg:     rgba(255,255,255,0.58);
     --glass-border: rgba(255,255,255,0.78);
     --glass-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 8px 40px rgba(0,0,0,0.09), 0 1px 2px rgba(0,0,0,0.06);
@@ -143,6 +141,7 @@
   /* ── HERO ── */
   .hero {
     position: relative; z-index: 1;
+    min-height: 100vh;
     min-height: 100svh;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
@@ -488,7 +487,7 @@
 <nav aria-label="Site navigation">
   <div class="nav-glass" aria-hidden="true"></div>
   <a href="#" class="nav-logo" aria-label="Pagebreak home">
-    <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/Pagebreak_Logo.png" alt="Pagebreak" width="105" height="26">
+    <img src="Pagebreak_Logo.png" alt="Pagebreak" width="105" height="26" fetchpriority="high">
   </a>
   <div class="nav-cta">
     <a href="app.html" class="btn-primary">Start writing free</a>
@@ -625,7 +624,7 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-logo">
-    <img src="https://raw.githubusercontent.com/wavebreakr/pagebreak/main/Pagebreak_Logo.png" alt="Pagebreak" width="89" height="22">
+    <img src="Pagebreak_Logo.png" alt="Pagebreak" width="89" height="22" loading="lazy">
   </div>
   <p class="footer-copy">© 2026 Pagebreak.</p>
 </footer>
