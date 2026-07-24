@@ -146,12 +146,17 @@
   .target-input {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 13px; font-weight: 500; color: var(--ink);
-    font-variant-numeric: tabular-nums; width: 80px;
+    font-variant-numeric: tabular-nums; width: 92px;
     background: var(--ink-faint); border: 1.2px solid var(--panel-border);
     outline: none; border-radius: 7px; padding: 4px 8px; text-align: center;
     transition: border-color 0.15s;
+    -moz-appearance: textfield;
   }
   .target-input:focus { border-color: var(--accent); }
+  .target-input::-webkit-outer-spin-button,
+  .target-input::-webkit-inner-spin-button {
+    -webkit-appearance: none; margin: 0;
+  }
   .target-set-btn {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 12px; font-weight: 600; color: #fff;
