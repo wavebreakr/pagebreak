@@ -660,7 +660,7 @@
       </button>
       <div class="target-popover" id="targetPopover">
         <span class="target-popover-label">Target</span>
-        <input class="target-input" id="targetInput" type="number" min="1" max="99999"
+        <input class="target-input" id="targetInput" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="5"
           placeholder="e.g. 500" aria-label="Word target">
         <button class="target-set-btn" id="targetSetBtn">Set</button>
       </div>
@@ -968,6 +968,10 @@ window.addEventListener('DOMContentLoaded', () => {
   elTargetInput.addEventListener('keydown', e => {
     if (e.key === 'Enter')  { e.preventDefault(); commitTarget(); }
     if (e.key === 'Escape') { e.preventDefault(); closeTargetInput(); }
+  });
+  elTargetInput.addEventListener('input', () => {
+    const digitsOnly = elTargetInput.value.replace(/\D/g, '');
+    if (digitsOnly !== elTargetInput.value) elTargetInput.value = digitsOnly;
   });
 
   // Slash menu items
