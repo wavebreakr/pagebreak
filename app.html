@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pagebreak</title>
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico?v=2">
+<link rel="icon" type="image/png" href="favicon.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -85,7 +85,8 @@
   .dark .brand img { filter: invert(1); }
 
   .post-title-inline {
-    font-size: 15px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
     font-weight: 500;
     color: var(--ink-dim); background: none; border: none; outline: none;
     width: 220px; max-width: 30vw;
@@ -854,10 +855,16 @@ let slashMenuOpen  = false;
 let slashMenuIndex = 0;
 let slashBlock     = null;
 let slashBareLine  = null;
+let slashEditorEl  = null;
 
 // Block tag sets used in DOM-walking hot paths
-const BLOCK_TAGS = new Set(['P', 'DIV', 'LI', 'BR', 'H1', 'H2', 'H3', 'UL', 'OL']);
-const PARA_RE    = /^(P|DIV|LI)$/;
+const BLOCK_TAGS   = new Set(['P', 'DIV', 'LI', 'BR', 'H1', 'H2', 'H3', 'UL', 'OL']);
+const PARA_RE      = /^(P|DIV|LI)$/;
+const HEADING_RE   = /^(H1|H2|H3)$/;
+// Stop points for the slash-menu's ancestor walk. Must include headings —
+// otherwise the walk skips past an H1/H2/H3 wrapper and wrongly concludes
+// it reached a "bare line" (see maybeOpenSlashMenu).
+const SLASH_STOP_RE = /^(P|DIV|LI|H1|H2|H3)$/;
 
 // Cached element references
 let elEditor, elEditorWrap, elPostsPanel, elWordCount, elWordCountWrap,
@@ -920,50 +927,19 @@ window.addEventListener('DOMContentLoaded', () => {
 
   elPostTitle.addEventListener('input', onTitleType);
 
-  // Editor listeners
+  // Editor listeners — identical wiring on both panes so every formatting
+  // feature (bold/italic, lists, slash menu, paste) works in Compare mode too.
   elEditor.addEventListener('keydown', onEditorKeydown);
   elEditor.addEventListener('input', onEditorInput);
   elEditor.addEventListener('compositionstart', () => { isComposing = true; });
   elEditor.addEventListener('compositionend',   () => { isComposing = false; });
-  elEditor.addEventListener('paste', e => {
-    // Strip all formatting — insert plain text only, wrapped in paragraphs
-    e.preventDefault();
-    const text = e.clipboardData.getData('text/plain');
-    const sel = window.getSelection();
-    if (!sel || !sel.rangeCount) return;
-    
-    const range = sel.getRangeAt(0);
-    range.deleteContents();
-    
-    // Split by double newlines for paragraphs, single newlines within
-    const paragraphs = text.split(/\n\n+/);
-    const fragments = paragraphs.map(para => {
-      const p = document.createElement('p');
-      const lines = para.split('\n');
-      lines.forEach((line, j) => {
-        p.appendChild(document.createTextNode(line));
-        if (j < lines.length - 1) p.appendChild(document.createElement('br'));
-      });
-      return p;
-    });
+  elEditor.addEventListener('paste', handlePaste);
 
-    fragments.forEach(node => {
-      range.insertNode(node);
-      range.setStartAfter(node);
-      range.collapse(true);
-    });
-    
-    sel.removeAllRanges();
-    sel.addRange(range);
-    
-    onType();
-  });
-
-  elEditorB.addEventListener('paste', e => {
-    e.preventDefault();
-    document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
-  });
-  elEditorB.addEventListener('input', updateComparePaneCount);
+  elEditorB.addEventListener('keydown', onEditorKeydown);
+  elEditorB.addEventListener('input', onEditorInput);
+  elEditorB.addEventListener('compositionstart', () => { isComposing = true; });
+  elEditorB.addEventListener('compositionend',   () => { isComposing = false; });
+  elEditorB.addEventListener('paste', handlePaste);
 
   elTargetInput.addEventListener('keydown', e => {
     if (e.key === 'Enter')  { e.preventDefault(); commitTarget(); }
@@ -1030,8 +1006,66 @@ function scrollToCursor() {
   if (Math.abs(delta) > 4) elEditorWrap.scrollTop += delta;
 }
 
+// ── Block-editing helpers ───────────────────────────────
+// Walks up from `node` until it hits `editorEl` (exclusive) or a node whose
+// tagName matches `matchRE`. Returns the matching ancestor, or null if the
+// walk reached editorEl without a match.
+function findAncestor(node, editorEl, matchRE) {
+  let el = node;
+  while (el && el !== editorEl) {
+    if (matchRE.test(el.nodeName)) return el;
+    el = el.parentNode;
+  }
+  return null;
+}
+
+// Splits `block` (a heading) at the given range, moving everything after
+// the cursor into a new plain paragraph inserted right after the heading,
+// and places the cursor at the start of that paragraph. Used whenever a
+// paragraph break happens inside a heading — headings are single-line by
+// design, so both Enter and paste route through this.
+function breakOutOfHeading(range, block) {
+  if (!range.collapsed) range.deleteContents();
+  const afterRange = document.createRange();
+  afterRange.selectNodeContents(block);
+  afterRange.setStart(range.startContainer, range.startOffset);
+  const fragment = afterRange.extractContents();
+
+  const p = document.createElement('p');
+  if (fragment.textContent.trim() === '' && !fragment.querySelector('br,img')) {
+    p.appendChild(document.createElement('br'));
+  } else {
+    p.appendChild(fragment);
+  }
+  block.parentNode.insertBefore(p, block.nextSibling);
+  if (!block.hasChildNodes()) block.appendChild(document.createElement('br'));
+
+  const sel = window.getSelection();
+  const r = document.createRange();
+  r.setStart(p, 0);
+  r.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(r);
+}
+
+// Inserts a paragraph break at the current selection, breaking out of a
+// heading first if the cursor is inside one. Falls back to the native
+// command otherwise, matching normal Enter behavior exactly.
+function insertParagraphBreak(editorEl) {
+  const sel = window.getSelection();
+  if (sel && sel.rangeCount) {
+    const range   = sel.getRangeAt(0);
+    const heading = findAncestor(range.startContainer, editorEl, HEADING_RE);
+    if (heading) { breakOutOfHeading(range, heading); return; }
+  }
+  document.execCommand('insertParagraph');
+}
+
 // ── Editor keydown ─────────────────────────────────────
+// Attached to both elEditor and elEditorB — e.currentTarget tells us which
+// pane triggered the event so every shortcut below works in Compare mode.
 function onEditorKeydown(e) {
+  const editorEl = e.currentTarget;
   isTyping = true;
   clearTimeout(_typingTimer);
   _typingTimer = setTimeout(() => { isTyping = false; }, 1000);
@@ -1051,12 +1085,28 @@ function onEditorKeydown(e) {
   if (mod && e.key === 'b') { e.preventDefault(); document.execCommand('bold');   return; }
   if (mod && e.key === 'i') { e.preventDefault(); document.execCommand('italic'); return; }
 
+  // Enter inside a heading: break out into a plain paragraph instead of
+  // continuing as another heading (see breakOutOfHeading above).
+  if (e.key === 'Enter' && !e.shiftKey) {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount) {
+      const range   = sel.getRangeAt(0);
+      const heading = findAncestor(range.startContainer, editorEl, HEADING_RE);
+      if (heading) {
+        e.preventDefault();
+        breakOutOfHeading(range, heading);
+        onType(editorEl);
+        return;
+      }
+    }
+  }
+
   if (e.key === 'Tab') {
     e.preventDefault();
     const sel = window.getSelection();
     if (sel && sel.rangeCount) {
       let node = sel.getRangeAt(0).startContainer;
-      while (node && node !== elEditor) {
+      while (node && node !== editorEl) {
         if (node.nodeName === 'LI') {
           document.execCommand(e.shiftKey ? 'outdent' : 'indent');
           return;
@@ -1075,10 +1125,10 @@ function onEditorKeydown(e) {
     const range = sel.getRangeAt(0);
     if (!range.collapsed) return;
     let block = range.startContainer;
-    while (block && block !== elEditor && !PARA_RE.test(block.nodeName)) {
+    while (block && block !== editorEl && !PARA_RE.test(block.nodeName)) {
       block = block.parentNode;
     }
-    if (!block || block === elEditor) return;
+    if (!block || block === editorEl) return;
     const pre = document.createRange();
     pre.setStart(block, 0);
     pre.setEnd(range.startContainer, range.startOffset);
@@ -1090,17 +1140,20 @@ function onEditorKeydown(e) {
       sel.removeAllRanges(); sel.addRange(del);
       document.execCommand('delete');
       document.execCommand('insertUnorderedList');
-      onType();
+      onType(editorEl);
     }
   }
 }
 
 // ── Editor input ───────────────────────────────────────
-function onEditorInput() {
-  if (!slashMenuOpen) maybeOpenSlashMenu();
-  onType();
-  normalizeEmptyEditor();
-  requestAnimationFrame(scrollToCursor);
+// Attached to both panes; e.currentTarget picks the right word count target
+// and keeps typewriter-scroll (a paneA-only feature) from touching paneB.
+function onEditorInput(e) {
+  const editorEl = e.currentTarget;
+  if (!slashMenuOpen) maybeOpenSlashMenu(editorEl);
+  onType(editorEl);
+  normalizeEmptyEditor(editorEl);
+  if (editorEl === elEditor) requestAnimationFrame(scrollToCursor);
 }
 
 // Contenteditable often leaves a stray <br> or an empty <p>/<div> behind
@@ -1109,37 +1162,47 @@ function onEditorInput() {
 // specific "visually empty but not actually empty" state and clears it.
 // Bails out immediately (O(1)) whenever there's real content, so it adds
 // no cost on normal typing.
-function normalizeEmptyEditor() {
-  const first = elEditor.firstChild;
-  if (!first || elEditor.childNodes.length > 1) return;
-  if (first.nodeName === 'BR') { elEditor.innerHTML = ''; return; }
+function normalizeEmptyEditor(editorEl) {
+  const first = editorEl.firstChild;
+  if (!first || editorEl.childNodes.length > 1) return;
+  if (first.nodeName === 'BR') { editorEl.innerHTML = ''; return; }
   if ((first.nodeName === 'P' || first.nodeName === 'DIV') &&
       (first.childNodes.length === 0 ||
        (first.childNodes.length === 1 && first.firstChild.nodeName === 'BR'))) {
-    elEditor.innerHTML = '';
+    editorEl.innerHTML = '';
   }
 }
 
 // ── Slash menu ─────────────────────────────────────────
-function maybeOpenSlashMenu() {
+function maybeOpenSlashMenu(editorEl) {
   if (isComposing) return;
   const sel = window.getSelection();
   if (!sel || !sel.rangeCount) return;
   const range = sel.getRangeAt(0);
   if (!range.collapsed) return;
 
-  let block = range.startContainer;
-  while (block && block !== elEditor && !PARA_RE.test(block.nodeName)) {
+  // Walk up to the nearest block wrapper. SLASH_STOP_RE includes headings
+  // so this correctly stops there instead of climbing past them — climbing
+  // past an H1/H2/H3 all the way to editorEl used to get misread as a
+  // "bare line" (see slashSelect), which crashed the header/paragraph swap
+  // whenever the cursor started inside an existing heading.
+  const node = range.startContainer;
+  let block = node;
+  while (block && block !== editorEl && !SLASH_STOP_RE.test(block.nodeName)) {
     block = block.parentNode;
   }
   if (!block) return;
+  // Converting a list item in place would leave a heading/paragraph
+  // dangling directly inside the surrounding <ul>, so skip list items.
+  if (block.nodeName === 'LI') return;
 
-  const isBareLine  = (block === elEditor);
-  const textContent = isBareLine ? range.startContainer.textContent : block.textContent;
+  const isBareLine  = (block === editorEl);
+  const textContent = isBareLine ? node.textContent : block.textContent;
   if (textContent !== '/') return;
 
   slashBlock    = block;
-  slashBareLine = isBareLine ? range.startContainer : null;
+  slashBareLine = isBareLine ? node : null;
+  slashEditorEl = editorEl;
   openSlashMenu(range);
 }
 
@@ -1157,8 +1220,10 @@ function closeSlashMenu(restoreFocus) {
   slashMenuOpen = false;
   slashBlock    = null;
   slashBareLine = null;
+  const editorEl = slashEditorEl;
+  slashEditorEl  = null;
   elSlashMenu.classList.remove('visible');
-  if (restoreFocus) elEditor.focus();
+  if (restoreFocus && editorEl) editorEl.focus();
 }
 
 function setSlashIndex(i) {
@@ -1176,6 +1241,7 @@ function updateSlashMenuItems() {
 function slashSelect(index) {
   const block    = slashBlock;
   const bareLine = slashBareLine;
+  const editorEl = slashEditorEl;
   closeSlashMenu();
 
   const tag   = index === 0 ? 'h2' : 'p';
@@ -1183,7 +1249,8 @@ function slashSelect(index) {
   newEl.appendChild(document.createElement('br'));
 
   if (bareLine) {
-    elEditor.replaceChild(newEl, bareLine);
+    if (!editorEl || !bareLine.isConnected) return;
+    editorEl.replaceChild(newEl, bareLine);
   } else {
     if (!block || !block.isConnected) return;
     block.parentNode.replaceChild(newEl, block);
@@ -1196,14 +1263,49 @@ function slashSelect(index) {
   sel.removeAllRanges();
   sel.addRange(r);
 
-  onType();
+  onType(editorEl);
 }
 
 // ── Word count + target ────────────────────────────────
-function onType() {
-  scheduleWordCountUpdate();
+function onType(editorEl) {
+  if (!editorEl || editorEl === elEditor) {
+    scheduleWordCountUpdate();
+  } else {
+    updateComparePaneCount();
+  }
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(silentSave, 5000);
+}
+
+// ── Paste ────────────────────────────────────────────
+// Shared by both panes. Reconstructs the paste via native execCommands
+// (insertParagraph / insertLineBreak / insertText) rather than manually
+// splicing <p> nodes with Range.insertNode(). Manual splicing inserts
+// exactly at the cursor's DOM position regardless of content rules, so
+// pasting partway into an existing paragraph could land a block element
+// inside another block — invalid nesting that renders unpredictably,
+// including an extra leading blank line before the pasted text. Native
+// commands split exactly the way pressing Enter does, so paste behaves
+// like typing the same lines by hand. Blank lines (double newline) become
+// new paragraphs; single newlines become soft line breaks within one.
+function handlePaste(e) {
+  e.preventDefault();
+  const editorEl = e.currentTarget;
+  const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+  if (!text) return;
+
+  const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const paragraphs = normalized.split(/\n\n+/);
+  paragraphs.forEach((para, pIdx) => {
+    if (pIdx > 0) insertParagraphBreak(editorEl);
+    const lines = para.split('\n');
+    lines.forEach((line, lIdx) => {
+      if (lIdx > 0) document.execCommand('insertLineBreak');
+      if (line) document.execCommand('insertText', false, line);
+    });
+  });
+
+  onType(editorEl);
 }
 
 // Coalesces bursts of input events (fast typing, paste, IME) into a single
