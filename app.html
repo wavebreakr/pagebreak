@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pagebreak</title>
-<link rel="icon" type="image/x-icon" href="favicon.ico?v=2">
-<link rel="icon" type="image/png" href="favicon.png?v=2">
+<link rel="icon" type="image/x-icon" href="favicon-v2.ico">
+<link rel="icon" type="image/png" href="favicon-v2.png">
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-canvas:      #edeae2;
@@ -29,6 +29,8 @@
     --blur:           blur(18px) saturate(1.6);
     --delete-bg:      rgba(184,74,74,0.15);
     --delete-color:   #b84a4a;
+    --success:        #4a9e6a;
+    --success-light:  #6ec48a;
   }
 
   .dark {
@@ -51,7 +53,7 @@
   html, body { height: 100%; overflow: hidden; }
 
   body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: sans-serif;
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -174,7 +176,7 @@
     transition: width 0.4s cubic-bezier(0.4,0,0.2,1), background 0.3s;
     border-radius: 0 1px 1px 0;
   }
-  .word-target-progress.done { background: linear-gradient(90deg, #4a9e6a, #6ec48a); }
+  .word-target-progress.done { background: linear-gradient(90deg, var(--success), var(--success-light)); }
 
   /* ── Glass icon button — circular, 50px ── */
   .icon-btn {
@@ -246,6 +248,7 @@
 
   /* ── Save status ── */
   .save-status {
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 13px; font-weight: 500; color: var(--accent);
     opacity: 0; transition: opacity 0.4s;
     white-space: nowrap; letter-spacing: -0.01em;
@@ -303,7 +306,7 @@
     background: var(--glass-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
     border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
-    color: var(--ink); font-size: 13px; font-weight: 500;
+    color: var(--ink); font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500;
     padding: 8px 20px; border-radius: 24px;
     opacity: 0; pointer-events: none; z-index: 300;
     transition: opacity 0.3s, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
@@ -314,7 +317,7 @@
   /* ── Toast ── */
   .toast {
     position: fixed; bottom: 24px; right: 24px;
-    font-size: 12px; font-weight: 500; color: var(--ink-mid);
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; color: var(--ink-mid);
     background: var(--glass-bg);
     backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
     border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow);
@@ -364,7 +367,8 @@
   .post-row.active { background: var(--accent-dim); box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset; }
   .post-row-info { flex: 1; min-width: 0; }
   .post-row-title {
-    font-size: 14px; font-weight: 500; color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px; font-weight: 500; color: var(--ink);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     letter-spacing: -0.01em; line-height: 1.3;
   }
@@ -381,14 +385,16 @@
   .post-row:hover .post-row-delete { opacity: 1; }
   .post-row-delete:hover { background: var(--delete-bg); color: var(--delete-color); }
 
-  .post-row-confirm-title { font-size: 12px; font-weight: 500; color: var(--delete-color); line-height: 1.3; }
-  .post-row-confirm-meta  { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
+  .post-row-confirm-title { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; color: var(--delete-color); line-height: 1.3; }
+  .post-row-confirm-meta  { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
   .post-row-confirm-yes {
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
     border: none; cursor: pointer; flex-shrink: 0;
     background: var(--delete-bg); color: var(--delete-color);
   }
   .post-row-confirm-no {
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
     border: none; cursor: pointer; flex-shrink: 0;
     background: var(--ink-faint); color: var(--ink-mid);
@@ -576,46 +582,12 @@
     color: var(--ink); letter-spacing: -0.01em; margin-bottom: 10px;
   }
   .desktop-gate-body {
-    font-size: 14px; color: var(--ink-mid); line-height: 1.6;
+    font-family: 'Lora', serif; font-size: 14px; color: var(--ink-mid); line-height: 1.6;
   }
 
   /* ── Mobile ── */
   @media (max-width: 700px) {
     .desktop-gate { display: flex; }
-
-    .chrome { padding: 0 14px; gap: 8px; }
-    .chrome-left { gap: 8px; flex: 1; min-width: 0; }
-    .chrome-right { gap: 8px; flex-shrink: 0; }
-    .post-title-inline { display: none; }
-    .brand img { height: 34px; }
-    .editor-inner { padding: 0 20px; }
-
-    .posts-panel {
-      top: auto; bottom: 0; left: 0; right: 0;
-      width: 100%; height: 62vh; max-height: 520px;
-      border-right: none; border-top: 1px solid var(--panel-border);
-      border-radius: 20px 20px 0 0;
-      transform: translateY(100%); opacity: 1;
-    }
-    .posts-panel.hidden {
-      transform: translateY(100%); opacity: 1;
-      pointer-events: none; border-top-width: 0;
-    }
-    .posts-panel.mobile-open {
-      transform: translateY(0) !important; opacity: 1 !important;
-      pointer-events: auto !important; border-top-width: 1px !important;
-    }
-    .posts-panel-backdrop { display: block; }
-    .posts-panel-header::before {
-      content: ''; position: absolute; top: 8px; left: 50%;
-      transform: translateX(-50%); width: 36px; height: 4px;
-      background: var(--ink-dim); border-radius: 2px; opacity: 0.35;
-    }
-    .posts-panel-header { position: relative; padding-top: 22px; }
-    .post-row-delete { opacity: 1; }
-
-    .writing-area.compare-mode { flex-direction: column; }
-    .writing-area.compare-mode #compareDivider { width: auto; height: 1px; margin-top: 0; }
   }
 </style>
 </head>
@@ -873,7 +845,8 @@ let elEditor, elEditorWrap, elPostsPanel, elWordCount, elWordCountWrap,
     elPostTitle, elPostsList, elBtnDark, elDarkIcon, elBtnPosts, elSlashMenu,
     elBtnCompare, elWritingArea, elPaneB, elEditorB,
     elPaneALabel, elPaneAFooter, elPostsPanelBackdrop,
-    elBtnMenu, elMenuDropdown, elHelpModal, elHelpBackdrop;
+    elBtnMenu, elMenuDropdown, elHelpModal, elHelpBackdrop, elBtnCloseHelp,
+    elPaneACount, elPaneBCount;
 
 // ── Init ───────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
@@ -907,6 +880,9 @@ window.addEventListener('DOMContentLoaded', () => {
   elMenuDropdown        = document.getElementById('menuDropdown');
   elHelpModal           = document.getElementById('helpModal');
   elHelpBackdrop        = document.getElementById('helpBackdrop');
+  elBtnCloseHelp        = document.getElementById('btnCloseHelp');
+  elPaneACount          = document.getElementById('paneACount');
+  elPaneBCount          = document.getElementById('paneBCount');
 
   document.execCommand('defaultParagraphSeparator', false, 'p');
 
@@ -918,7 +894,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnCopy').addEventListener('click',  () => { copyText();  closeMenu(); });
   document.getElementById('btnDownload').addEventListener('click', () => { downloadText(); closeMenu(); });
   document.getElementById('btnHelp').addEventListener('click',  () => { openHelp();  closeMenu(); });
-  document.getElementById('btnCloseHelp').addEventListener('click', closeHelp);
+  elBtnCloseHelp.addEventListener('click', closeHelp);
   elHelpBackdrop.addEventListener('click', closeHelp);
   document.getElementById('btnNewPost').addEventListener('click', newPost);
   elTargetToggleBtn.addEventListener('click', onTargetToggle);
@@ -1370,7 +1346,9 @@ function commitTarget() {
   const val = parseInt(elTargetInput.value, 10);
   wordTarget = val > 0 ? val : 0;
   targetCelebrated = false;
-  wordTarget ? localStorage.setItem('pb_target', wordTarget) : localStorage.removeItem('pb_target');
+  try {
+    wordTarget ? localStorage.setItem('pb_target', wordTarget) : localStorage.removeItem('pb_target');
+  } catch { /* target still applies this session even if it can't persist */ }
   closeTargetInput();
   updateWordCount();
   updateTargetToggleBtn();
@@ -1379,7 +1357,7 @@ function commitTarget() {
 function clearTarget() {
   wordTarget = 0;
   targetCelebrated = false;
-  localStorage.removeItem('pb_target');
+  try { localStorage.removeItem('pb_target'); } catch { /* non-fatal */ }
   closeTargetInput();
   updateWordCount();
   updateTargetToggleBtn();
@@ -1440,7 +1418,7 @@ function openHelp() {
   _helpTriggerEl = document.activeElement;
   elHelpBackdrop.classList.add('show');
   elHelpModal.classList.add('show');
-  document.getElementById('btnCloseHelp').focus();
+  elBtnCloseHelp.focus();
 }
 
 function closeHelp() {
@@ -1551,7 +1529,7 @@ function setEditorContent(body, title) {
 
 function openPost(id) {
   silentSave();
-  setActiveId(id);
+  try { setActiveId(id); } catch { /* post still opens; just won't be remembered as active on reload */ }
   const post = getPost(id);
   if (post) setEditorContent(post.body, post.title);
   renderPostsList();
@@ -1567,10 +1545,10 @@ function newPost() {
   try {
     saveAllPostIds([...getAllPostIds(), id]);
     savePost(id, { title: '', body: '', saved: Date.now(), words: 0 });
+    setActiveId(id);
   } catch {
     showSaveStatus('⚠ Save failed', true); return;
   }
-  setActiveId(id);
   setEditorContent('', '');
   renderPostsList();
   if (window.innerWidth <= 700 && elPostsPanel.classList.contains('mobile-open')) {
@@ -1602,7 +1580,13 @@ function confirmDeletePost(id) {
 function doDeletePost(id) {
   silentSave();
   const activeId = getActiveId();
-  deletePost(id);
+  try {
+    deletePost(id);
+  } catch {
+    showSaveStatus('⚠ Delete failed', true);
+    renderPostsList();
+    return;
+  }
   if (id === activeId) {
     const ids = getAllPostIds();
     ids.length ? openPost(ids[ids.length - 1]) : newPost();
@@ -1621,7 +1605,7 @@ function setDark(on) {
 function toggleDark() {
   const on = !document.body.classList.contains('dark');
   setDark(on);
-  localStorage.setItem('pb_dark', on);
+  try { localStorage.setItem('pb_dark', on); } catch { /* non-fatal — preference just won't persist */ }
 }
 
 // ── Save / Load ────────────────────────────────────────
@@ -1771,11 +1755,11 @@ function fmtCount(n) { return n + ' word' + (n !== 1 ? 's' : ''); }
 
 function updatePaneACount() {
   if (!compareMode) return;
-  document.getElementById('paneACount').textContent = fmtCount(countWords(elEditor));
+  elPaneACount.textContent = fmtCount(countWords(elEditor));
 }
 
 function updateComparePaneCount() {
-  document.getElementById('paneBCount').textContent = fmtCount(countWords(elEditorB));
+  elPaneBCount.textContent = fmtCount(countWords(elEditorB));
 }
 </script>
 </body>
