@@ -149,16 +149,6 @@
     padding: 120px 24px 80px;
   }
 
-  .hero-eyebrow {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px; font-weight: 500;
-    letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 24px;
-    opacity: 0;
-    animation: fadeUp 0.8s 0.1s forwards cubic-bezier(0.4,0,0.2,1);
-  }
-
   .hero-headline {
     font-family: 'Lora', serif;
     font-size: clamp(42px, 7vw, 82px);
@@ -169,7 +159,7 @@
     max-width: 760px;
     margin-bottom: 24px;
     opacity: 0;
-    animation: fadeUp 0.9s 0.2s forwards cubic-bezier(0.4,0,0.2,1);
+    animation: fadeUp 0.9s 0.1s forwards cubic-bezier(0.4,0,0.2,1);
   }
 
   .hero-headline em {
@@ -183,14 +173,14 @@
     max-width: 480px; line-height: 1.6;
     margin-bottom: 44px;
     opacity: 0;
-    animation: fadeUp 0.9s 0.32s forwards cubic-bezier(0.4,0,0.2,1);
+    animation: fadeUp 0.9s 0.22s forwards cubic-bezier(0.4,0,0.2,1);
   }
 
   .hero-actions {
     display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: center;
     margin-bottom: 14px;
     opacity: 0;
-    animation: fadeUp 0.9s 0.44s forwards cubic-bezier(0.4,0,0.2,1);
+    animation: fadeUp 0.9s 0.34s forwards cubic-bezier(0.4,0,0.2,1);
   }
 
   .btn-hero {
@@ -218,7 +208,7 @@
     letter-spacing: 0.01em;
     margin-bottom: 50px;
     opacity: 0;
-    animation: fadeUp 0.9s 0.5s forwards cubic-bezier(0.4,0,0.2,1);
+    animation: fadeUp 0.9s 0.4s forwards cubic-bezier(0.4,0,0.2,1);
   }
 
   /* ── EDITOR PREVIEW ── */
@@ -447,7 +437,7 @@
     border-top: 1px solid rgba(0,0,0,0.06);
   }
 
-  .footer-logo img { height: 22px; width: auto; opacity: 0.45; }
+  .footer-logo img { height: 32px; width: auto; opacity: 0.45; }
   .footer-copy {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px; color: var(--ink-dim);
@@ -496,7 +486,6 @@
 
 <!-- HERO -->
 <section class="hero" aria-label="Hero">
-  <p class="hero-eyebrow">Writing, simplified</p>
   <h1 class="hero-headline">The editor that gets <em>out of your way.</em></h1>
   <p class="hero-sub">Pagebreak is the distraction-free writing tool for marketers, bloggers, and creators.</p>
   <div class="hero-actions">
@@ -623,7 +612,7 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-logo">
-    <img src="Pagebreak_Logo.png" alt="Pagebreak" width="89" height="22" loading="lazy">
+    <img src="Pagebreak_Logo.png" alt="Pagebreak" width="129" height="32" loading="lazy">
   </div>
   <p class="footer-copy">© 2026 Pagebreak.</p>
 </footer>
