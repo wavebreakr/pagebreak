@@ -20,6 +20,7 @@
     --accent:         #0066ff;
     --accent-light:   #3385ff;
     --accent-dim:     rgba(0,102,255,0.12);
+    --link-color:     #1667d9;
     --panel-bg:       rgba(250,248,244,0.82);
     --panel-border:   rgba(0,0,0,0.08);
     --glass-bg:       rgba(255,255,255,0.65);
@@ -265,6 +266,8 @@
     flex: 1; overflow-y: auto; padding: 116px 0 120px;
     background: var(--editor-bg); transition: background 0.4s;
     scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.12) transparent;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 100px);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 100px);
   }
   .editor-wrap::-webkit-scrollbar { width: 3px; }
   .editor-wrap::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
@@ -298,6 +301,7 @@
   .editor h1 { font-size: 2em; }
   .editor h2 { font-size: 1.5em; }
   .editor h3 { font-size: 1.2em; }
+  .editor .link-line { color: var(--link-color); font-weight: 700; text-decoration: underline; }
 
   /* ── Celebration pill ── */
   .celebration {
@@ -369,8 +373,9 @@
   .post-row-title {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 13px; font-weight: 500; color: var(--ink);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     letter-spacing: -0.01em; line-height: 1.3;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; word-break: break-word;
   }
   .post-row.active .post-row-title { color: var(--accent); }
   .post-row-meta { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-dim); margin-top: 2px; }
@@ -433,6 +438,7 @@
   }
   .slash-menu-item-icon.icon-h { font-size: 14px; }
   .slash-menu-item-icon.icon-p { font-size: 10px; }
+  .slash-menu-item-icon.icon-link { font-size: 14px; color: var(--link-color); font-weight: 700; text-decoration: underline; }
   .slash-menu-item-label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
   .slash-menu-item-desc  { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--ink-dim); margin-top: 1px; }
 
@@ -647,6 +653,18 @@
         </svg>
       </button>
       <div class="menu-dropdown" id="menuDropdown" role="menu">
+        <button class="menu-item" id="btnCompare" role="menuitem">
+          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="8" y1="2" x2="8" y2="14"/>
+            <rect x="1" y="4" width="5" height="8" rx="1"/>
+            <rect x="10" y="4" width="5" height="8" rx="1"/>
+          </svg>
+          Compare mode
+        </button>
+        <button class="menu-item" id="btnDark" role="menuitem">
+          <span id="darkIcon" aria-hidden="true">🌙</span>
+          Dark mode
+        </button>
         <button class="menu-item" id="btnCopy" role="menuitem">
           <svg viewBox="0 0 16 16" fill="none" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="5" y="4" width="9" height="11" rx="1.5"/>
@@ -661,18 +679,6 @@
             <path d="M3 13.5h10"/>
           </svg>
           Download .txt
-        </button>
-        <button class="menu-item" id="btnCompare" role="menuitem">
-          <svg viewBox="0 0 16 16" fill="none" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="8" y1="2" x2="8" y2="14"/>
-            <rect x="1" y="4" width="5" height="8" rx="1"/>
-            <rect x="10" y="4" width="5" height="8" rx="1"/>
-          </svg>
-          Compare mode
-        </button>
-        <button class="menu-item" id="btnDark" role="menuitem">
-          <span id="darkIcon" aria-hidden="true">🌙</span>
-          Dark mode
         </button>
         <div class="menu-divider"></div>
         <button class="menu-item" id="btnHelp" role="menuitem">
@@ -718,8 +724,12 @@
       <span class="help-keys"><kbd>⇧</kbd><kbd>Tab</kbd></span>
     </div>
     <div class="help-row">
-      <span class="help-row-label">Insert block (heading / paragraph)</span>
+      <span class="help-row-label">Insert block (heading / paragraph / link)</span>
       <span class="help-keys"><kbd>/</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Change block type</span>
+      <span class="help-keys"><kbd>⌘</kbd><kbd>/</kbd></span>
     </div>
   </div>
   <div class="help-section">
@@ -727,6 +737,10 @@
     <div class="help-row">
       <span class="help-row-label">Save</span>
       <span class="help-keys"><kbd>⌘</kbd><kbd>S</kbd></span>
+    </div>
+    <div class="help-row">
+      <span class="help-row-label">Toggle compare mode</span>
+      <span class="help-keys"><kbd>⌘</kbd><kbd>\</kbd></span>
     </div>
     <div class="help-row">
       <span class="help-row-label">Select all</span>
@@ -805,6 +819,13 @@
       <div class="slash-menu-item-desc">Plain body text</div>
     </div>
   </div>
+  <div class="slash-menu-item" data-index="2" role="option">
+    <div class="slash-menu-item-icon icon-link">A</div>
+    <div>
+      <div class="slash-menu-item-label">Link</div>
+      <div class="slash-menu-item-desc">Styled like a link</div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -828,6 +849,8 @@ let slashMenuIndex = 0;
 let slashBlock     = null;
 let slashBareLine  = null;
 let slashEditorEl  = null;
+let slashMode      = 'insert'; // 'insert' (typed "/") or 'convert' (⌘/ on an existing line)
+let slashItemCount = 2;        // set from the actual DOM count once elSlashMenu exists
 
 // Block tag sets used in DOM-walking hot paths
 const BLOCK_TAGS   = new Set(['P', 'DIV', 'LI', 'BR', 'H1', 'H2', 'H3', 'UL', 'OL']);
@@ -837,6 +860,12 @@ const HEADING_RE   = /^(H1|H2|H3)$/;
 // otherwise the walk skips past an H1/H2/H3 wrapper and wrongly concludes
 // it reached a "bare line" (see maybeOpenSlashMenu).
 const SLASH_STOP_RE = /^(P|DIV|LI|H1|H2|H3)$/;
+// Slash-menu block types, indexed to match the menu's DOM order.
+const SLASH_TYPES = [
+  { tag: 'h2', cls: null },
+  { tag: 'p',  cls: null },
+  { tag: 'p',  cls: 'link-line' },
+];
 
 // Cached element references
 let elEditor, elEditorWrap, elPostsPanel, elWordCount, elWordCountWrap,
@@ -883,6 +912,8 @@ window.addEventListener('DOMContentLoaded', () => {
   elBtnCloseHelp        = document.getElementById('btnCloseHelp');
   elPaneACount          = document.getElementById('paneACount');
   elPaneBCount          = document.getElementById('paneBCount');
+
+  slashItemCount = elSlashMenu.querySelectorAll('.slash-menu-item').length;
 
   document.execCommand('defaultParagraphSeparator', false, 'p');
 
@@ -936,7 +967,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (slashMenuOpen && !elSlashMenu.contains(e.target)) closeSlashMenu();
     if (elMenuDropdown.classList.contains('show') &&
         !elMenuDropdown.contains(e.target) &&
-        e.target !== elBtnMenu) {
+        !elBtnMenu.contains(e.target)) {
       closeMenu();
     }
     if (elTargetPopover.classList.contains('show') &&
@@ -946,9 +977,10 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Cmd/Ctrl+S, Escape (help modal)
+  // Cmd/Ctrl+S, Cmd/Ctrl+\ (compare mode), Escape (help modal)
   document.addEventListener('keydown', e => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); silentSave(); return; }
+    if ((e.metaKey || e.ctrlKey) && e.key === 's')  { e.preventDefault(); silentSave();    return; }
+    if ((e.metaKey || e.ctrlKey) && e.key === '\\') { e.preventDefault(); toggleCompare(); return; }
     if (e.key === 'Escape' && elHelpModal.classList.contains('show')) {
       e.preventDefault();
       closeHelp();
@@ -983,24 +1015,32 @@ function scrollToCursor() {
 }
 
 // ── Block-editing helpers ───────────────────────────────
-// Walks up from `node` until it hits `editorEl` (exclusive) or a node whose
-// tagName matches `matchRE`. Returns the matching ancestor, or null if the
-// walk reached editorEl without a match.
-function findAncestor(node, editorEl, matchRE) {
+// Walks up from `node` until it hits `editorEl` (exclusive) or a node that
+// matches `matcher` — either a RegExp tested against tagName, or a
+// predicate function for checks a tag name alone can't express (e.g. a
+// class). Returns the matching ancestor, or null if the walk reached
+// editorEl without a match.
+function findAncestor(node, editorEl, matcher) {
+  const test = typeof matcher === 'function' ? matcher : el => matcher.test(el.nodeName);
   let el = node;
   while (el && el !== editorEl) {
-    if (matchRE.test(el.nodeName)) return el;
+    if (el.nodeType === 1 && test(el)) return el;
     el = el.parentNode;
   }
   return null;
 }
 
-// Splits `block` (a heading) at the given range, moving everything after
-// the cursor into a new plain paragraph inserted right after the heading,
-// and places the cursor at the start of that paragraph. Used whenever a
-// paragraph break happens inside a heading — headings are single-line by
+// Headings and Link-styled lines are both meant to stay short/single-line.
+function isBreakoutBlock(el) {
+  return HEADING_RE.test(el.nodeName) || (el.nodeName === 'P' && el.classList.contains('link-line'));
+}
+
+// Splits `block` at the given range, moving everything after the cursor
+// into a new plain paragraph inserted right after it, and places the
+// cursor at the start of that paragraph. Used whenever a paragraph break
+// happens inside a heading or a Link line — both are single-line by
 // design, so both Enter and paste route through this.
-function breakOutOfHeading(range, block) {
+function breakOutOfBlock(range, block) {
   if (!range.collapsed) range.deleteContents();
   const afterRange = document.createRange();
   afterRange.selectNodeContents(block);
@@ -1025,14 +1065,14 @@ function breakOutOfHeading(range, block) {
 }
 
 // Inserts a paragraph break at the current selection, breaking out of a
-// heading first if the cursor is inside one. Falls back to the native
-// command otherwise, matching normal Enter behavior exactly.
+// heading or Link line first if the cursor is inside one. Falls back to
+// the native command otherwise, matching normal Enter behavior exactly.
 function insertParagraphBreak(editorEl) {
   const sel = window.getSelection();
   if (sel && sel.rangeCount) {
     const range   = sel.getRangeAt(0);
-    const heading = findAncestor(range.startContainer, editorEl, HEADING_RE);
-    if (heading) { breakOutOfHeading(range, heading); return; }
+    const special = findAncestor(range.startContainer, editorEl, isBreakoutBlock);
+    if (special) { breakOutOfBlock(range, special); return; }
   }
   document.execCommand('insertParagraph');
 }
@@ -1048,9 +1088,15 @@ function onEditorKeydown(e) {
 
   const mod = e.metaKey || e.ctrlKey;
 
+  // Change the current line's block type (any content, not just an empty
+  // "/" line) — opens the same slash menu pre-highlighted to its current
+  // type. Checked before the slashMenuOpen block below so it works as a
+  // clean toggle rather than closing and immediately reopening.
+  if (mod && e.key === '/') { e.preventDefault(); toggleConvertMenu(editorEl); return; }
+
   if (slashMenuOpen) {
-    if (e.key === 'ArrowDown') { e.preventDefault(); setSlashIndex((slashMenuIndex + 1) % 2); return; }
-    if (e.key === 'ArrowUp')   { e.preventDefault(); setSlashIndex((slashMenuIndex - 1 + 2) % 2); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); setSlashIndex((slashMenuIndex + 1) % slashItemCount); return; }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); setSlashIndex((slashMenuIndex - 1 + slashItemCount) % slashItemCount); return; }
     if (e.key === 'Enter')     { e.preventDefault(); slashSelect(slashMenuIndex); return; }
     if (e.key === 'Escape')    { e.preventDefault(); closeSlashMenu(true); return; }
     if (e.key !== 'Shift' && e.key !== 'Meta' && e.key !== 'Control' && e.key !== 'Alt') {
@@ -1061,16 +1107,29 @@ function onEditorKeydown(e) {
   if (mod && e.key === 'b') { e.preventDefault(); document.execCommand('bold');   return; }
   if (mod && e.key === 'i') { e.preventDefault(); document.execCommand('italic'); return; }
 
-  // Enter inside a heading: break out into a plain paragraph instead of
-  // continuing as another heading (see breakOutOfHeading above).
+  // Straight " / ' -> typographic quotes, based on the character just
+  // before the cursor (see isOpenQuoteContext below).
+  if (!mod && !e.altKey && (e.key === '"' || e.key === "'")) {
+    e.preventDefault();
+    const before = charBeforeCursor();
+    const open   = isOpenQuoteContext(before);
+    const smart  = e.key === '"' ? (open ? '\u201C' : '\u201D') : (open ? '\u2018' : '\u2019');
+    document.execCommand('insertText', false, smart);
+    onType(editorEl);
+    return;
+  }
+
+  // Enter inside a heading or a Link line: break out into a plain
+  // paragraph instead of continuing as the same special type (see
+  // breakOutOfBlock above).
   if (e.key === 'Enter' && !e.shiftKey) {
     const sel = window.getSelection();
     if (sel && sel.rangeCount) {
       const range   = sel.getRangeAt(0);
-      const heading = findAncestor(range.startContainer, editorEl, HEADING_RE);
-      if (heading) {
+      const special = findAncestor(range.startContainer, editorEl, isBreakoutBlock);
+      if (special) {
         e.preventDefault();
-        breakOutOfHeading(range, heading);
+        breakOutOfBlock(range, special);
         onType(editorEl);
         return;
       }
@@ -1179,11 +1238,12 @@ function maybeOpenSlashMenu(editorEl) {
   slashBlock    = block;
   slashBareLine = isBareLine ? node : null;
   slashEditorEl = editorEl;
+  slashMode     = 'insert';
   openSlashMenu(range);
 }
 
-function openSlashMenu(range) {
-  slashMenuIndex = 0;
+function openSlashMenu(range, startIndex) {
+  slashMenuIndex = startIndex || 0;
   updateSlashMenuItems();
   const rect = range.getBoundingClientRect();
   elSlashMenu.style.left = Math.min(rect.left, window.innerWidth - 200) + 'px';
@@ -1192,10 +1252,37 @@ function openSlashMenu(range) {
   slashMenuOpen = true;
 }
 
+// Opens the slash menu in "convert" mode for whichever block the cursor is
+// currently in (any content, not just an empty "/" line), pre-highlighted
+// to its current type. Called from ⌘/ in onEditorKeydown, which already
+// toggles closed if the menu is open, so this only ever runs to open fresh.
+function toggleConvertMenu(editorEl) {
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  let block = range.startContainer;
+  while (block && block !== editorEl && !SLASH_STOP_RE.test(block.nodeName)) {
+    block = block.parentNode;
+  }
+  if (!block || block === editorEl || block.nodeName === 'LI') return;
+  slashMode     = 'convert';
+  slashBlock    = block;
+  slashBareLine = null;
+  slashEditorEl = editorEl;
+  openSlashMenu(range, typeIndexForBlock(block));
+}
+
+function typeIndexForBlock(block) {
+  if (block.nodeName === 'P' && block.classList.contains('link-line')) return 2;
+  if (HEADING_RE.test(block.nodeName)) return 0;
+  return 1;
+}
+
 function closeSlashMenu(restoreFocus) {
   slashMenuOpen = false;
   slashBlock    = null;
   slashBareLine = null;
+  slashMode     = 'insert';
   const editorEl = slashEditorEl;
   slashEditorEl  = null;
   elSlashMenu.classList.remove('visible');
@@ -1213,15 +1300,42 @@ function updateSlashMenuItems() {
   });
 }
 
-// 0 = Header (h2), 1 = Paragraph (p)
+function buildSlashElement(index) {
+  const t  = SLASH_TYPES[index] || SLASH_TYPES[1];
+  const el = document.createElement(t.tag);
+  if (t.cls) el.classList.add(t.cls);
+  return el;
+}
+
+// 0 = Header (h2), 1 = Paragraph (p), 2 = Link (p.link-line)
 function slashSelect(index) {
   const block    = slashBlock;
   const bareLine = slashBareLine;
   const editorEl = slashEditorEl;
+  const mode     = slashMode;
   closeSlashMenu();
 
-  const tag   = index === 0 ? 'h2' : 'p';
-  const newEl = document.createElement(tag);
+  if (mode === 'convert') {
+    // Converting an existing line: keep its content, just swap the wrapper.
+    if (!block || !block.isConnected) return;
+    const newEl = buildSlashElement(index);
+    while (block.firstChild) newEl.appendChild(block.firstChild);
+    if (!newEl.hasChildNodes()) newEl.appendChild(document.createElement('br'));
+    block.parentNode.replaceChild(newEl, block);
+
+    const sel = window.getSelection();
+    const r   = document.createRange();
+    r.selectNodeContents(newEl);
+    r.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(r);
+
+    onType(editorEl);
+    if (editorEl) editorEl.focus();
+    return;
+  }
+
+  const newEl = buildSlashElement(index);
   newEl.appendChild(document.createElement('br'));
 
   if (bareLine) {
@@ -1253,6 +1367,45 @@ function onType(editorEl) {
   _saveTimer = setTimeout(silentSave, 5000);
 }
 
+// ── Smart quotes ───────────────────────────────────────
+// Straight " and ' become typographic quotes based on the character right
+// before the cursor — whitespace/start-of-line/opening punctuation means
+// an opening quote, anything else means closing. Applied to single
+// keystrokes (onEditorKeydown) and to pasted text (handlePaste) alike.
+function charBeforeCursor() {
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return '';
+  const range = sel.getRangeAt(0);
+  if (!range.collapsed) return '';
+  const node   = range.startContainer;
+  const offset = range.startOffset;
+  if (node.nodeType === Node.TEXT_NODE) {
+    return offset > 0 ? node.textContent[offset - 1] : '';
+  }
+  return '';
+}
+
+function isOpenQuoteContext(prevChar) {
+  return prevChar === '' || /[\s([{\u2014\u2013\u2018\u201C]/.test(prevChar);
+}
+
+function smartenText(text, precedingChar) {
+  let prev = precedingChar || '';
+  let out  = '';
+  for (const ch of text) {
+    if (ch === '"' || ch === "'") {
+      const open  = isOpenQuoteContext(prev);
+      const smart = ch === '"' ? (open ? '\u201C' : '\u201D') : (open ? '\u2018' : '\u2019');
+      out += smart;
+      prev = smart;
+    } else {
+      out += ch;
+      prev = ch;
+    }
+  }
+  return out;
+}
+
 // ── Paste ────────────────────────────────────────────
 // Shared by both panes. Reconstructs the paste via native execCommands
 // (insertParagraph / insertLineBreak / insertText) rather than manually
@@ -1270,7 +1423,7 @@ function handlePaste(e) {
   const text = (e.clipboardData || window.clipboardData).getData('text/plain');
   if (!text) return;
 
-  const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const normalized = smartenText(text.replace(/\r\n/g, '\n').replace(/\r/g, '\n'), charBeforeCursor());
   const paragraphs = normalized.split(/\n\n+/);
   paragraphs.forEach((para, pIdx) => {
     if (pIdx > 0) insertParagraphBreak(editorEl);
@@ -1498,7 +1651,7 @@ function renderPostsList() {
     return `
       <div class="post-row${id === activeId ? ' active' : ''}" data-post-id="${id}" role="listitem">
         <div class="post-row-info">
-          <div class="post-row-title">${escHtml(title)}</div>
+          <div class="post-row-title" title="${escHtml(title)}">${escHtml(title)}</div>
           <div class="post-row-meta">${words} word${words !== 1 ? 's' : ''} · ${date}</div>
         </div>
         <button class="post-row-delete" aria-label="Delete ${escHtml(title)}">×</button>
@@ -1529,6 +1682,7 @@ function setEditorContent(body, title) {
 
 function openPost(id) {
   silentSave();
+  resetComparePane();
   try { setActiveId(id); } catch { /* post still opens; just won't be remembered as active on reload */ }
   const post = getPost(id);
   if (post) setEditorContent(post.body, post.title);
@@ -1541,6 +1695,8 @@ function openPost(id) {
 
 function newPost() {
   silentSave();
+  if (compareMode) toggleCompare();
+  resetComparePane();
   const id = genId();
   try {
     saveAllPostIds([...getAllPostIds(), id]);
@@ -1731,6 +1887,15 @@ function downloadText() {
 }
 
 // ── Compare mode ───────────────────────────────────────
+// Pane B is scratch space, scoped to whichever document it was typed in —
+// it's never persisted to localStorage, so switching posts (new or open)
+// just needs to clear whatever text is still sitting in the DOM from
+// before, rather than letting it silently carry over to the next post.
+function resetComparePane() {
+  elEditorB.innerHTML = '';
+  updateComparePaneCount();
+}
+
 function toggleCompare() {
   compareMode = !compareMode;
   elWritingArea.classList.toggle('compare-mode', compareMode);
