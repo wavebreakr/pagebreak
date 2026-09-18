@@ -287,6 +287,10 @@
     color: var(--ink-dim); font-style: italic; pointer-events: none;
   }
   .editor p, .editor div { margin-top: 1.15em; }
+  .editor hr {
+    border: none; border-top: 1px solid var(--ink-faint);
+    margin: 1.8em 0; width: 100%;
+  }
   .editor ul { padding-left: 1.4em; margin-top: 1.15em; list-style: disc; }
   .editor ul li { margin-bottom: 0.2em; line-height: 1.9; }
   .editor ul ul { margin-top: 0; list-style: circle; }
@@ -853,7 +857,7 @@ let slashMode      = 'insert'; // 'insert' (typed "/") or 'convert' (⌘/ on an 
 let slashItemCount = 2;        // set from the actual DOM count once elSlashMenu exists
 
 // Block tag sets used in DOM-walking hot paths
-const BLOCK_TAGS   = new Set(['P', 'DIV', 'LI', 'BR', 'H1', 'H2', 'H3', 'UL', 'OL']);
+const BLOCK_TAGS   = new Set(['P', 'DIV', 'LI', 'BR', 'H1', 'H2', 'H3', 'UL', 'OL', 'HR']);
 const PARA_RE      = /^(P|DIV|LI)$/;
 const HEADING_RE   = /^(H1|H2|H3)$/;
 // Stop points for the slash-menu's ancestor walk. Must include headings —
@@ -1064,6 +1068,24 @@ function breakOutOfBlock(range, block) {
   sel.addRange(r);
 }
 
+// Replaces `block` — which contains only "--" at this point, since the
+// third dash that triggered this was never inserted — with a horizontal
+// rule, followed by a fresh empty paragraph with the cursor inside it.
+function insertDivider(block) {
+  const hr = document.createElement('hr');
+  const p  = document.createElement('p');
+  p.appendChild(document.createElement('br'));
+  block.parentNode.replaceChild(hr, block);
+  hr.parentNode.insertBefore(p, hr.nextSibling);
+
+  const sel = window.getSelection();
+  const r = document.createRange();
+  r.setStart(p, 0);
+  r.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(r);
+}
+
 // Inserts a paragraph break at the current selection, breaking out of a
 // heading or Link line first if the cursor is inside one. Falls back to
 // the native command otherwise, matching normal Enter behavior exactly.
@@ -1151,6 +1173,30 @@ function onEditorKeydown(e) {
     }
     document.execCommand('insertText', false, '    ');
     return;
+  }
+
+  // "---" at the start of an otherwise-empty line -> horizontal rule,
+  // cursor moves into a fresh paragraph below it.
+  if (e.key === '-') {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount && sel.getRangeAt(0).collapsed) {
+      const range = sel.getRangeAt(0);
+      let block = range.startContainer;
+      while (block && block !== editorEl && !PARA_RE.test(block.nodeName)) {
+        block = block.parentNode;
+      }
+      if (block && block !== editorEl) {
+        const pre = document.createRange();
+        pre.setStart(block, 0);
+        pre.setEnd(range.startContainer, range.startOffset);
+        if (pre.toString() === '--') {
+          e.preventDefault();
+          insertDivider(block);
+          onType(editorEl);
+          return;
+        }
+      }
+    }
   }
 
   // "- " → bullet list
@@ -1260,16 +1306,34 @@ function toggleConvertMenu(editorEl) {
   const sel = window.getSelection();
   if (!sel || !sel.rangeCount) return;
   const range = sel.getRangeAt(0);
-  let block = range.startContainer;
-  while (block && block !== editorEl && !SLASH_STOP_RE.test(block.nodeName)) {
-    block = block.parentNode;
+  let node = range.startContainer;
+  while (node && node !== editorEl && !SLASH_STOP_RE.test(node.nodeName)) {
+    node = node.parentNode;
   }
-  if (!block || block === editorEl || block.nodeName === 'LI') return;
+  if (!node || node.nodeName === 'LI') return;
+
+  if (node === editorEl) {
+    // Cursor is in text typed directly into the editor with no block
+    // wrapper — a normal contenteditable quirk, most commonly the very
+    // first thing typed into a fresh document. Same case maybeOpenSlashMenu
+    // already handles for insert mode; convert needs the same fallback so
+    // ⌘/ doesn't silently do nothing here.
+    let bareNode = range.startContainer;
+    while (bareNode && bareNode.parentNode !== editorEl) bareNode = bareNode.parentNode;
+    if (!bareNode) return;
+    slashMode     = 'convert';
+    slashBlock    = null;
+    slashBareLine = bareNode;
+    slashEditorEl = editorEl;
+    openSlashMenu(range, 1); // unwrapped text is always plain
+    return;
+  }
+
   slashMode     = 'convert';
-  slashBlock    = block;
+  slashBlock    = node;
   slashBareLine = null;
   slashEditorEl = editorEl;
-  openSlashMenu(range, typeIndexForBlock(block));
+  openSlashMenu(range, typeIndexForBlock(node));
 }
 
 function typeIndexForBlock(block) {
@@ -1316,12 +1380,20 @@ function slashSelect(index) {
   closeSlashMenu();
 
   if (mode === 'convert') {
-    // Converting an existing line: keep its content, just swap the wrapper.
-    if (!block || !block.isConnected) return;
+    // Converting an existing line: keep its content, just swap the
+    // wrapper. Target is either an element block, or — for text typed
+    // directly into the editor with no wrapper yet — a bare text node,
+    // which has no firstChild to move, just textContent to carry over.
+    const target = block || bareLine;
+    if (!target || !target.isConnected) return;
     const newEl = buildSlashElement(index);
-    while (block.firstChild) newEl.appendChild(block.firstChild);
+    if (target.nodeType === Node.TEXT_NODE) {
+      if (target.textContent) newEl.appendChild(document.createTextNode(target.textContent));
+    } else {
+      while (target.firstChild) newEl.appendChild(target.firstChild);
+    }
     if (!newEl.hasChildNodes()) newEl.appendChild(document.createElement('br'));
-    block.parentNode.replaceChild(newEl, block);
+    target.parentNode.replaceChild(newEl, target);
 
     const sel = window.getSelection();
     const r   = document.createRange();
